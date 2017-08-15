@@ -68,7 +68,7 @@ categories: Userscript
 
 ### 使用Chrome开发者模式安装扩展
 
-Chrome浏览器中访问链接[chrome://extensions/](chrome://extensions/)打开扩展程序页面
+Chrome浏览器的地址栏输入`chrome://extensions/`并按回车，打开扩展程序页面
 
 勾选右上角的`开发者模式`进入开发者模式
 

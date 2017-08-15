@@ -50,7 +50,7 @@ menu:
   #categories: /categories/
   #about: /about/
   archives: /archives/
-  tags: /tags/
+  # tags: /tags/
   #sitemap: /sitemap.xml
   #commonweal: /404/
 
@@ -90,8 +90,13 @@ scheme: Gemini
 # Social Links
 # Key is the link label showing to end users.
 # Value is the target link (E.g. GitHub: https://github.com/iissnan)
-#social:
-  #LinkLabel: Link
+social:
+  GitHub: https://github.com/lrh3321
+  Coding: https://coding.net/u/lrh3321
+  Weibo: http://weibo.com/lrh3321
+  E-Mail: mailto:lrh3321@gmail.com
+  # StackOverflow: https://coding.net/u/lrh3321
+  # Steam: http://steamcommunity.com/id/lrh3321
 
 # Social Links Icons
 # Icon Mapping:
@@ -115,6 +120,7 @@ social_icons:
   Instagram: instagram
   StackOverflow: stack-overflow
   Weibo: weibo
+  Coding: github-alt
 
 # Blog rolls
 #links_title: Links
@@ -222,8 +228,8 @@ post_wordcount:
 # Declare license on posts
 post_copyright:
   enable: false
-  license: CC BY-NC-SA 3.0
-  license_url: https://creativecommons.org/licenses/by-nc-sa/3.0/
+  license: CC BY-NC-SA 4.0
+  license_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 
 # ---------------------------------------------------------------
@@ -249,7 +255,7 @@ custom_logo:
 # Available value:
 #    normal | night | night eighties | night blue | night bright
 # https://github.com/chriskempson/tomorrow-theme
-highlight_theme: normal
+highlight_theme: night eighties
 
 
 # ---------------------------------------------------------------
@@ -566,7 +572,7 @@ pace: false
 pace_theme: pace-theme-minimal
 
 # Canvas-nest
-canvas_nest: false
+canvas_nest: true
 
 # three_waves
 three_waves: false

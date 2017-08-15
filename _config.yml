@@ -4,8 +4,8 @@
 
 # Site
 title: LRH3321's Blog
-subtitle:
-description:
+subtitle: Bug制造者
+description: 常年挖坑不填
 author: LRH3321
 language: zh-CN
 timezone: Asia/Shanghai
@@ -40,8 +40,8 @@ future: true
 highlight:
   enable: true
   line_number: true
-  auto_detect: false
-  tab_replace:
+  auto_detect: true
+  tab_replace: false
 
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
