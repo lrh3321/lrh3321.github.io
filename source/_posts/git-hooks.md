@@ -2,7 +2,7 @@
 title: 利用 GitHook 构建持续交付和部署
 categories: Git
 date: 2017-10-22 21:16:08
-`update`d: 2017-10-22 21:16:08
+updated: 2017-10-22 21:16:08
 tags: git
 ---
 # 利用 GitHook 构建持续交付和部署
