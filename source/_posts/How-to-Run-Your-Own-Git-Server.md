@@ -3,7 +3,7 @@ title: 如何自己搭建git服务器
 categories: Git
 date: 2017-9-21 20:12:08
 updated: 2017-9-21 20:12:08
-tags:
+tags: git
 ---
 # 如何自己搭建git服务器
 
