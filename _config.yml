@@ -21,11 +21,13 @@ permalink_defaults:
 source_dir: source
 public_dir: public
 tag_dir: tags
-archive_dir: archives
+archive_dir: archives/
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
+
 skip_render:
+- 'robots.txt'
 
 # Writing
 new_post_name: :title.md # File name of new posts
@@ -47,10 +49,23 @@ highlight:
 # path: Root path for your blogs index page. (default = '')
 # per_page: Posts displayed per page. (0 = disable pagination)
 # order_by: Posts order. (Order by date descending by default)
+
 index_generator:
-  path: ''
-  per_page: 10
+  per_page: 4
   order_by: -date
+
+archive_generator:
+  per_page: 8
+  yearly: true
+  monthly: true
+  daily: false
+
+category_generator:
+  per_page: 5
+
+tag_generator:
+  per_page: 5
+  enable_index_page: false
 
 # Category & Tag
 default_category: uncategorized
@@ -80,3 +95,66 @@ deploy:
   type: heroku
   repo: git@github.com:lrh3321/lrh3321.github.io.git
   message: "Site updated: {{ now('YYYY-MM-DD HH:mm:ss') }}"
+
+#################################################################
+###################### NexT Configuration #######################
+#################################################################
+
+theme_config:
+
+  # ============================================================= #
+  # ============= Theme Core Configuration Settings ============= #
+  # ============================================================= #
+
+  cache:
+    enable: true
+
+  reminder: true
+  
+  custom_file_path:
+    style: source/_data/styles.styl
+    # footer: source/_data/footer.swig
+  menu:
+    home: / || home
+    #about: /about/ || user
+    tags: /tags/ || tags
+    categories: /categories/ || th
+    archives: /archives/ || archive
+    #schedule: /schedule/ || calendar
+    #sitemap: /sitemap.xml || sitemap
+    #commonweal: /404/ || heartbeat
+  scheme: Gemini
+  social:
+    GitHub: https://github.com/lrh3321 || github
+    E-Mail: mailto:lrh3321@gmail.com || envelope
+    Weibo: https://weibo.com/lrh3321 || weibo
+    Coding: https://coding.net/u/lrh3321
+    #Google: https://plus.google.com/yourname || google
+    #Twitter: https://twitter.com/yourname || twitter
+    #FB Page: https://www.facebook.com/yourname || facebook
+    #VK Group: https://vk.com/yourname || vk
+    #StackOverflow: https://stackoverflow.com/yourname || stack-overflow
+    #YouTube: https://youtube.com/yourname || youtube
+    #Instagram: https://instagram.com/yourname || instagram
+    #Skype: skype:yourname?call|chat || skype
+  # Post edit
+  # Dependencies: https://github.com/hexojs/hexo-deployer-git
+  post_edit:
+    enable: false
+    url: https://github.com/lrh3321/lrh3321.github.io/edit/blog-source/source/_posts/ # Link for view source.
+    #url: https://github.com/user-name/repo-name/edit/branch-name/subdirectory-name # Link for fork & edit.
+
+  font:
+    host: //fonts.lug.ustc.edu.cn
+    # Font settings for <code> and code blocks.
+    codes:
+      external: true
+      family: Fira Code
+  
+  # Mermaid tag
+  mermaid:
+    enable: false
+    # Available themes: default | dark | forest | neutral
+    theme: forest
+    cdn: //cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js
+    #cdn: //cdnjs.cloudflare.com/ajax/libs/mermaid/8.0.0/mermaid.min.js

@@ -143,23 +143,23 @@ baidu_push: false
 # Menu Settings
 # ---------------------------------------------------------------
 
-# When running the site in a subdirectory (e.g. domain.tld/blog), remove the leading slash from link value (/archives -> archives).
 # Usage: `Key: /link/ || icon`
-# Key is the name of menu item. If translate for this menu will find in languages - this translate will be loaded; if not - Key name will be used. Key is case-senstive.
-# Value before `||` delimeter is the target link.
-# Value after `||` delimeter is the name of FontAwesome icon. If icon (with or without delimeter) is not specified, question icon will be loaded.
-# External url should start with http:// or https:// .
+# Key is the name of menu item. If the translation for this item is available, the translated text will be loaded, otherwise the Key name will be used. Key is case-senstive.
+# Value before `||` delimiter is the target link.
+# Value after `||` delimiter is the name of Font Awesome icon. If icon (with or without delimiter) is not specified, question icon will be loaded.
+# When running the site in a subdirectory (e.g. domain.tld/blog), remove the leading slash from link value (/archives -> archives).
+# External url should start with http:// or https://
 menu:
   home: / || home
   #about: /about/ || user
-  tags: /tags/ || tags
-  categories: /categories/ || th
+  #tags: /tags/ || tags
+  #categories: /categories/ || th
   archives: /archives/ || archive
   #schedule: /schedule/ || calendar
   #sitemap: /sitemap.xml || sitemap
   #commonweal: /404/ || heartbeat
 
-# Enable/Disable menu icons / item badges.
+# Enable / Disable menu icons / item badges.
 menu_settings:
   icons: true
   badges: false
@@ -170,29 +170,29 @@ menu_settings:
 # ---------------------------------------------------------------
 
 # Schemes
-# scheme: Muse
+scheme: Muse
 #scheme: Mist
 #scheme: Pisces
-scheme: Gemini
+#scheme: Gemini
 
 
 # ---------------------------------------------------------------
 # Sidebar Settings
+# See: https://theme-next.org/docs/theme-settings/sidebar
 # ---------------------------------------------------------------
 
 # Posts / Categories / Tags in sidebar.
 site_state: true
 
-# Social Links.
+# Social Links
 # Usage: `Key: permalink || icon`
 # Key is the link label showing to end users.
-# Value before `||` delimeter is the target permalink.
-# Value after `||` delimeter is the name of FontAwesome icon. If icon (with or without delimeter) is not specified, globe icon will be loaded.
+# Value before `||` delimiter is the target permalink.
+# Value after `||` delimiter is the name of Font Awesome icon. If icon (with or without delimiter) is not specified, globe icon will be loaded.
 social:
-  GitHub: https://github.com/lrh3321 || github
-  E-Mail: mailto:lrh3321@gmail.com || envelope
-  Weibo: https://weibo.com/lrh3321 || weibo
-  Coding: https://coding.net/u/lrh3321
+  #GitHub: https://github.com/yourname || github
+  #E-Mail: mailto:yourname@gmail.com || envelope
+  #Weibo: https://weibo.com/yourname || weibo
   #Google: https://plus.google.com/yourname || google
   #Twitter: https://twitter.com/yourname || twitter
   #FB Page: https://www.facebook.com/yourname || facebook
@@ -358,8 +358,8 @@ related_posts:
 # Dependencies: https://github.com/hexojs/hexo-deployer-git
 post_edit:
   enable: false
-  url: https://github.com/lrh3321/lrh3321.github.io/edit/blog-source/source/_posts/ # Link for view source.
-  #url: https://github.com/user-name/repo-name/edit/branch-name/subdirectory-name # Link for fork & edit.
+  url: https://github.com/user-name/repo-name/tree/branch-name/subdirectory-name # Link for view source
+  #url: https://github.com/user-name/repo-name/edit/branch-name/subdirectory-name # Link for fork & edit
 
 
 # ---------------------------------------------------------------
@@ -426,7 +426,7 @@ codeblock:
   # Code Highlight theme
   # Available values: normal | night | night eighties | night blue | night bright
   # See: https://github.com/chriskempson/tomorrow-theme
-  highlight_theme: night eighties
+  highlight_theme: normal
   # Add copy button on codeblock
   copy_button:
     enable: false
@@ -494,7 +494,7 @@ font:
   # Font settings for <code> and code blocks.
   codes:
     external: true
-    family: Fira Code
+    family:
 
 
 # ---------------------------------------------------------------
