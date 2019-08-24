@@ -19,8 +19,8 @@ branches:
   only:
     - blog-source
 env:
- global:
-   - GH_REF: github.com/lrh3321/lrh3321.github.io.git
+  global:
+    - GH_REF: "github.com/lrh3321/lrh3321.github.io.git"
 cache:
   directories:
     - "node_modules"
