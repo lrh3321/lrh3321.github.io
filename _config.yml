@@ -27,6 +27,7 @@ code_dir: downloads/code
 i18n_dir: :lang
 
 skip_render:
+  - "README.md"
   - "robots.txt"
 
 # Writing
@@ -169,6 +170,7 @@ live2d:
   tagMode: false
   debug: false
   model:
+    use: "/live2dw/asuna/asuna_04.model.json"
     # use: "https://cdn.jsdelivr.net/npm/live2d-widget-model-chitose@latest/assets/chitose.model.json"
     # use: "https://cdn.jsdelivr.net/npm/live2d-widget-model-epsilon2_1@latest/assets/Epsilon2.1.model.json"
     # use: "https://cdn.jsdelivr.net/npm/live2d-widget-model-gf@latest/assets/Gantzert_Felixander.model.json"
@@ -187,14 +189,14 @@ live2d:
     # use: "https://cdn.jsdelivr.net/npm/live2d-widget-model-tororo@latest/assets/tororo.model.json"
     # use: "https://cdn.jsdelivr.net/npm/live2d-widget-model-tsumiki@latest/assets/tsumiki.model.json"
     # use: "https://cdn.jsdelivr.net/npm/live2d-widget-model-unitychan@latest/assets/unitychan.model.json"
-    use: "https://cdn.jsdelivr.net/npm/live2d-widget-model-wanko@latest/assets/wanko.model.json"
+    # use: "https://cdn.jsdelivr.net/npm/live2d-widget-model-wanko@latest/assets/wanko.model.json"
     # use: "https://cdn.jsdelivr.net/npm/live2d-widget-model-z16@latest/assets/z16.model.json"
     # use: "https://cdn.jsdelivr.net/npm/live2d-widget-model-haru@1.0.5/01/assets/haru01.model.json"
     # use: "https://cdn.jsdelivr.net/npm/live2d-widget-model-haru@1.0.5/02/assets/haru02.model.json"
   display:
     position: right
-    width: 150
-    height: 300
+    width: 300
+    height: 600
   mobile:
     show: true
   react:

@@ -3,6 +3,7 @@ node_js:
   - "node"
 install:
   - npm install
+  - git submodule update --remote
 script:
   - hexo generate
 after_script:
