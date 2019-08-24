@@ -26,3 +26,4 @@ cache:
   directories:
     - "node_modules"
     - "public"
+    - "themes"
