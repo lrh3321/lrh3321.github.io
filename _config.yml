@@ -6,6 +6,7 @@
 title: LRH3321's Blog
 subtitle: Bug制造者
 description: 常年挖坑不填
+keywords:
 author: LRH3321
 language: zh-CN
 timezone: Asia/Shanghai
@@ -16,6 +17,9 @@ url: http://www.lrh3321.win/
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
+pretty_urls:
+  trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
+  trailing_html: true # Set to false to remove trailing '.html' from permalinks
 
 # Directory
 source_dir: source
@@ -25,7 +29,6 @@ archive_dir: archives/
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
-
 skip_render:
   - "README.md"
   - "robots.txt"
@@ -34,7 +37,10 @@ skip_render:
 new_post_name: :title.md # File name of new posts
 default_layout: post
 titlecase: false # Transform title into titlecase
-external_link: true # Open external links in new tab
+external_link:
+  enable: true # Open external links in new tab
+  field: site # Apply to the whole site
+  exclude: ''
 filename_case: 0
 render_drafts: false
 post_asset_folder: false
@@ -45,14 +51,16 @@ highlight:
   line_number: true
   auto_detect: true
   tab_replace: false
+  wrap: true
+  hljs: false
 
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
 # per_page: Posts displayed per page. (0 = disable pagination)
 # order_by: Posts order. (Order by date descending by default)
-
 index_generator:
-  per_page: 4
+  path: ''
+  per_page: 10
   order_by: -date
 
 archive_generator:
@@ -73,17 +81,30 @@ default_category: uncategorized
 category_map:
 tag_map:
 
+# Metadata elements
+## https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta
+meta_generator: true
+
 # Date / Time format
 ## Hexo uses Moment.js to parse and display date
 ## You can customize the date format as defined in
 ## http://momentjs.com/docs/#/displaying/format/
 date_format: YYYY-MM-DD
 time_format: HH:mm:ss
+## Use post's date for updated date unless set in front-matter
+use_date_for_updated: false
 
 # Pagination
 ## Set per_page to 0 to disable pagination
 per_page: 10
 pagination_dir: page
+
+# Include / Exclude file(s)
+## include:/exclude: options only apply to the 'source/' folder
+include:
+exclude:
+ignore:
+ - README.md
 
 # Extensions
 ## Plugins: https://hexo.io/plugins/
@@ -128,7 +149,8 @@ theme_config:
     GitHub: https://github.com/lrh3321 || github
     E-Mail: mailto:lrh3321@gmail.com || envelope
     Weibo: https://weibo.com/lrh3321 || weibo
-    Coding: https://coding.net/u/lrh3321
+    Coding: https://coding.net/u/lrh3321 || code
+    LeetCode: https://leetcode.com/lrh3321/ || code
     #Google: https://plus.google.com/yourname || google
     #Twitter: https://twitter.com/yourname || twitter
     #FB Page: https://www.facebook.com/yourname || facebook
@@ -137,19 +159,331 @@ theme_config:
     #YouTube: https://youtube.com/yourname || youtube
     #Instagram: https://instagram.com/yourname || instagram
     #Skype: skype:yourname?call|chat || skype
+
+  social_icons:
+    enable: true
+    icons_only: false
+    transition: false
+
+  # Blog rolls
+  links_settings:
+    icon: link
+    title: Links
+    # Available values: block | inline
+    layout: block
+
+  links:
+    #Title: http://yoursite.com
+
+  # Table of Contents in the Sidebar
+  # Front-matter variable (unsupport wrap expand_all).
+  toc:
+    enable: true
+    # Automatically add list number to toc.
+    number: true
+    # If true, all words will placed on next lines if header width longer then sidebar width.
+    wrap: false
+    # If true, all level of TOC in a post will be displayed, rather than the activated part of it.
+    expand_all: false
+    # Maximum heading depth of generated toc.
+    max_depth: 6
+
+# A button to open designated chat widget in sidebar.
+# Firstly, you need enable the chat service you want to activate its sidebar button.
+chat:
+  enable: false
+  #service: chatra
+  #service: tidio
+  icon: comment # Icon name in Font Awesome, set false to disable icon.
+  text: Chat # Button text, change it as you wish.
+
+
+  # ---------------------------------------------------------------
+  # Post Settings
+  # See: https://theme-next.org/docs/theme-settings/posts
+  # ---------------------------------------------------------------
+
+  # Automatically excerpt description in homepage as preamble text.
+  excerpt_description: true
+
+  # Read more button
+  # If true, the read more button will be displayed in excerpt section.
+  read_more_btn: true
+
+  # Post meta display settings
+  post_meta:
+    item_text: true
+    created_at: true
+    updated_at:
+      enable: true
+      another_day: true
+    categories: true
+
+  # Post wordcount display settings
+  # Dependencies: https://github.com/theme-next/hexo-symbols-count-time
+  symbols_count_time:
+    separated_meta: true
+    item_text_post: true
+    item_text_total: false
+    awl: 4
+    wpm: 275
+
+  # Use icon instead of the symbol # to indicate the tag at the bottom of the post
+  tag_icon: false
+
+  # Reward (Donate)
+  # Front-matter variable (unsupport animation).
+  reward_settings:
+    # If true, reward will be displayed in every article by default.
+    enable: false
+    animation: false
+    #comment: Donate comment here.
+
+  reward:
+    #wechatpay: /images/wechatpay.png
+    #alipay: /images/alipay.png
+    #paypal: /images/paypal.png
+    #bitcoin: /images/bitcoin.png
+
+  # Subscribe through Telegram Channel, Twitter, etc.
+  # Usage: `Key: permalink || icon` (Font Awesome)
+  follow_me:
+    #Twitter: https://twitter.com/username || twitter
+    #Telegram: https://t.me/channel_name || telegram
+    #WeChat: /images/wechat_channel.jpg || wechat
+    #RSS: /atom.xml || rss
+
+  # Related popular posts
+  # Dependencies: https://github.com/tea3/hexo-related-popular-posts
+  related_posts:
+    enable: false
+    title: # Custom header, leave empty to use the default one
+    display_in_home: false
+    params:
+      maxCount: 5
+      #PPMixingRate: 0.0
+      #isDate: false
+      #isImage: false
+      #isExcerpt: false
+
   # Post edit
   # Dependencies: https://github.com/hexojs/hexo-deployer-git
   post_edit:
     enable: false
     url: https://github.com/lrh3321/lrh3321.github.io/edit/blog-source/source/_posts/ # Link for view source.
     #url: https://github.com/user-name/repo-name/edit/branch-name/subdirectory-name # Link for fork & edit.
+  
+  # Show previous post and next post in post footer if exists
+  # Available values: left | right | false
+  post_navigation: left
+
+
+  # ---------------------------------------------------------------
+  # Custom Page Settings
+  # See: https://theme-next.org/docs/theme-settings/custom-pages
+  # ---------------------------------------------------------------
+
+  # TagCloud settings for tags page.
+  tagcloud:
+    # All values below are same as default, change them by yourself.
+    min: 12 # Minimun font size in px
+    max: 30 # Maxium font size in px
+    start: "#ccc" # Start color (hex, rgba, hsla or color keywords)
+    end: "#111" # End color (hex, rgba, hsla or color keywords)
+    amount: 200 # Amount of tags, change it if you have more than 200 tags
+
+  # Google Calendar
+  # Share your recent schedule to others via calendar page.
+  calendar:
+    calendar_id: <required> # Your Google account E-Mail
+    api_key: <required>
+    orderBy: startTime
+    offsetMax: 24 # Time Range
+    offsetMin: 4 # Time Range
+    showDeleted: false
+    singleEvents: true
+    maxResults: 250
+
+
+  # ---------------------------------------------------------------
+  # Misc Theme Settings
+  # ---------------------------------------------------------------
+
+  # Set the text alignment in posts / pages.
+  text_align:
+    # Available values: start | end | left | right | center | justify | justify-all | match-parent
+    desktop: justify
+    mobile: justify
+
+  # Reduce padding / margin indents on devices with narrow width.
+  mobile_layout_economy: false
+
+  # Android Chrome header panel color ($brand-bg / $headband-bg => $black-deep).
+  android_chrome_color: "#222"
+
+  # Hide sticky headers and color the menu bar on Safari (iOS / macOS).
+  safari_rainbow: false
+
+  # Custom Logo (Do not support scheme Mist)
+  custom_logo: #/uploads/custom-logo.jpg
+
+  codeblock:
+    # Code Highlight theme
+    # Available values: normal | night | night eighties | night blue | night bright | solarized | solarized dark | galactic
+    # See: https://github.com/chriskempson/tomorrow-theme
+    highlight_theme: normal
+    # Add copy button on codeblock
+    copy_button:
+      enable: false
+      # Show text copy result.
+      show_result: false
+      # Available values: default | flat | mac
+      style:
+
+  back2top:
+    enable: true
+    # Back to top in sidebar.
+    sidebar: false
+    # Scroll percent label in b2t button.
+    scrollpercent: false
+
+  # Reading progress bar
+  reading_progress:
+    enable: false
+    # Available values: top | bottom
+    position: top
+    color: "#37c6c0"
+    height: 3px
+
+  # Bookmark Support
+  bookmark:
+    enable: false
+    # Customize the color of the bookmark.
+    color: "#222"
+    # If auto, save the reading progress when closing the page or clicking the bookmark-icon.
+    # If manual, only save it by clicking the bookmark-icon.
+    save: auto
+
+  # `Follow me on GitHub` banner in the top-right corner.
+  github_banner:
+    enable: false
+    permalink: https://github.com/yourname
+    title: Follow me on GitHub
+
+
+
+  # ---------------------------------------------------------------
+  # Custom Page Settings
+  # See: https://theme-next.org/docs/theme-settings/custom-pages
+  # ---------------------------------------------------------------
 
   font:
     host: //fonts.lug.ustc.edu.cn
+
+    # Font options:
+    # `external: true` will load this font family from `host` above.
+    # `family: Times New Roman`. Without any quotes.
+    # `size: x.x`. Use `em` as unit. Default: 1 (16px)
+
+    # Global font settings used for all elements inside <body>.
+    global:
+      external: true
+      family: Lato
+      size:
+
+    # Font settings for site title (.site-title).
+    title:
+      external: true
+      family:
+      size:
+
+    # Font settings for headlines (<h1> to <h6>).
+    headings:
+      external: true
+      family:
+      size:
+
+    # Font settings for posts (.post-body).
+    posts:
+      external: true
+      family:
+
     # Font settings for <code> and code blocks.
     codes:
       external: true
       family: Fira Code
+
+
+  # ---------------------------------------------------------------
+  # SEO Settings
+  # ---------------------------------------------------------------
+
+  # Disable Baidu transformation on mobile devices.
+  disable_baidu_transformation: false
+
+  # Set a canonical link tag for your Hexo site.
+  # See: https://support.google.com/webmasters/answer/139066
+  # Remember to set up your URL in Hexo `_config.yml` (e.g. url: http://yoursite.com)
+  canonical: true
+
+  # Change headers hierarchy on site-subtitle (will be main site description) and on all post / page titles for better SEO-optimization.
+  seo: false
+
+  # If true, site-subtitle will be added to index page.
+  # Remember to set up your site-subtitle in Hexo `_config.yml` (e.g. subtitle: Subtitle)
+  index_with_subtitle: false
+
+  # Automatically add external URL with Base64 encrypt & decrypt.
+  exturl: false
+
+  # Google Webmaster tools verification.
+  # See: https://www.google.com/webmasters
+  google_site_verification:
+
+  # Bing Webmaster tools verification.
+  # See: https://www.bing.com/webmaster
+  bing_site_verification:
+
+  # Yandex Webmaster tools verification.
+  # See: https://webmaster.yandex.ru
+  yandex_site_verification:
+
+  # Baidu Webmaster tools verification.
+  # See: https://ziyuan.baidu.com/site
+  baidu_site_verification:
+
+  # Enable baidu push so that the blog will push the url to baidu automatically which is very helpful for SEO.
+  baidu_push: false
+
+
+  # ---------------------------------------------------------------
+  # Third Party Plugins & Services Settings
+  # See: https://theme-next.org/docs/third-party-services/
+  # You may need to install dependencies or set CDN URLs in `vendors`
+  # There are two different CDN providers by default:
+  #   - jsDelivr (cdn.jsdelivr.net), works everywhere even in China
+  #   - CDNJS (cdnjs.cloudflare.com), provided by cloudflare
+  # ---------------------------------------------------------------
+
+  # Math Formulas Render Support
+  math:
+    # Default (true) will load mathjax / katex script on demand.
+    # That is it only render those page which has `mathjax: true` in Front-matter.
+    # If you set it to false, it will load mathjax / katex srcipt EVERY PAGE.
+    per_page: true
+
+    # hexo-renderer-pandoc (or hexo-renderer-kramed) required for full MathJax support.
+    mathjax:
+      enable: false
+      # See: https://mhchem.github.io/MathJax-mhchem/
+      mhchem: false
+
+    # hexo-renderer-markdown-it-plus (or hexo-renderer-markdown-it with markdown-it-katex plugin) required for full Katex support.
+    katex:
+      enable: false
+      # See: https://github.com/KaTeX/KaTeX/tree/master/contrib/copy-tex
+      copy_tex: false
+
 
   # Mermaid tag
   mermaid:
