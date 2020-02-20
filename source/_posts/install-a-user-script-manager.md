@@ -21,6 +21,8 @@ categories: Userscript
 [Greasemonkey](https://addons.mozilla.org/firefox/addon/greasemonkey/)、[Tampermonkey](https://addons.mozilla.org/firefox/addon/tampermonkey/)
 或 [Violentmonkey](https://addons.mozilla.org/firefox/addon/violentmonkey/)
 
+<!-- more -->
+
 ## Safari
 
 [Tampermonkey](http://tampermonkey.net/?browser=safari)

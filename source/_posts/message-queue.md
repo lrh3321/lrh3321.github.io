@@ -1,52 +1,12 @@
 ---
-title: Worker消息持久化
+title: 物联网设备消息队列选型
 categories: message-queue
 date: 2019-07-09 12:11:11
-updated: 2019-08-09 16:11:11
+updated: 2020-02-20 15:11:11
 tags:
   - message-queue
 ---
-# Worker消息持久化
-
-- [Worker消息持久化](#worker%e6%b6%88%e6%81%af%e6%8c%81%e4%b9%85%e5%8c%96)
-  - [需求](#%e9%9c%80%e6%b1%82)
-    - [消息队列的作用](#%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e7%9a%84%e4%bd%9c%e7%94%a8)
-    - [目前状况](#%e7%9b%ae%e5%89%8d%e7%8a%b6%e5%86%b5)
-    - [重点关注特性](#%e9%87%8d%e7%82%b9%e5%85%b3%e6%b3%a8%e7%89%b9%e6%80%a7)
-    - [不太关注的特性](#%e4%b8%8d%e5%a4%aa%e5%85%b3%e6%b3%a8%e7%9a%84%e7%89%b9%e6%80%a7)
-  - [待选方案](#%e5%be%85%e9%80%89%e6%96%b9%e6%a1%88)
-    - [基于 MQTT 协议的 broker](#%e5%9f%ba%e4%ba%8e-mqtt-%e5%8d%8f%e8%ae%ae%e7%9a%84-broker)
-      - [Eclipse Mosquitto](#eclipse-mosquitto)
-        - [操作1](#%e6%93%8d%e4%bd%9c1)
-        - [操作2](#%e6%93%8d%e4%bd%9c2)
-      - [EMQ](#emq)
-    - [JVM 系消息队列](#jvm-%e7%b3%bb%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97)
-      - [Kafka](#kafka)
-        - [Kafka 几大概念](#kafka-%e5%87%a0%e5%a4%a7%e6%a6%82%e5%bf%b5)
-        - [Kafka 持久化](#kafka-%e6%8c%81%e4%b9%85%e5%8c%96)
-      - [ActiveMQ](#activemq)
-      - [RocketMQ](#rocketmq)
-    - [RabbitMQ](#rabbitmq)
-      - [RabbitMQ 基本概念](#rabbitmq-%e5%9f%ba%e6%9c%ac%e6%a6%82%e5%bf%b5)
-        - [Message](#message)
-        - [Publisher](#publisher)
-        - [Exchange](#exchange)
-        - [Binding](#binding)
-        - [Queue](#queue)
-        - [Connection](#connection)
-        - [Channel](#channel)
-        - [Consumer](#consumer)
-        - [Virtual Host](#virtual-host)
-        - [Broker](#broker)
-      - [注意事项](#%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9)
-  - [NATS Streaming](#nats-streaming)
-  - [实现自己的 Broker](#%e5%ae%9e%e7%8e%b0%e8%87%aa%e5%b7%b1%e7%9a%84-broker)
-    - [设计构思](#%e8%ae%be%e8%ae%a1%e6%9e%84%e6%80%9d)
-    - [RushMQ](#rushmq)
-    - [FileMQ](#filemq)
-      - [优势](#%e4%bc%98%e5%8a%bf)
-      - [缺点](#%e7%bc%ba%e7%82%b9)
-    - [MoonMQ](#moonmq)
+# 物联网设备消息队列选型
 
 ## 需求
 
@@ -54,6 +14,8 @@ tags:
 
 - 削峰，形象点的话，可以比喻为蓄水池。比如elk日志收集系统中的kafka，主要在日志高峰期的时候，在牺牲实时性的同时，保证了整个系统的安全。
 - 同步系统异构化。原先一个同步操作里的诸多步骤，可以考虑将一些不影响主线发展的步骤，通过消息队列异步处理。比如，电商行业，一个订单完成之后，一般除了直接返回给客户购买成功的消息，还要通知账户组进行扣费，通知处理库存变化，通知物流进行派送等，通知一些用户组做一些增加会员积分等操作等。
+
+<!-- more -->
 
 ### 目前状况
 

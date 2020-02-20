@@ -1,5 +1,5 @@
 ---
-title: pip
+title: 调教 Pip
 categories: pip
 date: 2017-10-21 20:12:08
 updated: 2017-10-21 20:12:08
@@ -25,6 +25,8 @@ tags:
 + %HOME%\pip\pip.ini
 + C:\Documents and Settings\All Users\Application Data\PyPA\pip\pip.conf (Windows XP)
 + C:\ProgramData\PyPA\pip\pip.conf (Windows 7及以后)
+
+<!-- more -->
 
 ## pip配置的主要一些配置
 
