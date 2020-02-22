@@ -188,14 +188,14 @@ theme_config:
     # Maximum heading depth of generated toc.
     max_depth: 6
 
-# A button to open designated chat widget in sidebar.
-# Firstly, you need enable the chat service you want to activate its sidebar button.
-chat:
-  enable: false
-  #service: chatra
-  #service: tidio
-  icon: comment # Icon name in Font Awesome, set false to disable icon.
-  text: Chat # Button text, change it as you wish.
+  # A button to open designated chat widget in sidebar.
+  # Firstly, you need enable the chat service you want to activate its sidebar button.
+  chat:
+    enable: false
+    #service: chatra
+    #service: tidio
+    icon: comment # Icon name in Font Awesome, set false to disable icon.
+    text: Chat # Button text, change it as you wish.
 
 
   # ---------------------------------------------------------------
@@ -474,20 +474,20 @@ chat:
 
     # hexo-renderer-pandoc (or hexo-renderer-kramed) required for full MathJax support.
     mathjax:
-      enable: false
+      enable: true
       # See: https://mhchem.github.io/MathJax-mhchem/
       mhchem: false
 
     # hexo-renderer-markdown-it-plus (or hexo-renderer-markdown-it with markdown-it-katex plugin) required for full Katex support.
     katex:
-      enable: false
+      enable: true
       # See: https://github.com/KaTeX/KaTeX/tree/master/contrib/copy-tex
-      copy_tex: false
+      copy_tex: true
 
 
   # Mermaid tag
   mermaid:
-    enable: false
+    enable: true
     # Available themes: default | dark | forest | neutral
     theme: forest
     cdn: //cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js
