@@ -5,6 +5,8 @@ date: 2020-02-21 23:33:09
 updated: 2020-02-21 23:33:09
 tags:
   - aria2
+  - systemd
+  - nginx
 ---
 
 # 使用 aria2 搭建离线下载服务器
