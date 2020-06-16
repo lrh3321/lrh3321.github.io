@@ -2,7 +2,7 @@
 title: 使用 aria2 搭建离线下载服务器
 categories: aria2
 date: 2020-02-21 23:33:09
-updated: 2020-02-21 23:33:09
+updated: 2020-06-16 23:33:09
 tags:
   - aria2
   - systemd
@@ -111,10 +111,13 @@ user-agent=Transmission/2.77
 
 ```bash
 # 创建 service 文件
-echo "[Unit]
+tee ~/.aria2/aria2.service <<EOF
+[Unit]
 Description=Aria2 Service
 After=network.target
 Wants=network.target
+[Install]
+WantedBy=multi-user.target
 
 [Service]
 # 使用当前用户运行程序
@@ -123,16 +126,15 @@ Group=$USER
 Type=simple
 PIDFile=/run/aria2.pid
 ExecStart=/usr/bin/aria2c --conf-path $HOME/.aria2/aria2.conf
-Restart=on-failure" > ~/.aria2/aria2.service
+Restart=on-failure
+EOF
 
 # 加入 Systemd
 sudo ln -s ${HOME}/.aria2/aria2.service /lib/systemd/system/
 # 重新加载 unit 文件
 sudo systemctl daemon-reload
-# 启用服务
-sudo systemctl enable aria2
-# 启动服务
-sudo systemctl start aria2
+# 开启开机自启，并启用服务
+sudo systemctl enable --now aria2
 ```
 
 ## 添加 Web 管理界面
@@ -163,11 +165,13 @@ sudo apt install nignx
 
 ```bash
 # 下载，可以修改需要的版本
-version=1.1.4
+version=${version:-"1.1.6"}
 wget https://github.com/mayswind/AriaNg/releases/download/${version}/AriaNg-${version}.zip -O /tmp/AriaNg.zip
 
 # 创建前端文件保存目录
 sudo mkdir -p /var/www/html/airang
+sudo chown -R ${USER}:${USER} /var/www/html/airang
+rm -rf /var/www/html/airang/*
 pushd /var/www/html/airang
 # 解压文件
 sudo unzip /tmp/AriaNg.zip
@@ -182,7 +186,7 @@ popd
 
 ```bash
 # 指定用户名，这里为 admin
-user=admin
+user=${user:-"admin"}
 sudo mkdir -p /var/www/auth
 sudo htpasswd -c -d /var/www/auth/nginx_auth ${user}
 ```
@@ -190,10 +194,15 @@ sudo htpasswd -c -d /var/www/auth/nginx_auth ${user}
 #### 创建为默认站点
 
 ```bash
-echo "
+port=${port:-"80"}
+sudo tee /etc/nginx/sites-enabled/default <<EOF
+map \$http_upgrade \$connection_upgrade {
+    default upgrade;
+    '' close;
+}
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+    listen ${port} default_server;
+    listen [::]:${port} default_server;
 
     # 可设置域名
     server_name _;
@@ -202,13 +211,17 @@ server {
     index index.html;
 
     # 注释以下两行可取消用户密码登录
-    auth_basic \"Authrization\";
+    auth_basic "Authrization";
     auth_basic_user_file /var/www/auth/nginx_auth;
 
     # 为 aria2 JSON-RPC 配置反向代理，可选。
     # 配置后可以少对外开放一个端口
     location /jsonrpc {
         proxy_pass http://127.0.0.1:6800;
+        # 反代 WebSocket 协议
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "Upgrade";
     }
 
     # 配置 HTTP 文件服务，用于取回文件
@@ -221,8 +234,8 @@ server {
         autoindex_localtime on;
     }
 }
-" > default
-sudo mv default /etc/nginx/sites-enabled/
+EOF
+
 # 查看配置是否正确
 sudo nginx -t
 # 让 Nginx 重新加载配置
