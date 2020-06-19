@@ -1,5 +1,5 @@
 ---
-title: terminal-proxy
+title: 为终端设置代理
 categories: proxy
 date: 2020-04-13 14:16:53
 updated: 2020-06-18 14:16:53

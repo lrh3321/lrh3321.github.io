@@ -52,7 +52,7 @@ highlight:
   auto_detect: true
   tab_replace: false
   wrap: true
-  hljs: false
+  hljs: true
 
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
@@ -109,7 +109,7 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: next
+theme: theme-next
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
@@ -123,261 +123,133 @@ deploy:
 #################################################################
 
 theme_config:
-  # ============================================================= #
-  # ============= Theme Core Configuration Settings ============= #
-  # ============================================================= #
+  # ---------------------------------------------------------------
+  # Theme Core Configuration Settings
+  # See: https://theme-next.js.org/docs/theme-settings/
+  # ---------------------------------------------------------------
 
-  cache:
-    enable: true
-
-  reminder: true
-
+  # Define custom file paths.
+  # Create your custom files in site directory `source/_data` and uncomment needed files below.
   custom_file_path:
-    style: source/_data/styles.styl
-    # footer: source/_data/footer.swig
-  menu:
-    home: / || home
-    #about: /about/ || user
-    tags: /tags/ || tags
-    categories: /categories/ || th
-    archives: /archives/ || archive
-    #schedule: /schedule/ || calendar
-    #sitemap: /sitemap.xml || sitemap
-    #commonweal: /404/ || heartbeat
+    #head: source/_data/head.njk
+    #header: source/_data/header.njk
+    #sidebar: source/_data/sidebar.njk
+    #postMeta: source/_data/post-meta.njk
+    #postBodyEnd: source/_data/post-body-end.njk
+    #footer: source/_data/footer.njk
+    #bodyEnd: source/_data/body-end.njk
+    #variable: source/_data/variables.styl
+    #mixin: source/_data/mixins.styl
+    #style: source/_data/styles.styl
+
+  footer:
+    # Specify the date when the site was setup. If not defined, current year will be used.
+    since: 2017
+
+    # Icon between year and copyright info.
+    icon:
+      # Icon name in Font Awesome. See: https://fontawesome.com/icons
+      name: fa fa-heart
+      # If you want to animate the icon, set it to true.
+      animated: false
+      # Change the color of icon, using Hex Code.
+      color: "#ff0000"
+
+    # If not defined, `author` from Hexo `_config.yml` will be used.
+    copyright:
+
+    # Powered by Hexo & NexT
+    powered: true
+
+
+  # ---------------------------------------------------------------
+  # Scheme Settings
+  # ---------------------------------------------------------------
+
+  # Schemes
+  # scheme: Muse
+  #scheme: Mist
+  #scheme: Pisces
   scheme: Gemini
+
+  # Dark Mode
+  darkmode: true
+
+
+  # ---------------------------------------------------------------
+  # Menu Settings
+  # ---------------------------------------------------------------
+
+  # Usage: `Key: /link/ || icon`
+  # Key is the name of menu item. If the translation for this item is available, the translated text will be loaded, otherwise the Key name will be used. Key is case-senstive.
+  # Value before `||` delimiter is the target link, value after `||` delimiter is the name of Font Awesome icon.
+  # When running the site in a subdirectory (e.g. yoursite.com/blog), remove the leading slash from link value (/archives -> archives).
+  # External url should start with http:// or https://
+  menu:
+    home: / || fa fa-home
+    #about: /about/ || fa fa-user
+    tags: /tags/ || fa fa-tags
+    categories: /categories/ || fa fa-th
+    archives: /archives/ || fa fa-archive
+    #schedule: /schedule/ || fa fa-calendar
+    #sitemap: /sitemap.xml || fa fa-sitemap
+    #commonweal: /404/ || fa fa-heartbeat
+
+  # Enable / Disable menu icons / item badges.
+  menu_settings:
+    icons: true
+    badges: true
+
+  # Social Links
+  # Usage: `Key: permalink || icon`
+  # Key is the link label showing to end users.
+  # Value before `||` delimiter is the target permalink, value after `||` delimiter is the name of Font Awesome icon.
   social:
-    GitHub: https://github.com/lrh3321 || github
-    E-Mail: mailto:lrh3321@gmail.com || envelope
-    Weibo: https://weibo.com/lrh3321 || weibo
-    Coding: https://coding.net/u/lrh3321 || code
-    LeetCode: https://leetcode.com/lrh3321/ || code
-    #Google: https://plus.google.com/yourname || google
-    #Twitter: https://twitter.com/yourname || twitter
-    #FB Page: https://www.facebook.com/yourname || facebook
-    #VK Group: https://vk.com/yourname || vk
-    #StackOverflow: https://stackoverflow.com/yourname || stack-overflow
-    #YouTube: https://youtube.com/yourname || youtube
-    #Instagram: https://instagram.com/yourname || instagram
-    #Skype: skype:yourname?call|chat || skype
-
-  social_icons:
-    enable: true
-    icons_only: false
-    transition: false
-
-  # Blog rolls
-  links_settings:
-    icon: link
-    title: Links
-    # Available values: block | inline
-    layout: block
-
-  links:
-    #Title: http://yoursite.com
-
-  # Table of Contents in the Sidebar
-  # Front-matter variable (unsupport wrap expand_all).
-  toc:
-    enable: true
-    # Automatically add list number to toc.
-    number: true
-    # If true, all words will placed on next lines if header width longer then sidebar width.
-    wrap: false
-    # If true, all level of TOC in a post will be displayed, rather than the activated part of it.
-    expand_all: false
-    # Maximum heading depth of generated toc.
-    max_depth: 6
-
-  # A button to open designated chat widget in sidebar.
-  # Firstly, you need enable the chat service you want to activate its sidebar button.
-  chat:
-    enable: false
-    #service: chatra
-    #service: tidio
-    icon: comment # Icon name in Font Awesome, set false to disable icon.
-    text: Chat # Button text, change it as you wish.
-
-
-  # ---------------------------------------------------------------
-  # Post Settings
-  # See: https://theme-next.org/docs/theme-settings/posts
-  # ---------------------------------------------------------------
-
-  # Automatically excerpt description in homepage as preamble text.
-  excerpt_description: true
-
-  # Read more button
-  # If true, the read more button will be displayed in excerpt section.
-  read_more_btn: true
-
-  # Post meta display settings
-  post_meta:
-    item_text: true
-    created_at: true
-    updated_at:
-      enable: true
-      another_day: true
-    categories: true
-
-  # Post wordcount display settings
-  # Dependencies: https://github.com/theme-next/hexo-symbols-count-time
-  symbols_count_time:
-    separated_meta: true
-    item_text_post: true
-    item_text_total: false
-    awl: 4
-    wpm: 275
-
-  # Use icon instead of the symbol # to indicate the tag at the bottom of the post
-  tag_icon: false
-
-  # Reward (Donate)
-  # Front-matter variable (unsupport animation).
-  reward_settings:
-    # If true, reward will be displayed in every article by default.
-    enable: false
-    animation: false
-    #comment: Donate comment here.
-
-  reward:
-    #wechatpay: /images/wechatpay.png
-    #alipay: /images/alipay.png
-    #paypal: /images/paypal.png
-    #bitcoin: /images/bitcoin.png
-
-  # Subscribe through Telegram Channel, Twitter, etc.
-  # Usage: `Key: permalink || icon` (Font Awesome)
-  follow_me:
-    #Twitter: https://twitter.com/username || twitter
-    #Telegram: https://t.me/channel_name || telegram
-    #WeChat: /images/wechat_channel.jpg || wechat
-    #RSS: /atom.xml || rss
-
-  # Related popular posts
-  # Dependencies: https://github.com/tea3/hexo-related-popular-posts
-  related_posts:
-    enable: false
-    title: # Custom header, leave empty to use the default one
-    display_in_home: false
-    params:
-      maxCount: 5
-      #PPMixingRate: 0.0
-      #isDate: false
-      #isImage: false
-      #isExcerpt: false
-
-  # Post edit
-  # Dependencies: https://github.com/hexojs/hexo-deployer-git
-  post_edit:
-    enable: false
-    url: https://github.com/lrh3321/lrh3321.github.io/edit/blog-source/source/_posts/ # Link for view source.
-    #url: https://github.com/user-name/repo-name/edit/branch-name/subdirectory-name # Link for fork & edit.
-  
-  # Show previous post and next post in post footer if exists
-  # Available values: left | right | false
-  post_navigation: left
-
-
-  # ---------------------------------------------------------------
-  # Custom Page Settings
-  # See: https://theme-next.org/docs/theme-settings/custom-pages
-  # ---------------------------------------------------------------
-
-  # TagCloud settings for tags page.
-  tagcloud:
-    # All values below are same as default, change them by yourself.
-    min: 12 # Minimun font size in px
-    max: 30 # Maxium font size in px
-    start: "#ccc" # Start color (hex, rgba, hsla or color keywords)
-    end: "#111" # End color (hex, rgba, hsla or color keywords)
-    amount: 200 # Amount of tags, change it if you have more than 200 tags
-
-  # Google Calendar
-  # Share your recent schedule to others via calendar page.
-  calendar:
-    calendar_id: <required> # Your Google account E-Mail
-    api_key: <required>
-    orderBy: startTime
-    offsetMax: 24 # Time Range
-    offsetMin: 4 # Time Range
-    showDeleted: false
-    singleEvents: true
-    maxResults: 250
-
-
-  # ---------------------------------------------------------------
-  # Misc Theme Settings
-  # ---------------------------------------------------------------
-
-  # Set the text alignment in posts / pages.
-  text_align:
-    # Available values: start | end | left | right | center | justify | justify-all | match-parent
-    desktop: justify
-    mobile: justify
-
-  # Reduce padding / margin indents on devices with narrow width.
-  mobile_layout_economy: false
-
-  # Android Chrome header panel color ($brand-bg / $headband-bg => $black-deep).
-  android_chrome_color: "#222"
-
-  # Hide sticky headers and color the menu bar on Safari (iOS / macOS).
-  safari_rainbow: false
-
-  # Custom Logo (Do not support scheme Mist)
-  custom_logo: #/uploads/custom-logo.jpg
+    GitHub: https://github.com/lrh3321 || fab fa-github
+    E-Mail: mailto:lrh3321@gmail.com || fa fa-envelope
+    Weibo: https://weibo.com/lrh3321 || fab fa-weibo
+    #Google: https://plus.google.com/yourname || fab fa-google
+    #Twitter: https://twitter.com/yourname || fab fa-twitter
+    #FB Page: https://www.facebook.com/yourname || fab fa-facebook
+    #StackOverflow: https://stackoverflow.com/yourname || fab fa-stack-overflow
+    #YouTube: https://youtube.com/yourname || fab fa-youtube
+    #Instagram: https://instagram.com/yourname || fab fa-instagram
+    #Skype: skype:yourname?call|chat || fab fa-skype
+    Coding: https://coding.net/u/lrh3321 || fas fa-code
+    LeetCode: https://leetcode.com/lrh3321/ || fas fa-code
 
   codeblock:
     # Code Highlight theme
-    # Available values: normal | night | night eighties | night blue | night bright | solarized | solarized dark | galactic
-    # See: https://github.com/chriskempson/tomorrow-theme
-    highlight_theme: normal
+    # See: https://github.com/highlightjs/highlight.js/tree/master/src/styles
+    theme:
+      light: default
+      dark: tomorrow-night-eighties
+    # See: https://github.com/PrismJS/prism/tree/master/themes
+    prism:
+      light: prism
+      dark: prism-tomorrow
     # Add copy button on codeblock
     copy_button:
-      enable: false
-      # Show text copy result.
-      show_result: false
+      enable: true
       # Available values: default | flat | mac
-      style:
-
-  back2top:
-    enable: true
-    # Back to top in sidebar.
-    sidebar: false
-    # Scroll percent label in b2t button.
-    scrollpercent: false
-
-  # Reading progress bar
-  reading_progress:
-    enable: false
-    # Available values: top | bottom
-    position: top
-    color: "#37c6c0"
-    height: 3px
-
-  # Bookmark Support
-  bookmark:
-    enable: false
-    # Customize the color of the bookmark.
-    color: "#222"
-    # If auto, save the reading progress when closing the page or clicking the bookmark-icon.
-    # If manual, only save it by clicking the bookmark-icon.
-    save: auto
-
-  # `Follow me on GitHub` banner in the top-right corner.
-  github_banner:
-    enable: false
-    permalink: https://github.com/lrh3321
-    title: Follow me on GitHub
-
+      style: flat
 
 
   # ---------------------------------------------------------------
-  # Custom Page Settings
-  # See: https://theme-next.org/docs/theme-settings/custom-pages
+  # Font Settings
+  # See: https://theme-next.js.org/docs/theme-settings/#Fonts-Customization
+  # ---------------------------------------------------------------
+  # Find fonts on Google Fonts (https://www.google.com/fonts)
+  # All fonts set here will have the following styles:
+  #   light | light italic | normal | normal italic | bold | bold italic
+  # Be aware that setting too much fonts will cause site running slowly
+  # ---------------------------------------------------------------
+  # To avoid space between header and sidebar in scheme Pisces / Gemini, Web Safe fonts are recommended for `global` (and `title`):
+  # Arial | Tahoma | Helvetica | Times New Roman | Courier New | Verdana | Georgia | Palatino | Garamond | Comic Sans MS | Trebuchet MS
   # ---------------------------------------------------------------
 
   font:
+    enable: false
     host: //fonts.lug.ustc.edu.cn
 
     # Font options:
@@ -415,50 +287,9 @@ theme_config:
 
 
   # ---------------------------------------------------------------
-  # SEO Settings
-  # ---------------------------------------------------------------
-
-  # Disable Baidu transformation on mobile devices.
-  disable_baidu_transformation: false
-
-  # Set a canonical link tag for your Hexo site.
-  # See: https://support.google.com/webmasters/answer/139066
-  # Remember to set up your URL in Hexo `_config.yml` (e.g. url: http://yoursite.com)
-  canonical: true
-
-  # Change headers hierarchy on site-subtitle (will be main site description) and on all post / page titles for better SEO-optimization.
-  seo: false
-
-  # If true, site-subtitle will be added to index page.
-  # Remember to set up your site-subtitle in Hexo `_config.yml` (e.g. subtitle: Subtitle)
-  index_with_subtitle: false
-
-  # Automatically add external URL with Base64 encrypt & decrypt.
-  exturl: false
-
-  # Google Webmaster tools verification.
-  # See: https://www.google.com/webmasters
-  google_site_verification:
-
-  # Bing Webmaster tools verification.
-  # See: https://www.bing.com/webmaster
-  bing_site_verification:
-
-  # Yandex Webmaster tools verification.
-  # See: https://webmaster.yandex.ru
-  yandex_site_verification:
-
-  # Baidu Webmaster tools verification.
-  # See: https://ziyuan.baidu.com/site
-  baidu_site_verification:
-
-  # Enable baidu push so that the blog will push the url to baidu automatically which is very helpful for SEO.
-  baidu_push: false
-
-
-  # ---------------------------------------------------------------
   # Third Party Plugins & Services Settings
-  # See: https://theme-next.org/docs/third-party-services/
+  # See: https://theme-next.js.org/docs/third-party-services/
+  # More plugins: https://github.com/next-theme/awesome-next
   # You may need to install dependencies or set CDN URLs in `vendors`
   # There are two different CDN providers by default:
   #   - jsDelivr (cdn.jsdelivr.net), works everywhere even in China
@@ -466,6 +297,7 @@ theme_config:
   # ---------------------------------------------------------------
 
   # Math Formulas Render Support
+  # Server-side plugin: https://github.com/next-theme/hexo-filter-mathjax
   math:
     # Default (true) will load mathjax / katex script on demand.
     # That is it only render those page which has `mathjax: true` in Front-matter.
@@ -484,14 +316,11 @@ theme_config:
       # See: https://github.com/KaTeX/KaTeX/tree/master/contrib/copy-tex
       copy_tex: true
 
-
   # Mermaid tag
   mermaid:
     enable: true
     # Available themes: default | dark | forest | neutral
     theme: forest
-    cdn: //cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js
-    #cdn: //cdnjs.cloudflare.com/ajax/libs/mermaid/8.0.0/mermaid.min.js
 
 
   #! ---------------------------------------------------------------
@@ -511,10 +340,18 @@ theme_config:
     anime: //cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js
     # anime:
 
-    # Internal version: 4.7.0
-    fontawesome: //cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css
-    # fontawesome: //cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
+    # Internal version: 5.13.0
+    fontawesome: //cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css
+    # fontawesome: //cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css
     # fontawesome:
+
+    # Prism
+    prism: //cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js
+    prism_autoloader: //cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js
+    prism_line_numbers: //cdn.jsdelivr.net/npm/prismjs@1/plugins/line-numbers/prism-line-numbers.js
+    # prism:
+    # prism_autoloader:
+    # prism_line_numbers:
 
     # MathJax
     mathjax: //cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
@@ -589,7 +426,7 @@ theme_config:
 
     # Mermaid
     mermaid: //cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js
-    # mermaid: //cdnjs.cloudflare.com/ajax/libs/mermaid/8.3.0/mermaid.min.js
+    # mermaid: //cdnjs.cloudflare.com/ajax/libs/mermaid/8.4.8/mermaid.min.js
     # mermaid:
 
     # Internal version: 1.2.1
