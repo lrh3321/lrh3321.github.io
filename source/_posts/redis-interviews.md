@@ -1,10 +1,10 @@
 ---
 title: Redis 常见面试题
-categories: Redis-interviews
+categories: interview
 date: 2020-02-28 16:14:32
 updated: 2020-02-28 16:14:32
 tags:
-  - Redis
+  - redis
   - interview
 ---
 # Redis 常见面试题
