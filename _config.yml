@@ -101,8 +101,8 @@ pagination_dir: page
 
 # Include / Exclude file(s)
 ## include:/exclude: options only apply to the 'source/' folder
-include:
-exclude:
+include: []
+exclude: []
 ignore:
  - README.md
 
@@ -138,9 +138,9 @@ theme_config:
     #postBodyEnd: source/_data/post-body-end.njk
     #footer: source/_data/footer.njk
     #bodyEnd: source/_data/body-end.njk
-    #variable: source/_data/variables.styl
+    variable: source/_data/variables.styl
     #mixin: source/_data/mixins.styl
-    #style: source/_data/styles.styl
+    style: source/_data/styles.styl
 
   footer:
     # Specify the date when the site was setup. If not defined, current year will be used.
