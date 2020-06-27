@@ -64,19 +64,19 @@ export https_proxy=socks5://10.0.0.52:1080
 
 ```shell
 # 全局
-git config http.proxy http://127.0.0.1:1089   --global
-git config https.proxy https://127.0.0.1:1089 --global
+git config --global http.proxy http://127.0.0.1:1089
+git config --global https.proxy http://127.0.0.1:1089
 # 仓库
 git config http.proxy http://127.0.0.1:1089
-git config https.proxy https://127.0.0.1:1089
+git config https.proxy http://127.0.0.1:1089
 ```
 
 ### Socks 5 代理
 
 ```shell
 # 全局
-git config http.proxy socks5://127.0.0.1:1088  --global
-git config https.proxy socks5://127.0.0.1:1088 --global
+git config --global http.proxy socks5://127.0.0.1:1088
+git config --global https.proxy socks5://127.0.0.1:1088
 # 仓库
 git config http.proxy socks5://127.0.0.1:1088
 git config https.proxy socks5://127.0.0.1:1088
@@ -86,8 +86,8 @@ git config https.proxy socks5://127.0.0.1:1088
 
 ```shell
 # 全局
-git config --unset http.proxy  --global
-git config --unset https.proxy --global
+git config --global --unset http.proxy
+git config --global --unset https.proxy
 # 仓库
 git config --unset http.proxy
 git config --unset https.proxy
