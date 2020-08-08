@@ -235,10 +235,18 @@ ClientAliveCountMax 2
 
 在 `~/.bash_profile` 文件中添加以下内容：
 
-```shell script
+```shell
 if [ -f ~/.bashrc ]; then
   . ~/.bashrc
 fi
+```
+
+## `key_load_public: invalid format`
+
+重新生成公钥
+
+```shell
+ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
 ```
 
 ## Authentication refused: bad ownership or modes for directory 
@@ -279,3 +287,4 @@ sshd 为了安全，对属主的目录和文件权限有所要求。如果权限
 - [How to Keep Alive SSH Sessions
 ](https://patrickmn.com/aside/how-to-keep-alive-ssh-sessions/)
 - [ssh免密码登陆设置时Authentication refused: bad ownership or modes错误解决方法](https://www.bo56.com/ssh%E5%85%8D%E5%AF%86%E7%A0%81%E7%99%BB%E9%99%86%E8%AE%BE%E7%BD%AE%E6%97%B6authentication-refused-bad-ownership-or-modes%E9%94%99%E8%AF%AF%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/)
+- [设置免密码ssh后出现key_load_public: invalid format](https://hostingwiki.cn/en/%E8%AE%BE%E7%BD%AE%E5%85%8D%E5%AF%86%E7%A0%81ssh%E5%90%8E%E5%87%BA%E7%8E%B0key_load_public-invalid-format/)
