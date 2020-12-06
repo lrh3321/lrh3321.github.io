@@ -92,7 +92,7 @@ meta_generator: true
 date_format: YYYY-MM-DD
 time_format: HH:mm:ss
 ## Use post's date for updated date unless set in front-matter
-use_date_for_updated: false
+updated_option: mtime
 
 # Pagination
 ## Set per_page to 0 to disable pagination
@@ -220,11 +220,10 @@ theme_config:
 
   codeblock:
     # Code Highlight theme
-    # See: https://github.com/highlightjs/highlight.js/tree/master/src/styles
+    # All available themes: https://theme-next.js.org/highlight/
     theme:
       light: default
       dark: tomorrow-night-eighties
-    # See: https://github.com/PrismJS/prism/tree/master/themes
     prism:
       light: prism
       dark: prism-tomorrow
