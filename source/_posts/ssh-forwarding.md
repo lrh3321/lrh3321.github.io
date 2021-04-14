@@ -2,7 +2,7 @@
 title: SSH 端口转发
 categories: ssh
 date: 2020-02-22 15:34:40
-updated: 2020-02-22 15:34:40
+updated: 2021-04-07 18:30:40
 tags:
   - ssh
 ---
@@ -112,9 +112,15 @@ SSH 实际是创建了一个 SOCKS 代理服务。而这里需要值得注意的
 
 - `-D [bind_address:]port`
 
+如果经常使用动态转发，可以将设置写入 SSH 客户端的用户个人配置文件（`~/.ssh/config`）。
+
+```text
+DynamicForward tunnel-host:local-port
+```
+
 ----
 
 ## 参考资料
 
-- [实战 SSH 端口转发
-](https://www.ibm.com/developerworks/cn/linux/l-cn-sshforward/index.html)
+- [实战 SSH 端口转发](https://www.ibm.com/developerworks/cn/linux/l-cn-sshforward/index.html)
+- [SSH 端口转发](https://wangdoc.com/ssh/port-forwarding.html)
