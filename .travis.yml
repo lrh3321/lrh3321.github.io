@@ -5,7 +5,8 @@ install:
   - npm install
   # - git submodule update --remote
 script:
-  - hexo generate
+  # - hexo generate
+  - npx hexo generate
 after_script:
   - cd ./public
   - git init
