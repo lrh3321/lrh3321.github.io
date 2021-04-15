@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.lrh3321.win","root":"/","images":"/images","scheme":"Gemini","version":"8.3.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="如何自己搭建git服务器  准备  可以用 SSH 访问的服务器   在服务器上安装git 如果要在 Linux 上安装预编译好的 Git 二进制安装包，可以直接用系统提供的包管理工具。在 Fedora 上用 yum 安装： 1yum install git-core 在 Ubuntu 这类 Debian 体系的系统上，可以用 apt 安装： 1sudo apt install git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何自己搭建git服务器">
+<meta property="og:url" content="http://www.lrh3321.win/2017/09/21/How-to-Run-Your-Own-Git-Server/index.html">
+<meta property="og:site_name" content="LRH3321&#39;s Blog">
+<meta property="og:description" content="如何自己搭建git服务器  准备  可以用 SSH 访问的服务器   在服务器上安装git 如果要在 Linux 上安装预编译好的 Git 二进制安装包，可以直接用系统提供的包管理工具。在 Fedora 上用 yum 安装： 1yum install git-core 在 Ubuntu 这类 Debian 体系的系统上，可以用 apt 安装： 1sudo apt install git">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-09-21T12:12:08.000Z">
+<meta property="article:modified_time" content="2017-09-21T12:12:08.000Z">
+<meta property="article:author" content="LRH3321">
+<meta property="article:tag" content="git">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://www.lrh3321.win/2017/09/21/How-to-Run-Your-Own-Git-Server/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>如何自己搭建git服务器 | LRH3321's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">LRH3321's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Bug制造者</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">13</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">16</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%87%AA%E5%B7%B1%E6%90%AD%E5%BB%BAgit%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text"> 如何自己搭建git服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87"><span class="nav-number">1.1.</span> <span class="nav-text"> 准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E5%AE%89%E8%A3%85git"><span class="nav-number">1.2.</span> <span class="nav-text"> 在服务器上安装git</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh-%E8%BF%9E%E6%8E%A5"><span class="nav-number">1.3.</span> <span class="nav-text"> SSH 连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%BB%99%E6%AF%8F%E4%B8%AA%E4%BA%BA%E5%BB%BA%E7%AB%8B%E4%B8%80%E4%B8%AA%E8%B4%A6%E6%88%B7"><span class="nav-number">1.3.1.</span> <span class="nav-text"> 1. 给每个人建立一个账户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%9C%A8%E4%B8%BB%E6%9C%BA%E4%B8%8A%E5%BB%BA%E7%AB%8B%E4%B8%80%E4%B8%AA-git-%E8%B4%A6%E6%88%B7"><span class="nav-number">1.3.2.</span> <span class="nav-text"> 2. 在主机上建立一个 git 账户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%AE%A9-ssh-%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%80%9A%E8%BF%87%E6%9F%90%E4%B8%AA-ldap-%E6%9C%8D%E5%8A%A1%E6%88%96%E8%80%85%E5%85%B6%E4%BB%96%E5%B7%B2%E7%BB%8F%E8%AE%BE%E5%AE%9A%E5%A5%BD%E7%9A%84%E9%9B%86%E4%B8%AD%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6%E6%9D%A5%E8%BF%9B%E8%A1%8C%E6%8E%88%E6%9D%83"><span class="nav-number">1.3.3.</span> <span class="nav-text"> 3. 让 SSH 服务器通过某个 LDAP 服务，或者其他已经设定好的集中授权机制，来进行授权</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%A9%BA%E4%BB%93%E5%BA%93"><span class="nav-number">1.4.</span> <span class="nav-text"> 新建一个空仓库</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LRH3321</p>
+  <div class="site-description" itemprop="description">常年挖坑不填</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrh3321" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrh3321@gmail.com" title="E-Mail → mailto:lrh3321@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/lrh3321" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://coding.net/u/lrh3321" title="Coding → https:&#x2F;&#x2F;coding.net&#x2F;u&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>Coding</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://leetcode.com/lrh3321/" title="LeetCode → https:&#x2F;&#x2F;leetcode.com&#x2F;lrh3321&#x2F;" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>LeetCode</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.lrh3321.win/2017/09/21/How-to-Run-Your-Own-Git-Server/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LRH3321">
+      <meta itemprop="description" content="常年挖坑不填">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LRH3321's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何自己搭建git服务器
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-09-21 20:12:08" itemprop="dateCreated datePublished" datetime="2017-09-21T20:12:08+08:00">2017-09-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="如何自己搭建git服务器"><a class="markdownIt-Anchor" href="#如何自己搭建git服务器"></a> 如何自己搭建git服务器</h1>
+<h2 id="准备"><a class="markdownIt-Anchor" href="#准备"></a> 准备</h2>
+<ul>
+<li>可以用 SSH 访问的服务器</li>
+</ul>
+<h2 id="在服务器上安装git"><a class="markdownIt-Anchor" href="#在服务器上安装git"></a> 在服务器上安装git</h2>
+<p>如果要在 Linux 上安装预编译好的 Git 二进制安装包，可以直接用系统提供的包管理工具。在 Fedora 上用 yum 安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install git-core</span><br></pre></td></tr></table></figure>
+<p>在 Ubuntu 这类 Debian 体系的系统上，可以用 apt 安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install git</span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+<h2 id="ssh-连接"><a class="markdownIt-Anchor" href="#ssh-连接"></a> SSH 连接</h2>
+<p>如果已经有了一个所有开发成员都可以用 SSH 访问的服务器，架设第一个服务器将变得异常简单，几乎什么都不用做。如果需要对仓库进行更复杂的访问控制，只要使用服务器操作系统的本地文件访问许可机制就行了。</p>
+<p>如果需要团队里的每个人都对仓库有写权限，又不能给每个人在服务器上建立账户，那么提供 SSH 连接就是唯一的选择了。我们假设用来共享仓库的服务器已经安装了 SSH 服务，而且你通过它访问服务器。</p>
+<p>有好几个办法可以让团队的每个人都有访问权。下面介绍3种：</p>
+<h3 id="1-给每个人建立一个账户"><a class="markdownIt-Anchor" href="#1-给每个人建立一个账户"></a> 1. 给每个人建立一个账户</h3>
+<p>直截了当但略过繁琐。反复运行 adduser 并给所有人设定临时密码可不是好玩的。</p>
+<h3 id="2-在主机上建立一个-git-账户"><a class="markdownIt-Anchor" href="#2-在主机上建立一个-git-账户"></a> 2. 在主机上建立一个 git 账户</h3>
+<p>让每个需要写权限的人发送一个 SSH 公钥，然后将其加入 git 账户的 <code>~/.ssh/authorized_keys</code> 文件。这样一来，所有人都将通过 git 账户访问主机。这丝毫不会影响提交的数据 — 访问主机用的身份不会影响提交对象的提交者信息。</p>
+<p>首先，创建一个操作系统用户 <code>git</code>，并为其建立一个 <code>.ssh</code> 目录。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo adduser git</span><br><span class="line">su git</span><br><span class="line"><span class="built_in">cd</span></span><br><span class="line">mkdir .ssh &amp;&amp; chmod 700 .ssh</span><br><span class="line">touch .ssh/authorized_keys &amp;&amp; chmod 600 .ssh/authorized_keys</span><br></pre></td></tr></table></figure>
+<p>接着，我们需要为系统用户 git 的 authorized_keys 文件添加一些开发者 SSH 公钥。 假设我们已经获得了若干受信任的公钥，并将它们保存在临时文件中。将这些公钥加入系统用户 git 的 .ssh 目录下 authorized_keys 文件的末尾：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 假设开发者的公钥保存在 /tmp/id_rsa.pub</span></span><br><span class="line">cat /tmp/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys</span><br></pre></td></tr></table></figure>
+<h3 id="3-让-ssh-服务器通过某个-ldap-服务或者其他已经设定好的集中授权机制来进行授权"><a class="markdownIt-Anchor" href="#3-让-ssh-服务器通过某个-ldap-服务或者其他已经设定好的集中授权机制来进行授权"></a> 3. 让 SSH 服务器通过某个 LDAP 服务，或者其他已经设定好的集中授权机制，来进行授权</h3>
+<p>只要每个人都能获得主机的 shell 访问权，任何可用的 SSH 授权机制都能达到相同效果。</p>
+<h2 id="新建一个空仓库"><a class="markdownIt-Anchor" href="#新建一个空仓库"></a> 新建一个空仓库</h2>
+<p>为开发者新建一个空仓库。可以借助带 <code>--bare</code> 选项的 <code>git init</code> 命令来做到这一点，该命令在初始化仓库时不会创建工作目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /opt/git</span><br><span class="line">mkdir project.git</span><br><span class="line"><span class="built_in">cd</span> project.git</span><br><span class="line">git init --bare</span><br></pre></td></tr></table></figure>
+<p>此时，有ssh访问权限的开发者可以克隆此仓库，并推回各自的改动，步骤很简单：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 假设已在 DNS 配置或hosts文件中将 gitserver 指向此服务器</span></span><br><span class="line">git <span class="built_in">clone</span> git@gitserver:/opt/git/project.git</span><br><span class="line"><span class="built_in">cd</span> project</span><br><span class="line">vim README.md</span><br><span class="line">git commit -am <span class="string">&#x27;fix for the README.md file&#x27;</span></span><br><span class="line">git push origin master</span><br></pre></td></tr></table></figure>
+<p>通过这种方法，你可以快速搭建一个具有读写权限、面向多个开发者的 Git 服务器。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/git/" rel="tag"># git</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/08/15/ssh-config/" rel="prev" title="SSH配置文件详解">
+                  <i class="fa fa-chevron-left"></i> SSH配置文件详解
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/10/21/pip/" rel="next" title="调教 Pip">
+                  调教 Pip <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LRH3321</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+<script>
+var mermaidElements = document.querySelectorAll('.mermaid');
+if (mermaidElements.length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaidElements.forEach(element => {
+      const newElement = document.createElement('div');
+      newElement.innerHTML = element.innerHTML;
+      newElement.className = element.className;
+      element.parentNode.replaceChild(newElement, element);
+    });
+
+    mermaid.init({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    }, '.mermaid');
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+
+
+
+  
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/asuna/asuna_04.model.json"},"display":{"position":"right","width":300,"height":600},"mobile":{"show":true},"react":{"opacity":0.7},"log":false});</script></body>
+</html>

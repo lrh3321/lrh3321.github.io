@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.lrh3321.win","root":"/","images":"/images","scheme":"Gemini","version":"8.3.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="SSH配置文件详解  配置文件~&#x2F;.ssh&#x2F;config和&#x2F;etc&#x2F;ssh&#x2F;ssh_config 一般不需要修改OpenSSH客户端配置文件。 对于给定用户，共有两个配置文件：~&#x2F;.ssh&#x2F;config（用户专用）和&#x2F;etc&#x2F;ssh&#x2F;ssh_config（全局共享）。 要按照该顺序读取这些文件，对于给定的某个参数，它使用的是读取过程中发现的第一个配置。用户可以通过以下方式将全局参数设置覆盖掉：在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSH配置文件详解">
+<meta property="og:url" content="http://www.lrh3321.win/2017/08/15/ssh-config/index.html">
+<meta property="og:site_name" content="LRH3321&#39;s Blog">
+<meta property="og:description" content="SSH配置文件详解  配置文件~&#x2F;.ssh&#x2F;config和&#x2F;etc&#x2F;ssh&#x2F;ssh_config 一般不需要修改OpenSSH客户端配置文件。 对于给定用户，共有两个配置文件：~&#x2F;.ssh&#x2F;config（用户专用）和&#x2F;etc&#x2F;ssh&#x2F;ssh_config（全局共享）。 要按照该顺序读取这些文件，对于给定的某个参数，它使用的是读取过程中发现的第一个配置。用户可以通过以下方式将全局参数设置覆盖掉：在">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-08-15T12:11:11.000Z">
+<meta property="article:modified_time" content="2020-06-15T12:11:11.000Z">
+<meta property="article:author" content="LRH3321">
+<meta property="article:tag" content="ssh">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://www.lrh3321.win/2017/08/15/ssh-config/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>SSH配置文件详解 | LRH3321's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">LRH3321's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Bug制造者</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">13</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">16</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ssh%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text"> SSH配置文件详解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6~sshconfig%E5%92%8Cetcsshssh_config"><span class="nav-number">1.1.</span> <span class="nav-text"> 配置文件~&#x2F;.ssh&#x2F;config和&#x2F;etc&#x2F;ssh&#x2F;ssh_config</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#checkhostip"><span class="nav-number">1.1.1.</span> <span class="nav-text"> CheckHostIP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#forwardx11"><span class="nav-number">1.1.2.</span> <span class="nav-text"> ForwardX11</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#forwardx11trusted"><span class="nav-number">1.1.3.</span> <span class="nav-text"> ForwardX11Trusted</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hashknownhosts"><span class="nav-number">1.1.4.</span> <span class="nav-text"> HashKnownHosts</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#host-hostnames"><span class="nav-number">1.1.5.</span> <span class="nav-text"> Host hostnames</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hostbasedauthentication"><span class="nav-number">1.1.6.</span> <span class="nav-text"> HostbasedAuthentication</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hostkeyalgorithms-algorithms"><span class="nav-number">1.1.7.</span> <span class="nav-text"> HostKeyAlgorithms algorithms</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#port-num"><span class="nav-number">1.1.8.</span> <span class="nav-text"> Port num</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stricthostkeychecking"><span class="nav-number">1.1.9.</span> <span class="nav-text"> StrictHostKeyChecking</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tcpkeepalive"><span class="nav-number">1.1.10.</span> <span class="nav-text"> TCPKeepAlive</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#user-name"><span class="nav-number">1.1.11.</span> <span class="nav-text"> User name</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh%E7%99%BB%E5%BD%95%E5%BE%88%E6%85%A2%E9%97%AE%E9%A2%98%E7%9A%84%E8%A7%A3%E5%86%B3"><span class="nav-number">1.2.</span> <span class="nav-text"> SSH登录很慢问题的解决</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#dns%E5%8F%8D%E5%90%91%E8%A7%A3%E6%9E%90%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">1.2.1.</span> <span class="nav-text"> DNS反向解析的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gssapi-%E8%AE%A4%E8%AF%81%E9%80%A0%E6%88%90%E7%9A%84"><span class="nav-number">1.2.2.</span> <span class="nav-text"> GSSAPI 认证造成的</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-keep-alive-ssh-sessions"><span class="nav-number">1.3.</span> <span class="nav-text"> How to Keep Alive SSH Sessions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh%E7%99%BB%E5%BD%95%E6%97%B6%E4%B8%8D%E8%87%AA%E5%8A%A8%E6%89%A7%E8%A1%8C-bashrc"><span class="nav-number">1.4.</span> <span class="nav-text"> SSH登录时不自动执行 .bashrc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#key_load_public-invalid-format"><span class="nav-number">1.5.</span> <span class="nav-text"> key_load_public: invalid format</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#authentication-refused-bad-ownership-or-modes-for-directory"><span class="nav-number">1.6.</span> <span class="nav-text"> Authentication refused: bad ownership or modes for directory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.7.</span> <span class="nav-text"> 参考链接</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LRH3321</p>
+  <div class="site-description" itemprop="description">常年挖坑不填</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrh3321" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrh3321@gmail.com" title="E-Mail → mailto:lrh3321@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/lrh3321" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://coding.net/u/lrh3321" title="Coding → https:&#x2F;&#x2F;coding.net&#x2F;u&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>Coding</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://leetcode.com/lrh3321/" title="LeetCode → https:&#x2F;&#x2F;leetcode.com&#x2F;lrh3321&#x2F;" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>LeetCode</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.lrh3321.win/2017/08/15/ssh-config/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LRH3321">
+      <meta itemprop="description" content="常年挖坑不填">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LRH3321's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SSH配置文件详解
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-08-15 20:11:11" itemprop="dateCreated datePublished" datetime="2017-08-15T20:11:11+08:00">2017-08-15</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-06-15 20:11:11" itemprop="dateModified" datetime="2020-06-15T20:11:11+08:00">2020-06-15</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ssh/" itemprop="url" rel="index"><span itemprop="name">ssh</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="ssh配置文件详解"><a class="markdownIt-Anchor" href="#ssh配置文件详解"></a> SSH配置文件详解</h1>
+<h2 id="配置文件~sshconfig和etcsshssh_config"><a class="markdownIt-Anchor" href="#配置文件~sshconfig和etcsshssh_config"></a> 配置文件<code>~/.ssh/config</code>和<code>/etc/ssh/ssh_config</code></h2>
+<p>一般不需要修改OpenSSH客户端配置文件。<br />
+对于给定用户，共有两个配置文件：<code>~/.ssh/config</code>（用户专用）和<code>/etc/ssh/ssh_config</code>（全局共享）。<br />
+要按照该顺序读取这些文件，对于给定的某个参数，它使用的是读取过程中发现的第一个配置。用户可以通过以下方式将全局参数设置覆盖掉：在自己的用户配置文件中设置同样的参数即可。<br />
+在<code>ssh</code>或<code>scp</code>命令行上给出的参数的优先级要高于这两个文件中所设置的参数的优先级。<br />
+用户的<code>~/.ssh/config</code>文件必须由该用户所有（他是目录&quot;<code>~/</code>&quot;的所有者），并且除了所有者之外任何人都不能写入该文件。<br />
+否则客户端就会给出一条错误消息然后退出。<br />
+这个文件的模式通常被设为 <code>600</code>，这是因为除了它的所有者之外任何人没有理由能够读取它。</p>
+<p>这些配置文件中的配置行包含着声明，这些声明均以某个关键字（不区分大小写）开头，后面跟着空格，最后是参数（区分大小写）。<br />
+可以使用关键字<code>Host</code>，让声明只作用于特定的系统。<code>Host</code>声明作用于它与下一条<code>Host</code>声明之间的所有配置行。</p>
+<span id="more"></span>
+<h3 id="checkhostip"><a class="markdownIt-Anchor" href="#checkhostip"></a> CheckHostIP</h3>
+<p><code>yes | no</code></p>
+<p>如果将其设置为<code>yes</code>（默认值），那么除了用<strong>known_hosts</strong>文件中的主机名之外，还可以采用IP地址来识别远程系统。</p>
+<p>若设置为<code>no</code>，则只使用主机名。</p>
+<p>将<code>CheckHostIP</code>设置为yes可以提高系统的安全性。</p>
+<h3 id="forwardx11"><a class="markdownIt-Anchor" href="#forwardx11"></a> ForwardX11</h3>
+<p><code>yes | no</code></p>
+<p>如果设置为<code>yes</code>，那么自动通过一条安全通道以不可信模式来转发X11连接，但是并不设置shell变量<code>DISPLAY</code>。如果<code>ForwardX11Trusted</code>也设置为<code>yes</code>,那么连接以可信模式转发。此外，可以在命令行上使用选项-X以不可信模式重定向X11连接。</p>
+<p>这个参数的默认值是<code>no</code>。要想让X11转发起作用，还必须将服务器上的<code>/etc/sshd_config</code>文件中的<code>X11Forwarding</code>设置为<code>yes</code>。</p>
+<h3 id="forwardx11trusted"><a class="markdownIt-Anchor" href="#forwardx11trusted"></a> ForwardX11Trusted</h3>
+<p><code>yes | no</code></p>
+<p>与ForwardX11一块使用时，ForwardX11必须设置为 <code>yes</code>（默认），这个声明才能起作用。<br />
+当这个声明设置为<code>yes</code>（默认），而<code>ForwardX11</code>也设置为<code>yes</code>时，这个声明将设置shell变量<code>DISPLAY</code>，并给予远程X11客户端对原来的（服务器）X11显示的完全访问权限。<br />
+此外，可以在命令行上使用选项<code>-Y</code>以可信模式重定向X11连接。</p>
+<p>这个声明的默认值是<code>no</code>。要想让X11转发起作用，必须将服务器上的<code>/etc/sshd_config</code>文件中的<code>X11Forwarding</code>设置为<code>yes</code>。</p>
+<h3 id="hashknownhosts"><a class="markdownIt-Anchor" href="#hashknownhosts"></a> HashKnownHosts</h3>
+<ul>
+<li>当设置为 <code>yes</code> 时，OpenSSH 会将文件 <code>~/.ssh/known_hosts</code> 中的主机名和地址进行散列。</li>
+<li>当设置为 <code>no</code> 时，主机名与地址将以明文形式写入。Ubuntu Linux 将这份声明设置为 <code>yes</code> 来提高系统的安全性。</li>
+</ul>
+<h3 id="host-hostnames"><a class="markdownIt-Anchor" href="#host-hostnames"></a> Host hostnames</h3>
+<p>指定它后面的（直到下一个主机声明为止）声明只适用于与hostnames相匹配的主机。<br />
+Hostnames可以包含?与<code>*</code>通配符。单个的<code>*</code>指定所有主机。如果没有这个关键字，任何声明都适用于所有主机。</p>
+<h3 id="hostbasedauthentication"><a class="markdownIt-Anchor" href="#hostbasedauthentication"></a> HostbasedAuthentication</h3>
+<p><code>yes | no</code></p>
+<ul>
+<li>当设置为 <code>yes</code> 时，尝试进行rhosts身份验证。</li>
+<li>对于安全性要求较高的系统，设置为 <code>no</code>（默认）。</li>
+</ul>
+<h3 id="hostkeyalgorithms-algorithms"><a class="markdownIt-Anchor" href="#hostkeyalgorithms-algorithms"></a> HostKeyAlgorithms algorithms</h3>
+<p>其中algorithms是一个由逗号隔开的算法列表，客户端按照优先级顺序依次使用这些算法。<br />
+从<code>ssh-rsa</code>或<code>ssh-dss</code>中选择algorithms（默认值为<code>ssh-rsa, ssh-dss</code>）。</p>
+<h3 id="port-num"><a class="markdownIt-Anchor" href="#port-num"></a> Port num</h3>
+<p>使OpenSSH通过num端口与远程系统连接。默认值为 <code>22</code>。</p>
+<h3 id="stricthostkeychecking"><a class="markdownIt-Anchor" href="#stricthostkeychecking"></a> StrictHostKeyChecking</h3>
+<p><code>yes | no | ask</code></p>
+<p>决定OpenSSH是否将主机密钥添加到用户的known_hosts文件中以及如何添加。<br />
+如果将该选项设置为ask，那么在连接新系统时会询问是否添加主机密钥；<br />
+如果设置为no，就会自动添加主机密钥；<br />
+如果设置为yes，就要求手工添加主机密钥。<br />
+若将参数设置yes或ask，则当某系统的主机密钥发生改变之后，OpenSSH会拒绝连接到该系统。<br />
+对于安全性要求较高的系统，请将此参设置为yes或ask。默认为ask。</p>
+<h3 id="tcpkeepalive"><a class="markdownIt-Anchor" href="#tcpkeepalive"></a> TCPKeepAlive</h3>
+<p><code>yes | no</code></p>
+<p>如果设置为yes（默认值），就定期检查连接是否存活。如果服务器崩溃或者由于其他原因导致连接死掉，那么这种检查将会导致ssh或scp连接中断，即便连接只是暂时死掉。<br />
+若将这个参数设置为no，则会导致客户端不去检查连接是否存活。这项声明用到了TCP keepalive选项，它未经加密，并且容易受到IP欺骗（参见术语表）。如果希望采用能够防止IP欺骗的替代品，<br />
+那么可以采用基于服务器的相关技术。</p>
+<h3 id="user-name"><a class="markdownIt-Anchor" href="#user-name"></a> User name</h3>
+<p>指定登录系统时所用的用户名。可用Host声明来指定系统。该选项意味着，在远程系统上登录时，如果使用的用户名不同于在本地系统上登录所用的用户名，那么不必在命令行上输入用户名。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"># $OpenBSD: ssh_config,v 1.30 2016/02/20 23:06:23 sobrado Exp $</span><br><span class="line"></span><br><span class="line"># This is the ssh client system-wide configuration file.  See</span><br><span class="line"># ssh_config(5) for more information.  This file provides defaults for</span><br><span class="line"># users, and the values can be changed in per-user configuration files</span><br><span class="line"># or on the command line.</span><br><span class="line"></span><br><span class="line"># Configuration data is parsed as follows:</span><br><span class="line">#  1. command line options</span><br><span class="line">#  2. user-specific file</span><br><span class="line">#  3. system-wide file</span><br><span class="line"># Any configuration value is only changed the first time it is set.</span><br><span class="line"># Thus, host-specific definitions should be at the beginning of the</span><br><span class="line"># configuration file, and defaults at the end.</span><br><span class="line"></span><br><span class="line"># Site-wide defaults for some commonly used options.  For a comprehensive</span><br><span class="line"># list of available options, their meanings and defaults, please see the</span><br><span class="line"># ssh_config(5) man page.</span><br><span class="line"></span><br><span class="line"># Host *</span><br><span class="line">#   ForwardAgent no</span><br><span class="line">#   ForwardX11 no</span><br><span class="line">#   RhostsRSAAuthentication no</span><br><span class="line">#   RSAAuthentication yes</span><br><span class="line">#   PasswordAuthentication yes</span><br><span class="line">#   HostbasedAuthentication no</span><br><span class="line">#   GSSAPIAuthentication no</span><br><span class="line">#   GSSAPIDelegateCredentials no</span><br><span class="line">#   BatchMode no</span><br><span class="line">#   CheckHostIP yes</span><br><span class="line">#   AddressFamily any</span><br><span class="line">#   ConnectTimeout 0</span><br><span class="line">#   StrictHostKeyChecking ask</span><br><span class="line">#   IdentityFile ~/.ssh/identity</span><br><span class="line">#   IdentityFile ~/.ssh/id_rsa</span><br><span class="line">#   IdentityFile ~/.ssh/id_dsa</span><br><span class="line">#   IdentityFile ~/.ssh/id_ecdsa</span><br><span class="line">#   IdentityFile ~/.ssh/id_ed25519</span><br><span class="line">#   Port 22</span><br><span class="line">#   Protocol 2</span><br><span class="line">#   Cipher 3des</span><br><span class="line">#   Ciphers aes128-ctr,aes192-ctr,aes256-ctr,arcfour256,arcfour128,aes128-cbc,3des-cbc</span><br><span class="line">#   MACs hmac-md5,hmac-sha1,umac-64@openssh.com,hmac-ripemd160</span><br><span class="line">#   EscapeChar ~</span><br><span class="line">#   Tunnel no</span><br><span class="line">#   TunnelDevice any:any</span><br><span class="line">#   PermitLocalCommand no</span><br><span class="line">#   VisualHostKey no</span><br><span class="line">#   ProxyCommand ssh -q -W %h:%p gateway.example.com</span><br><span class="line">#   RekeyLimit 1G 1h</span><br><span class="line">Host *</span><br><span class="line">    StrictHostKeyChecking no</span><br><span class="line">    UserKnownHostsFile=~/.ssh/known_hosts</span><br><span class="line">    IdentityFile=~/.ssh/github_rsa</span><br><span class="line">    IdentityFile=~/.ssh/github3_rsa</span><br><span class="line">    IdentityFile=~/.ssh/id_rsa</span><br><span class="line"></span><br><span class="line">Host github.com</span><br><span class="line">    StrictHostKeyChecking no</span><br><span class="line">    UserKnownHostsFile=/dev/null</span><br><span class="line">    IdentityFile=~/.ssh/github_rsa</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="ssh登录很慢问题的解决"><a class="markdownIt-Anchor" href="#ssh登录很慢问题的解决"></a> SSH登录很慢问题的解决</h2>
+<h3 id="dns反向解析的问题"><a class="markdownIt-Anchor" href="#dns反向解析的问题"></a> DNS反向解析的问题</h3>
+<p>OpenSSH 在用户登录的时候会验证 IP ，它根据用户的IP使用反向DNS找到主机名，再使用 DNS 找到 IP 地址，最后匹配一下登录的 IP 是否合法。如果客户机的 IP 没有域名，或者 DNS 服务器很慢或不通，那么登录就会很花时间。</p>
+<p>解决办法：</p>
+<p>在目标服务器上修改sshd服务器端配置,并重启 sshd</p>
+<p><code>vi /etc/ssh/sshd_config</code>，设置 <code>UseDNS</code> 为 <code>no</code> 即可</p>
+<p>当然也可以通过提供DNS正确反向解析的方法解决，有如下两种思路</p>
+<ol>
+<li>修改server上的 hosts 文件，将目标机器的IP和域名加上去。或者</li>
+<li>让本机的 DNS 服务器能解析目标地址。</li>
+</ol>
+<p>在 server 上 <code>/etc/hosts</code> 文件中把常用的 ip 和 hostname 加入，然后在<code>/etc/nsswitch.conf</code> 看看程序是否先查询 <code>hosts</code> 文件（一般缺省是这样）。</p>
+<h3 id="gssapi-认证造成的"><a class="markdownIt-Anchor" href="#gssapi-认证造成的"></a> GSSAPI 认证造成的</h3>
+<p>用 <code>ssh -v user@server</code> 可以看到登录时有如下信息：</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">debug1: Next authentication <span class="function"><span class="keyword">method</span>:</span> gssapi-<span class="keyword">with</span>-mic</span><br><span class="line"></span><br><span class="line">debug1: Unspecified GSS failure. Minor code may provide more information</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注：<code>ssh -vvv user@server</code> 可以看到更细的debug信息</p>
+</blockquote>
+<p>解决办法：</p>
+<p>在客户端上修改 ssh 客户端配置(注意不是 <code>sshd_conf</code> ）</p>
+<p><code>vi /etc/ssh/ssh_config</code>，设置 <code>GSSAPIAuthentication no</code>  并重启 <code>sshd</code></p>
+<p>可以使用</p>
+<figure class="highlight shell"><figcaption><span>script</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -A -o StrictHostKeyChecking=no -o GSSAPIAuthentication=no -p 32200 username@server_ip</span><br></pre></td></tr></table></figure>
+<p>GSSAPI ( Generic Security Services Application Programming Interface) 是一套类似Kerberos 5 的通用网络安全系统接口。该接口是对各种不同的客户端服务器安全机制的封装，以消除安全接口的不同，降低编程难度。但该接口在目标机器无域名解析时会有问题</p>
+<p>使用 <code>strace</code> 查看后发现，ssh 在验证完 key 之后，进行 <code>authentication gssapi-with-mic</code>，此时先去连接 DNS 服务器，在这之后会进行其他操作。</p>
+<h2 id="how-to-keep-alive-ssh-sessions"><a class="markdownIt-Anchor" href="#how-to-keep-alive-ssh-sessions"></a> How to Keep Alive SSH Sessions</h2>
+<p>添加以下配置到 <code>/etc/ssh/ssh_config</code> (修改系统内所有用户) 或 <code>~/.ssh/config</code> (只修改当前用户) ，开启 keep alive</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Host</span> *</span><br><span class="line">    <span class="attribute">ServerAliveInterval</span> <span class="number">300</span></span><br><span class="line">    <span class="attribute">ServerAliveCountMax</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<p>添加以下配置到 <code>/etc/ssh/sshd_config</code>，可以使 OpenSSH 服务器保留所有活跃连接:</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ClientAliveInterval</span> <span class="number">300</span></span><br><span class="line"><span class="attribute">ClientAliveCountMax</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<p>这些设置将使SSH客户端或服务器每300秒（5分钟）向另一侧发送一个空数据包，并在两次尝试后仍未收到任何响应的情况下放弃，此时连接很可能已被丢弃。</p>
+<h2 id="ssh登录时不自动执行-bashrc"><a class="markdownIt-Anchor" href="#ssh登录时不自动执行-bashrc"></a> SSH登录时不自动执行 <code>.bashrc</code></h2>
+<p>在 <code>~/.bash_profile</code> 文件中添加以下内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if [ -f ~/.bashrc ]; then</span><br><span class="line">  . ~/.bashrc</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+<h2 id="key_load_public-invalid-format"><a class="markdownIt-Anchor" href="#key_load_public-invalid-format"></a> <code>key_load_public: invalid format</code></h2>
+<p>重新生成公钥</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -f ~/.ssh/id_rsa -y &gt; ~/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure>
+<h2 id="authentication-refused-bad-ownership-or-modes-for-directory"><a class="markdownIt-Anchor" href="#authentication-refused-bad-ownership-or-modes-for-directory"></a> Authentication refused: bad ownership or modes for directory</h2>
+<p><strong>问题</strong></p>
+<p>设置 ssh 免密码登陆的时候，发现有一些机器设置不生效。有一些机器正常。</p>
+<p><strong>跟踪</strong></p>
+<p>登陆目标机器，查看 sshd 的日志信息。日志信息目录为，<code>/var/log/auth.log</code><br />
+你会发现如下字样的日志信息。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Jul</span> <span class="number">22</span> <span class="number">14</span>:<span class="number">20</span>:<span class="number">33</span> v<span class="number">138020</span>.go sshd[<span class="number">4917</span>]: Authentication refused: bad ownership or modes for directory /home/xinhailong</span><br></pre></td></tr></table></figure>
+<p><strong>原因</strong></p>
+<p>sshd 为了安全，对属主的目录和文件权限有所要求。如果权限不对，则 ssh 的免密码登陆不生效。</p>
+<p>用户目录权限为 <code>755</code> 或者 <code>700</code>，就是不能是<code>77x</code></p>
+<ul>
+<li><code>.ssh</code> 目录权限一般为 <code>755</code> 或者 <code>700</code></li>
+<li><code>rsa_id.pub</code> 及 <code>authorized_keys</code> 权限一般为 <code>644</code></li>
+<li><code>rsa_id</code> 权限必须为 <code>600</code></li>
+</ul>
+<p><strong>解决方法</strong></p>
+<p>检测目录权限，把不符合要求的按要求设置权限即可。</p>
+<hr />
+<h2 id="参考链接"><a class="markdownIt-Anchor" href="#参考链接"></a> 参考链接</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://book.51cto.com/art/200906/126284.htm">配置文件~/.ssh/config和/etc/ssh/ssh_config</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/leoyang63/articles/12061136.html">SSH登录很慢问题的解决</a></li>
+<li><a target="_blank" rel="noopener" href="https://patrickmn.com/aside/how-to-keep-alive-ssh-sessions/">How to Keep Alive SSH Sessions<br />
+</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bo56.com/ssh%E5%85%8D%E5%AF%86%E7%A0%81%E7%99%BB%E9%99%86%E8%AE%BE%E7%BD%AE%E6%97%B6authentication-refused-bad-ownership-or-modes%E9%94%99%E8%AF%AF%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/">ssh免密码登陆设置时Authentication refused: bad ownership or modes错误解决方法</a></li>
+<li><a target="_blank" rel="noopener" href="https://hostingwiki.cn/en/%E8%AE%BE%E7%BD%AE%E5%85%8D%E5%AF%86%E7%A0%81ssh%E5%90%8E%E5%87%BA%E7%8E%B0key_load_public-invalid-format/">设置免密码ssh后出现key_load_public: invalid format</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ssh/" rel="tag"># ssh</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/08/12/install-a-user-script-manager/" rel="prev" title="安装一个用户脚本管理器">
+                  <i class="fa fa-chevron-left"></i> 安装一个用户脚本管理器
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/09/21/How-to-Run-Your-Own-Git-Server/" rel="next" title="如何自己搭建git服务器">
+                  如何自己搭建git服务器 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LRH3321</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+<script>
+var mermaidElements = document.querySelectorAll('.mermaid');
+if (mermaidElements.length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaidElements.forEach(element => {
+      const newElement = document.createElement('div');
+      newElement.innerHTML = element.innerHTML;
+      newElement.className = element.className;
+      element.parentNode.replaceChild(newElement, element);
+    });
+
+    mermaid.init({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    }, '.mermaid');
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+
+
+
+  
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/asuna/asuna_04.model.json"},"display":{"position":"right","width":300,"height":600},"mobile":{"show":true},"react":{"opacity":0.7},"log":false});</script></body>
+</html>

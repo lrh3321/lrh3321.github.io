@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.lrh3321.win","root":"/","images":"/images","scheme":"Gemini","version":"8.3.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="利用 GitHook 构建持续交付和部署  Git 钩子 和其它版本控制系统一样，Git 能在特定的重要动作发生时触发自定义脚本。 有两组这样的钩子：客户端的和服务器端的。 客户端钩子由诸如提交和合并这样的操作所调用，而服务器端钩子作用于诸如接收被推送的提交这样的联网操作。 你可以随心所欲地运用这些钩子。本文只介绍服务器端钩子。  安装一个钩子 钩子都被存储在 Git 目录下的 hooks 子目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用 GitHook 构建持续交付和部署">
+<meta property="og:url" content="http://www.lrh3321.win/2017/10/22/git-hooks/index.html">
+<meta property="og:site_name" content="LRH3321&#39;s Blog">
+<meta property="og:description" content="利用 GitHook 构建持续交付和部署  Git 钩子 和其它版本控制系统一样，Git 能在特定的重要动作发生时触发自定义脚本。 有两组这样的钩子：客户端的和服务器端的。 客户端钩子由诸如提交和合并这样的操作所调用，而服务器端钩子作用于诸如接收被推送的提交这样的联网操作。 你可以随心所欲地运用这些钩子。本文只介绍服务器端钩子。  安装一个钩子 钩子都被存储在 Git 目录下的 hooks 子目">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-10-22T13:16:08.000Z">
+<meta property="article:modified_time" content="2017-10-22T13:16:08.000Z">
+<meta property="article:author" content="LRH3321">
+<meta property="article:tag" content="git">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://www.lrh3321.win/2017/10/22/git-hooks/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>利用 GitHook 构建持续交付和部署 | LRH3321's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">LRH3321's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Bug制造者</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">13</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">16</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%A9%E7%94%A8-githook-%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E5%92%8C%E9%83%A8%E7%BD%B2"><span class="nav-number">1.</span> <span class="nav-text"> 利用 GitHook 构建持续交付和部署</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#git-%E9%92%A9%E5%AD%90"><span class="nav-number">1.1.</span> <span class="nav-text"> Git 钩子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E4%B8%80%E4%B8%AA%E9%92%A9%E5%AD%90"><span class="nav-number">1.1.1.</span> <span class="nav-text"> 安装一个钩子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E9%92%A9%E5%AD%90"><span class="nav-number">1.1.2.</span> <span class="nav-text"> 服务器端钩子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pre-receive"><span class="nav-number">1.1.3.</span> <span class="nav-text"> pre-receive</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#update"><span class="nav-number">1.1.4.</span> <span class="nav-text"> update</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#post-receive"><span class="nav-number">1.1.5.</span> <span class="nav-text"> post-receive</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%B5%8B%E8%AF%95%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">1.2.</span> <span class="nav-text"> 配置测试服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E6%B5%8B%E8%AF%95%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E6%96%B0%E5%BB%BA%E4%BB%93%E5%BA%93"><span class="nav-number">1.2.1.</span> <span class="nav-text"> 在测试服务器上新建仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E5%86%99post-receive%E9%92%A9%E5%AD%90"><span class="nav-number">1.2.2.</span> <span class="nav-text"> 编写post-receive钩子</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LRH3321</p>
+  <div class="site-description" itemprop="description">常年挖坑不填</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrh3321" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrh3321@gmail.com" title="E-Mail → mailto:lrh3321@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/lrh3321" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://coding.net/u/lrh3321" title="Coding → https:&#x2F;&#x2F;coding.net&#x2F;u&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>Coding</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://leetcode.com/lrh3321/" title="LeetCode → https:&#x2F;&#x2F;leetcode.com&#x2F;lrh3321&#x2F;" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>LeetCode</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.lrh3321.win/2017/10/22/git-hooks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LRH3321">
+      <meta itemprop="description" content="常年挖坑不填">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LRH3321's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          利用 GitHook 构建持续交付和部署
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-10-22 21:16:08" itemprop="dateCreated datePublished" datetime="2017-10-22T21:16:08+08:00">2017-10-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="利用-githook-构建持续交付和部署"><a class="markdownIt-Anchor" href="#利用-githook-构建持续交付和部署"></a> 利用 GitHook 构建持续交付和部署</h1>
+<h2 id="git-钩子"><a class="markdownIt-Anchor" href="#git-钩子"></a> Git 钩子</h2>
+<p>和其它版本控制系统一样，Git 能在特定的重要动作发生时触发自定义脚本。 有两组这样的钩子：客户端的和服务器端的。 客户端钩子由诸如提交和合并这样的操作所调用，而服务器端钩子作用于诸如接收被推送的提交这样的联网操作。 你可以随心所欲地运用这些钩子。本文只介绍服务器端钩子。</p>
+<h3 id="安装一个钩子"><a class="markdownIt-Anchor" href="#安装一个钩子"></a> 安装一个钩子</h3>
+<p>钩子都被存储在 Git 目录下的 <code>hooks</code> 子目录中。 也即绝大部分项目中的 <code>.git/hooks</code> 。 当你用 <code>git init</code> 初始化一个新版本库时，Git 默认会在这个目录中放置一些示例脚本。这些脚本除了本身可以被调用外，它们还透露了被触发时所传入的参数。 所有的示例都是 shell 脚本，其中一些还混杂了 Perl 代码，不过，任何正确命名的可执行脚本都可以正常使用 —— 你可以用 Ruby 或 Python，或其它语言编写它们。 这些示例的名字都是以 .sample 结尾，如果你想启用它们，得先移除这个后缀。</p>
+<p>把一个正确命名且可执行的文件放入 Git 目录下的 <code>hooks</code> 子目录中，即可激活该钩子脚本。 这样一来，它就能被 Git 调用。</p>
+<span id="more"></span>
+<h3 id="服务器端钩子"><a class="markdownIt-Anchor" href="#服务器端钩子"></a> 服务器端钩子</h3>
+<p>这些钩子脚本在推送到服务器之前和之后运行。 推送到服务器前运行的钩子可以在任何时候以非零值退出，拒绝推送并给客户端返回错误消息，还可以依你所想设置足够复杂的推送策略。</p>
+<h3 id="pre-receive"><a class="markdownIt-Anchor" href="#pre-receive"></a> <code>pre-receive</code></h3>
+<p>处理来自客户端的推送操作时，最先被调用的脚本是 <code>pre-receive</code>。 它从标准输入获取一系列被推送的引用。如果它以非零值退出，所有的推送内容都不会被接受。 你可以用这个钩子阻止对引用进行非快进（non-fast-forward）的更新，或者对该推送所修改的所有引用和文件进行访问控制。</p>
+<h3 id="update"><a class="markdownIt-Anchor" href="#update"></a> <code>update</code></h3>
+<p><code>update</code> 脚本和 <code>pre-receive</code> 脚本十分类似，不同之处在于它会为每一个准备更新的分支各运行一次。 假如推送者同时向多个分支推送内容，<code>pre-receive</code> 只运行一次，相比之下 <code>update</code> 则会为每一个被推送的分支各运行一次。 它不会从标准输入读取内容，而是接受三个参数：引用的名字（分支），推送前的引用指向的内容的 SHA-1 值，以及用户准备推送的内容的 SHA-1 值。 如果 <code>update</code> 脚本以非零值退出，只有相应的那一个引用会被拒绝；其余的依然会被更新。</p>
+<h3 id="post-receive"><a class="markdownIt-Anchor" href="#post-receive"></a> <code>post-receive</code></h3>
+<p><code>post-receive</code> 挂钩在整个过程完结以后运行，可以用来更新其他系统服务或者通知用户。 它接受与 <code>pre-receive</code> 相同的标准输入数据。 它的用途包括给某个邮件列表发信，通知持续集成（continous integration）的服务器，或者更新问题追踪系统（ticket-tracking system） —— 甚至可以通过分析提交信息来决定某个问题（ticket）是否应该被开启，修改或者关闭。 该脚本无法终止推送进程，不过客户端在它结束运行之前将保持连接状态，所以如果你想做其他操作需谨慎使用它，因为它将耗费你很长的一段时间。</p>
+<h2 id="配置测试服务器"><a class="markdownIt-Anchor" href="#配置测试服务器"></a> 配置测试服务器</h2>
+<h3 id="在测试服务器上新建仓库"><a class="markdownIt-Anchor" href="#在测试服务器上新建仓库"></a> 在测试服务器上新建仓库</h3>
+<p>因为需要在测试服务器上构建和集成，所以仓库需要有工作目录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /opt/git</span><br><span class="line">mkdir demo.git</span><br><span class="line"><span class="built_in">cd</span> demo.git</span><br><span class="line">git init</span><br><span class="line"><span class="comment"># 允许更新非纯仓库的当前分支</span></span><br><span class="line">git config receive.denyCurrentBranch ignore</span><br></pre></td></tr></table></figure>
+<h3 id="编写post-receive钩子"><a class="markdownIt-Anchor" href="#编写post-receive钩子"></a> 编写<code>post-receive</code>钩子</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /opt/git/demo/.git/hooks/post-receive</span><br></pre></td></tr></table></figure>
+<p>一个仅供参考的Spring boot项目钩子</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">DEST=/opt/git/demo</span><br><span class="line"></span><br><span class="line"><span class="built_in">unset</span> GIT_DIR</span><br><span class="line"></span><br><span class="line"><span class="built_in">pushd</span> <span class="variable">$DEST</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 清理仓库</span></span><br><span class="line">git reset --hard</span><br><span class="line"><span class="comment"># 打包Jar</span></span><br><span class="line">gradle bootJar</span><br><span class="line"><span class="comment"># 使用Docker打包镜像，需要用户属于docker组</span></span><br><span class="line">docker build -t demo:latest</span><br><span class="line"><span class="comment"># 移除旧的容器</span></span><br><span class="line">docker stop demo &amp;&amp; docker rm demo</span><br><span class="line"><span class="comment"># 使用新镜像启动容器</span></span><br><span class="line">docker run -d --name demo demo:latest</span><br><span class="line"><span class="built_in">popd</span></span><br></pre></td></tr></table></figure>
+<p>之后每次向测试服务器推送代码，都会自动执行<code>post-receive</code>钩子</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/git/" rel="tag"># git</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/10/21/pip/" rel="prev" title="调教 Pip">
+                  <i class="fa fa-chevron-left"></i> 调教 Pip
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/07/09/message-queue/" rel="next" title="物联网设备消息队列选型">
+                  物联网设备消息队列选型 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LRH3321</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+<script>
+var mermaidElements = document.querySelectorAll('.mermaid');
+if (mermaidElements.length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaidElements.forEach(element => {
+      const newElement = document.createElement('div');
+      newElement.innerHTML = element.innerHTML;
+      newElement.className = element.className;
+      element.parentNode.replaceChild(newElement, element);
+    });
+
+    mermaid.init({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    }, '.mermaid');
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+
+
+
+  
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/asuna/asuna_04.model.json"},"display":{"position":"right","width":300,"height":600},"mobile":{"show":true},"react":{"opacity":0.7},"log":false});</script></body>
+</html>

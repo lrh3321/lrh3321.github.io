@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.lrh3321.win","root":"/","images":"/images","scheme":"Gemini","version":"8.3.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="物联网设备消息队列选型  需求  消息队列的作用  削峰，形象点的话，可以比喻为蓄水池。比如elk日志收集系统中的kafka，主要在日志高峰期的时候，在牺牲实时性的同时，保证了整个系统的安全。 同步系统异构化。原先一个同步操作里的诸多步骤，可以考虑将一些不影响主线发展的步骤，通过消息队列异步处理。比如，电商行业，一个订单完成之后，一般除了直接返回给客户购买成功的消息，还要通知账户组进行扣费，通知">
+<meta property="og:type" content="article">
+<meta property="og:title" content="物联网设备消息队列选型">
+<meta property="og:url" content="http://www.lrh3321.win/2019/07/09/message-queue/index.html">
+<meta property="og:site_name" content="LRH3321&#39;s Blog">
+<meta property="og:description" content="物联网设备消息队列选型  需求  消息队列的作用  削峰，形象点的话，可以比喻为蓄水池。比如elk日志收集系统中的kafka，主要在日志高峰期的时候，在牺牲实时性的同时，保证了整个系统的安全。 同步系统异构化。原先一个同步操作里的诸多步骤，可以考虑将一些不影响主线发展的步骤，通过消息队列异步处理。比如，电商行业，一个订单完成之后，一般除了直接返回给客户购买成功的消息，还要通知账户组进行扣费，通知">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/60ed8b14gy1g60ndgrpvej20fe04egm2.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/60ed8b14gy1g60ng60gt8j20dg0aut9k.jpg">
+<meta property="og:image" content="https://www.baidu.com/img/bd_logo1.png?where=super">
+<meta property="article:published_time" content="2019-07-09T04:11:11.000Z">
+<meta property="article:modified_time" content="2020-02-20T07:11:11.000Z">
+<meta property="article:author" content="LRH3321">
+<meta property="article:tag" content="message-queue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ww1.sinaimg.cn/large/60ed8b14gy1g60ndgrpvej20fe04egm2.jpg">
+
+
+<link rel="canonical" href="http://www.lrh3321.win/2019/07/09/message-queue/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>物联网设备消息队列选型 | LRH3321's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">LRH3321's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Bug制造者</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">13</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">16</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%89%A9%E8%81%94%E7%BD%91%E8%AE%BE%E5%A4%87%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E9%80%89%E5%9E%8B"><span class="nav-number">1.</span> <span class="nav-text"> 物联网设备消息队列选型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9C%80%E6%B1%82"><span class="nav-number">1.1.</span> <span class="nav-text"> 需求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">1.1.1.</span> <span class="nav-text"> 消息队列的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E5%89%8D%E7%8A%B6%E5%86%B5"><span class="nav-number">1.1.2.</span> <span class="nav-text"> 目前状况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E5%85%B3%E6%B3%A8%E7%89%B9%E6%80%A7"><span class="nav-number">1.1.3.</span> <span class="nav-text"> 重点关注特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%A4%AA%E5%85%B3%E6%B3%A8%E7%9A%84%E7%89%B9%E6%80%A7"><span class="nav-number">1.1.4.</span> <span class="nav-text"> 不太关注的特性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%85%E9%80%89%E6%96%B9%E6%A1%88"><span class="nav-number">1.2.</span> <span class="nav-text"> 待选方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E-mqtt-%E5%8D%8F%E8%AE%AE%E7%9A%84-broker"><span class="nav-number">1.2.1.</span> <span class="nav-text"> 基于 MQTT 协议的 broker</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#eclipse-mosquitto"><span class="nav-number">1.2.1.1.</span> <span class="nav-text"> Eclipse Mosquitto</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C1"><span class="nav-number">1.2.1.1.1.</span> <span class="nav-text"> 操作1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C2"><span class="nav-number">1.2.1.1.2.</span> <span class="nav-text"> 操作2</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#emq"><span class="nav-number">1.2.1.2.</span> <span class="nav-text"> EMQ</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jvm-%E7%B3%BB%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="nav-number">1.2.2.</span> <span class="nav-text"> JVM 系消息队列</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#kafka"><span class="nav-number">1.2.2.1.</span> <span class="nav-text"> Kafka</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#kafka-%E5%87%A0%E5%A4%A7%E6%A6%82%E5%BF%B5"><span class="nav-number">1.2.2.1.1.</span> <span class="nav-text"> Kafka 几大概念</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#kafka-%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">1.2.2.1.2.</span> <span class="nav-text"> Kafka 持久化</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#activemq"><span class="nav-number">1.2.2.2.</span> <span class="nav-text"> ActiveMQ</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#rocketmq"><span class="nav-number">1.2.2.3.</span> <span class="nav-text"> RocketMQ</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rabbitmq"><span class="nav-number">1.2.3.</span> <span class="nav-text"> RabbitMQ</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#rabbitmq-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.2.3.1.</span> <span class="nav-text"> RabbitMQ 基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#message"><span class="nav-number">1.2.3.1.1.</span> <span class="nav-text"> Message</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#publisher"><span class="nav-number">1.2.3.1.2.</span> <span class="nav-text"> Publisher</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#exchange"><span class="nav-number">1.2.3.1.3.</span> <span class="nav-text"> Exchange</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#binding"><span class="nav-number">1.2.3.1.4.</span> <span class="nav-text"> Binding</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#queue"><span class="nav-number">1.2.3.1.5.</span> <span class="nav-text"> Queue</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#connection"><span class="nav-number">1.2.3.1.6.</span> <span class="nav-text"> Connection</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#channel"><span class="nav-number">1.2.3.1.7.</span> <span class="nav-text"> Channel</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#consumer"><span class="nav-number">1.2.3.1.8.</span> <span class="nav-text"> Consumer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#virtual-host"><span class="nav-number">1.2.3.1.9.</span> <span class="nav-text"> Virtual Host</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#broker"><span class="nav-number">1.2.3.1.10.</span> <span class="nav-text"> Broker</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">1.2.3.2.</span> <span class="nav-text"> 注意事项</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nats-streaming"><span class="nav-number">1.3.</span> <span class="nav-text"> NATS Streaming</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%B7%B1%E7%9A%84-broker"><span class="nav-number">1.4.</span> <span class="nav-text"> 实现自己的 Broker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%9E%84%E6%80%9D"><span class="nav-number">1.4.1.</span> <span class="nav-text"> 设计构思</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rushmq"><span class="nav-number">1.4.2.</span> <span class="nav-text"> RushMQ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#filemq"><span class="nav-number">1.4.3.</span> <span class="nav-text"> FileMQ</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF"><span class="nav-number">1.4.3.1.</span> <span class="nav-text"> 优势</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9"><span class="nav-number">1.4.3.2.</span> <span class="nav-text"> 缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#moonmq"><span class="nav-number">1.4.4.</span> <span class="nav-text"> MoonMQ</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LRH3321</p>
+  <div class="site-description" itemprop="description">常年挖坑不填</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrh3321" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrh3321@gmail.com" title="E-Mail → mailto:lrh3321@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/lrh3321" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://coding.net/u/lrh3321" title="Coding → https:&#x2F;&#x2F;coding.net&#x2F;u&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>Coding</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://leetcode.com/lrh3321/" title="LeetCode → https:&#x2F;&#x2F;leetcode.com&#x2F;lrh3321&#x2F;" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>LeetCode</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.lrh3321.win/2019/07/09/message-queue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LRH3321">
+      <meta itemprop="description" content="常年挖坑不填">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LRH3321's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          物联网设备消息队列选型
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-07-09 12:11:11" itemprop="dateCreated datePublished" datetime="2019-07-09T12:11:11+08:00">2019-07-09</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-02-20 15:11:11" itemprop="dateModified" datetime="2020-02-20T15:11:11+08:00">2020-02-20</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/message-queue/" itemprop="url" rel="index"><span itemprop="name">message-queue</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="物联网设备消息队列选型"><a class="markdownIt-Anchor" href="#物联网设备消息队列选型"></a> 物联网设备消息队列选型</h1>
+<h2 id="需求"><a class="markdownIt-Anchor" href="#需求"></a> 需求</h2>
+<h3 id="消息队列的作用"><a class="markdownIt-Anchor" href="#消息队列的作用"></a> 消息队列的作用</h3>
+<ul>
+<li>削峰，形象点的话，可以比喻为蓄水池。比如elk日志收集系统中的kafka，主要在日志高峰期的时候，在牺牲实时性的同时，保证了整个系统的安全。</li>
+<li>同步系统异构化。原先一个同步操作里的诸多步骤，可以考虑将一些不影响主线发展的步骤，通过消息队列异步处理。比如，电商行业，一个订单完成之后，一般除了直接返回给客户购买成功的消息，还要通知账户组进行扣费，通知处理库存变化，通知物流进行派送等，通知一些用户组做一些增加会员积分等操作等。</li>
+</ul>
+<span id="more"></span>
+<h3 id="目前状况"><a class="markdownIt-Anchor" href="#目前状况"></a> 目前状况</h3>
+<p>Woker使用网络质量、工作环境较差，需要在设备失去与Master的网络连接时，将未发送的消息持久化在本地，防止设备意外断电/宕机时消息丢失。并且，在设备重启后，将持久化后的消息，发送给Master。</p>
+<h3 id="重点关注特性"><a class="markdownIt-Anchor" href="#重点关注特性"></a> 重点关注特性</h3>
+<ul>
+<li>设备资源有限，资源占用不能太高</li>
+<li>能将消息持久化</li>
+<li>启动/重启快</li>
+<li>设备设备极有可能应各种意外突然断电，需要有一定的容错能力</li>
+<li>ACK或类似机制，确保消息至少被正确消费一次</li>
+<li>支持广播消费</li>
+</ul>
+<h3 id="不太关注的特性"><a class="markdownIt-Anchor" href="#不太关注的特性"></a> 不太关注的特性</h3>
+<ul>
+<li>在不可靠的连接上工作， Broker 主要为本地 Client 工作</li>
+<li>高并发，由于设备机能限制，本地 Client 数应该会小于 1000</li>
+<li>低延迟，目前来看消息消费者对消息的实时性要求不高，秒级延迟应该都是在容许范围内</li>
+<li>多域部署以及High Availablity，只需要部署本地单个节点，但是要求 Broker 意外宕机后，能快速重启</li>
+</ul>
+<h2 id="待选方案"><a class="markdownIt-Anchor" href="#待选方案"></a> 待选方案</h2>
+<h3 id="基于-mqtt-协议的-broker"><a class="markdownIt-Anchor" href="#基于-mqtt-协议的-broker"></a> 基于 MQTT 协议的 broker</h3>
+<p>MQTT(Message Queuing Telemetry Transport) 是为硬件性能低下的远程设备以及网络状况糟糕的情况下而设计的发布/订阅型消息协议。</p>
+<blockquote>
+<p>MQTT is a machine-to-machine (M2M)/“Internet of Things” connectivity protocol. It was designed as an extremely lightweight publish/subscribe messaging transport. It is useful for connections with remote locations where a small code footprint is required and/or network bandwidth is at a premium.</p>
+</blockquote>
+<h4 id="eclipse-mosquitto"><a class="markdownIt-Anchor" href="#eclipse-mosquitto"></a> <a target="_blank" rel="noopener" href="https://mosquitto.org/">Eclipse Mosquitto</a></h4>
+<p>测试后发现 <code>Mosquitto</code> 的持久化功能可能不够可靠。</p>
+<p>测试环境</p>
+<p>Win 10 虚拟机， 系统为 <code>Linux stretch 4.9.0-9-amd64 #1 SMP Debian 4.9.168-1+deb9u2 (2019-05-13) x86_64 GNU/Linux</code></p>
+<p>使用 <code>eclipse-mosquitto</code> 镜像，Python 3.5 - paho-mqtt 1.4.0 环境。</p>
+<p>容器启动命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /home/vagrant/emqx/data</span><br><span class="line">docker run -it --name mqtt -p 1883:1883 -p 9001:9001 -v /home/vagrant/emqx/mosquitto.conf:/mosquitto/config/mosquitto.conf -v /home/vagrant/emqx/data:/mosquitto/data eclipse-mosquitto</span><br></pre></td></tr></table></figure>
+<p><code>mosquitto.conf</code> 配置如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">persistence true</span><br><span class="line">persistence_location &#x2F;mosquitto&#x2F;data&#x2F;</span><br><span class="line">log_dest file &#x2F;mosquitto&#x2F;log&#x2F;mosquitto.log</span><br><span class="line"></span><br><span class="line">persistent_client_expiration 14d</span><br><span class="line">autosave_interval 60</span><br></pre></td></tr></table></figure>
+<p>消息发布脚本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mosquitto_pub -t <span class="string">&#x27;Home/BedRoom/DHT22/1a&#x27;</span> -m <span class="string">&#x27;hello world3&#x27;</span> -q 1</span><br><span class="line">mosquitto_pub -t <span class="string">&#x27;Home/BedRoom/DHT22/aa&#x27;</span> -m <span class="string">&#x27;hello world3&#x27;</span> -q 2</span><br></pre></td></tr></table></figure>
+<p>订阅端 Python 脚本</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> paho.mqtt.client <span class="keyword">as</span> mqtt</span><br><span class="line"></span><br><span class="line">MQTT_Topic = <span class="string">&quot;Home/BedRoom/DHT22/#&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">on_connect</span>(<span class="params">client, userdata, flags, rc</span>):</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Connected with result code &quot;</span> - <span class="built_in">str</span>(rc))</span><br><span class="line"></span><br><span class="line">    client.subscribe(MQTT_Topic)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">on_message</span>(<span class="params">client, userdata, msg</span>):</span></span><br><span class="line">    <span class="built_in">print</span>(msg.topic - <span class="string">&quot; &quot;</span> - <span class="built_in">str</span>(msg.payload))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    client = mqtt.Client(<span class="string">&quot;worker&quot;</span>, clean_session=<span class="literal">False</span>)</span><br><span class="line">    client.on_connect = on_connect</span><br><span class="line">    client.on_message = on_message</span><br><span class="line"></span><br><span class="line">    host = <span class="string">&quot;127.0.0.1&quot;</span></span><br><span class="line"></span><br><span class="line">    client.connect(host)</span><br><span class="line">    client.loop_forever()</span><br></pre></td></tr></table></figure>
+<h5 id="操作1"><a class="markdownIt-Anchor" href="#操作1"></a> 操作1</h5>
+<ol>
+<li>启动 broker</li>
+<li>启动客户端进程，订阅消息</li>
+<li>发布消息（客户端能正常接收消息）</li>
+<li>关闭客户端进程</li>
+<li>继续发布消息</li>
+<li>重启客户端进程</li>
+<li>继续发布消息（客户端能收到最新的消息，但是进程关闭期间的消息丢失）</li>
+</ol>
+<h5 id="操作2"><a class="markdownIt-Anchor" href="#操作2"></a> 操作2</h5>
+<ol>
+<li>启动 broker</li>
+<li>启动客户端进程，订阅消息</li>
+<li>发布消息（客户端能正常接收消息）</li>
+<li>关闭客户端进程</li>
+<li>继续发布消息</li>
+<li>3分钟后，关闭 broker</li>
+<li>检查 <code>/home/vagrant/emqx/data</code> 未发现有任何持久化文件生成</li>
+</ol>
+<h4 id="emq"><a class="markdownIt-Anchor" href="#emq"></a> <a target="_blank" rel="noopener" href="https://www.emqx.io/cn/">EMQ</a></h4>
+<p>Erlang 编写，付费的企业版支持消息持久化，开源版不提供消息持久化功能，需要自己编写扩展实现。</p>
+<p>MQTT 协议主要用于机器与机器间通信，与我们的场景不太符合。</p>
+<h3 id="jvm-系消息队列"><a class="markdownIt-Anchor" href="#jvm-系消息队列"></a> JVM 系消息队列</h3>
+<p>需要在设备上部署 JVM 虚拟机，内存占用大（或需要专门人员对虚拟机调优），不适合直接在性能有限的设备上部署</p>
+<h4 id="kafka"><a class="markdownIt-Anchor" href="#kafka"></a> <a target="_blank" rel="noopener" href="https://kafka.apache.org/">Kafka</a></h4>
+<p>Kafka 是一个分布式消息系统，具有高水平扩展和高吞吐量的特点。在Kafka 集群中，没有 “中心主节点” 的概念，集群中所有的节点都是对等的。</p>
+<h5 id="kafka-几大概念"><a class="markdownIt-Anchor" href="#kafka-几大概念"></a> Kafka 几大概念</h5>
+<p>Topic（主题）</p>
+<p>Kafka 中可将消息分类，每一类的消息称为一个 Topic，消费者可以对不同的 Topic 进行不同的处理。</p>
+<p>Broker（代理）</p>
+<p>每个 Broker 即一个 Kafka 服务实例，多个 Broker 构成一个 Kafka 集群，生产者发布的消息将保存在 Broker 中，消费者将从 Broker 中拉取消息进行消费。</p>
+<p>Producer（生产者）</p>
+<p>负责生产消息并发送给 Broker 。</p>
+<p>Consumer（生产者）</p>
+<p>负责消费 Broker 中 Topic 消息，每个 Consumer  实例归属于一个 Consumer Group 查看更多介绍</p>
+<p>Partition（分区）</p>
+<p>Partition 是 Kafka 中比较特色的部分，一个 Topic 可以分为多个 Partition，每个 Partition 是一个有序的队列，Partition 中的每条消息都存在一个有序的偏移量（Offest） ，同一个 Consumer Group 中，只有一个  Consumer 实例可消费某个 Partition 的消息。</p>
+<p>LogSegment（日志分段）</p>
+<p>每个分区又被划分为多个日志分段（LogSegment）组成，日志段是Kafka日志对象分片的最小单位；LogSegment算是一个逻辑概念，对应一个具体的日志文件（<code>.log</code>的数据文件）和两个索引文件（<code>.index</code>和<code>.timeindex</code>，分别表示偏移量索引文件和消息时间戳索引文件）组成</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"># 1、执行下面命令即可将日志数据文件内容dump出来</span><br><span class="line">./kafka-run-class.sh kafka.tools.DumpLogSegments --files /apps/svr/Kafka/kafkalogs/kafka-topic-01-0/00000000000022372103.log --print-data-log &gt; 00000000000022372103_txt.log</span><br><span class="line"></span><br><span class="line"># 2、dump出来的具体日志数据内容</span><br><span class="line">Dumping /apps/svr/Kafka/kafkalogs/kafka-topic-01-0/00000000000022372103.log</span><br><span class="line">Starting offset: 22372103</span><br><span class="line">offset: 22372103 position: 0 CreateTime: 1532433067157 isvalid: true keysize: 4 valuesize: 36 magic: 2 compresscodec: NONE producerId: -1 producerEpoch: -1 sequence: -1 isTransactional: false headerKeys: [] key: 1 payload: 5d2697c5-d04a-4018-941d-881ac72ed9fd</span><br><span class="line">offset: 22372104 position: 0 CreateTime: 1532433067159 isvalid: true keysize: 4 valuesize: 36 magic: 2 compresscodec: NONE producerId: -1 producerEpoch: -1 sequence: -1 isTransactional: false headerKeys: [] key: 1 payload: 0ecaae7d-aba5-4dd5-90df-597c8b426b47</span><br><span class="line">offset: 22372105 position: 0 CreateTime: 1532433067159 isvalid: true keysize: 4 valuesize: 36 magic: 2 compresscodec: NONE producerId: -1 producerEpoch: -1 sequence: -1 isTransactional: false headerKeys: [] key: 1 payload: 87709dd9-596b-4cf4-80fa-d1609d1f2087</span><br><span class="line">......</span><br><span class="line">......</span><br><span class="line">offset: 22372444 position: 16365 CreateTime: 1532433067166 isvalid: true keysize: 4 valuesize: 36 magic: 2 compresscodec: NONE producerId: -1 producerEpoch: -1 sequence: -1 isTransactional: false headerKeys: [] key: 1 payload: 8d52ec65-88cf-4afd-adf1-e940ed9a8ff9</span><br><span class="line">offset: 22372445 position: 16365 CreateTime: 1532433067168 isvalid: true keysize: 4 valuesize: 36 magic: 2 compresscodec: NONE producerId: -1 producerEpoch: -1 sequence: -1 isTransactional: false headerKeys: [] key: 1 payload: 5f5f6646-d0f5-4ad1-a257-4e3c38c74a92</span><br><span class="line">offset: 22372446 position: 16365 CreateTime: 1532433067168 isvalid: true keysize: 4 valuesize: 36 magic: 2 compresscodec: NONE producerId: -1 producerEpoch: -1 sequence: -1 isTransactional: false headerKeys: [] key: 1 payload: 51dd1da4-053e-4507-9ef8-68ef09d18cca</span><br><span class="line">offset: 22372447 position: 16365 CreateTime: 1532433067168 isvalid: true keysize: 4 valuesize: 36 magic: 2 compresscodec: NONE producerId: -1 producerEpoch: -1 sequence: -1 isTransactional: false headerKeys: [] key: 1 payload: 80d50a8e-0098-4748-8171-fd22d6af3c9b</span><br><span class="line">......</span><br><span class="line">......</span><br><span class="line">offset: 22372785 position: 32730 CreateTime: 1532433067174 isvalid: true keysize: 4 valuesize: 36 magic: 2 compresscodec: NONE producerId: -1 producerEpoch: -1 sequence: -1 isTransactional: false headerKeys: [] key: 1 payload: db80eb79-8250-42e2-ad26-1b6cfccb5c00</span><br><span class="line">offset: 22372786 position: 32730 CreateTime: 1532433067176 isvalid: true keysize: 4 valuesize: 36 magic: 2 compresscodec: NONE producerId: -1 producerEpoch: -1 sequence: -1 isTransactional: false headerKeys: [] key: 1 payload: 51d95ab0-ab0d-4530-b1d1-05eeb9a6ff00</span><br><span class="line">......</span><br><span class="line">......</span><br><span class="line"># 3、同样地，dump出来的具体偏移量索引内容</span><br><span class="line">Dumping /apps/svr/Kafka/kafkalogs/kafka-topic-01-0/00000000000022372103.index</span><br><span class="line">offset: 22372444 position: 16365</span><br><span class="line">offset: 22372785 position: 32730</span><br><span class="line">offset: 22373467 position: 65460</span><br><span class="line">offset: 22373808 position: 81825</span><br><span class="line">offset: 22374149 position: 98190</span><br><span class="line">offset: 22374490 position: 114555</span><br><span class="line">......</span><br><span class="line">......</span><br><span class="line"># 4、dump出来的时间戳索引文件内容</span><br><span class="line">Dumping /apps/svr/Kafka/kafkalogs/kafka-topic-01-0/00000000000022372103.timeindex</span><br><span class="line">timestamp: 1532433067174 offset: 22372784</span><br><span class="line">timestamp: 1532433067191 offset: 22373466</span><br><span class="line">timestamp: 1532433067206 offset: 22373807</span><br><span class="line">timestamp: 1532433067214 offset: 22374148</span><br><span class="line">timestamp: 1532433067222 offset: 22374489</span><br><span class="line">timestamp: 1532433067230 offset: 22374830</span><br></pre></td></tr></table></figure>
+<p>Offset（偏移量）</p>
+<p>每个 partition 中都由一系列有序的、不可变的消息组成，这些消息被顺序地追加到 partition 中。每个消息都有一个连续的序列号称之为 offset —— 偏移量，用于在 partition 内唯一标识消息（并不表示消息在磁盘上的物理位置）</p>
+<p>Message（消息）</p>
+<p>消息是Kafka中存储的最小最基本的单位，即为一个 commit log，由一个固定长度的消息头和一个可变长度的消息体组成；</p>
+<h5 id="kafka-持久化"><a class="markdownIt-Anchor" href="#kafka-持久化"></a> Kafka 持久化</h5>
+<p>每个 Topic 将消息分成多 Partition，每个 Partition 在存储层面是 append log 文件。任何发布到此 Partition 的消息都会被直接追加到 log 文件的尾部，每条消息在文件中的位置称为 Offest（偏移量），Partition 是以文件的形式存储在文件系统中，log 文件根据 Broker 中的配置保留一定时间后删除来释放磁盘空间。</p>
+<p>Kafka 高效数据存储设计的特点：</p>
+<ol>
+<li>Kafka把主题中一个分区划分成多个分段的小文件段，通过多个小文件段，就容易根据偏移量查找消息、定期清除和删除已经消费完成的数据文件，减少磁盘容量的占用；</li>
+<li>采用稀疏索引存储的方式构建日志的偏移量索引文件，并将其映射至内存中，提高查找消息的效率，同时减少磁盘IO操作；</li>
+<li>Kafka将消息追加的操作逻辑变成为日志数据文件的顺序写入，极大的提高了磁盘IO的性能；</li>
+</ol>
+<p>在很多互联网大厂都有稳定应用，除了太重，其他都好。</p>
+<h4 id="activemq"><a class="markdownIt-Anchor" href="#activemq"></a> <a target="_blank" rel="noopener" href="http://activemq.apache.org/">ActiveMQ</a></h4>
+<h4 id="rocketmq"><a class="markdownIt-Anchor" href="#rocketmq"></a> <a target="_blank" rel="noopener" href="http://rocketmq.apache.org/">RocketMQ</a></h4>
+<blockquote>
+<p>Prerequisite<br />
+The following softwares are assumed installed:</p>
+<ol>
+<li>64bit OS, Linux/Unix/Mac is recommended;</li>
+<li>64bit JDK 1.8+;</li>
+<li>Maven 3.2.x;</li>
+<li>Git;</li>
+<li>4g- free disk for Broker server</li>
+</ol>
+</blockquote>
+<p>直接 Pass</p>
+<h3 id="rabbitmq"><a class="markdownIt-Anchor" href="#rabbitmq"></a> <a target="_blank" rel="noopener" href="https://www.rabbitmq.com/">RabbitMQ</a></h3>
+<p>优势</p>
+<ul>
+<li>可靠，有 ack 和重新投递机制，保证消息至少投递一次</li>
+<li>支持多种协议，通过官方插件可直接支持 MQTT 协议</li>
+<li>自带持久化功能，需持久化的消息会在到达队列后优先写入磁盘 (在 MQTT 协议下的消息不会被持久化)</li>
+</ul>
+<p>劣势</p>
+<ul>
+<li>镜像较大 <code>rabbitmq:alpine</code> 镜像约 100MB</li>
+<li>Worker 关机方式比较简单粗暴，如果断电时 Broker 正在向消息写入磁盘，可能造成文件损坏， Broker 无法正常启动</li>
+<li>使用 Erlang 自带的 Mnesia 数据库进行持久化，其他语言几乎无法操作和进行数据修复</li>
+<li>Erlang 编写，扩展难度大，Broker 崩溃以后看个日志都很痛苦</li>
+</ul>
+<p><img src="http://ww1.sinaimg.cn/large/60ed8b14gy1g60ndgrpvej20fe04egm2.jpg" alt="RabbitMQ 内部结构" /></p>
+<h4 id="rabbitmq-基本概念"><a class="markdownIt-Anchor" href="#rabbitmq-基本概念"></a> RabbitMQ 基本概念</h4>
+<h5 id="message"><a class="markdownIt-Anchor" href="#message"></a> Message</h5>
+<p>消息，消息是不具名的，它由消息头和消息体组成。消息体是不透明的，而消息头则由一系列的可选属性组成，这些属性包括routing-key（路由键）、priority（相对于其他消息的优先权）、delivery-mode（指出该消息可能需要持久性存储）等。</p>
+<h5 id="publisher"><a class="markdownIt-Anchor" href="#publisher"></a> Publisher</h5>
+<p>消息的生产者，也是一个向交换器发布消息的客户端应用程序。</p>
+<h5 id="exchange"><a class="markdownIt-Anchor" href="#exchange"></a> Exchange</h5>
+<p>交换器，用来接收生产者发送的消息并将这些消息路由给服务器中的队列。</p>
+<h5 id="binding"><a class="markdownIt-Anchor" href="#binding"></a> Binding</h5>
+<p>绑定，用于消息队列和交换器之间的关联。一个绑定就是基于路由键将交换器和消息队列连接起来的路由规则，所以可以将交换器理解成一个由绑定构成的路由表。</p>
+<h5 id="queue"><a class="markdownIt-Anchor" href="#queue"></a> Queue</h5>
+<p>消息队列，用来保存消息直到发送给消费者。它是消息的容器，也是消息的终点。一个消息可投入一个或多个队列。消息一直在队列里面，等待消费者连接到这个队列将其取走。</p>
+<h5 id="connection"><a class="markdownIt-Anchor" href="#connection"></a> Connection</h5>
+<p>网络连接，比如一个TCP连接。</p>
+<h5 id="channel"><a class="markdownIt-Anchor" href="#channel"></a> Channel</h5>
+<p>信道，多路复用连接中的一条独立的双向数据流通道。信道是建立在真实的TCP连接内地虚拟连接，AMQP 命令都是通过信道发出去的，不管是发布消息、订阅队列还是接收消息，这些动作都是通过信道完成。因为对于操作系统来说建立和销毁 TCP 都是非常昂贵的开销，所以引入了信道的概念，以复用一条 TCP 连接。</p>
+<h5 id="consumer"><a class="markdownIt-Anchor" href="#consumer"></a> Consumer</h5>
+<p>消息的消费者，表示一个从消息队列中取得消息的客户端应用程序。</p>
+<h5 id="virtual-host"><a class="markdownIt-Anchor" href="#virtual-host"></a> Virtual Host</h5>
+<p>虚拟主机，表示一批交换器、消息队列和相关对象。虚拟主机是共享相同的身份认证和加密环境的独立服务器域。每个 vhost 本质上就是一个 mini 版的 RabbitMQ 服务器，拥有自己的队列、交换器、绑定和权限机制。vhost 是 AMQP 概念的基础，必须在连接时指定，RabbitMQ 默认的 vhost 是 / 。</p>
+<h5 id="broker"><a class="markdownIt-Anchor" href="#broker"></a> Broker</h5>
+<p>表示消息队列服务器实体。</p>
+<p><img src="http://ww1.sinaimg.cn/large/60ed8b14gy1g60ng60gt8j20dg0aut9k.jpg" alt="AMQP 的消息路由过程" /></p>
+<p><img src="https://www.baidu.com/img/bd_logo1.png?where=super" alt="AMQP 的消息路由过程" /></p>
+<h4 id="注意事项"><a class="markdownIt-Anchor" href="#注意事项"></a> 注意事项</h4>
+<p>RabbitMQ 默认不支持 <code>guest</code> 用户通过<code>127.0.0.1</code>以外的ip访问。以下代码可以解除这个限制:</p>
+<p><code>echo '[&#123;rabbit, [&#123;loopback_users, []&#125;]&#125;].' &gt; /etc/rabbitmq/rabbitmq.config</code></p>
+<p>也可以考虑创建其他用户。</p>
+<h2 id="nats-streaming"><a class="markdownIt-Anchor" href="#nats-streaming"></a> <a target="_blank" rel="noopener" href="https://github.com/nats-io/nats-streaming-server">NATS Streaming</a></h2>
+<p>NATS Streaming 是一个以 <a target="_blank" rel="noopener" href="https://github.com/nats-io/nats-server">NATS</a> 为驱动的数据流系统且它的源码也是由Golang语言编写的。其中 NATS Streaming 服务是一个可执行的文件名为：<code>nats-streaming-server</code>。NATS Streaming 与底层 NATS 服务平台无缝嵌入、扩展和互动</p>
+<p>优势</p>
+<ul>
+<li>支持至少一次投递，有 Ack 和重发机制</li>
+<li>支持持久化消息和订阅到 文件系统、MySQL、Postgres</li>
+<li>支持自动重连，自动发现</li>
+<li>启动速度比 RabbitMQ 快（磁盘上保存有大量消息时为对比）</li>
+<li>可以在持久化文件损坏时忽略损坏部分，强制启动</li>
+<li>单可执行文件，开箱即用</li>
+<li>使用 Push 模式接收消息（刚连接上 Broker 时会使用 Pull 模式将不在线时产生的所有拉至本地，待验证）</li>
+</ul>
+<p>劣势</p>
+<ul>
+<li>不支持模糊订阅</li>
+<li>使用 protobuf 序列化，NATS 本身不支持消息持久化，由模块 NATS Streaming 作为作为中间人提供持久化功能，消息投递所需的时间大概是 RabbitMQ 的两倍</li>
+</ul>
+<h2 id="实现自己的-broker"><a class="markdownIt-Anchor" href="#实现自己的-broker"></a> 实现自己的 Broker</h2>
+<p>目前主流消息队列都在往高可用、提升并发性能、降低延迟的方向上发力，恰好这些都是我们不太重视的。也许，定制适合我们自身场景的 Broker 才是最佳方案</p>
+<h3 id="设计构思"><a class="markdownIt-Anchor" href="#设计构思"></a> 设计构思</h3>
+<ul>
+<li>可以考虑使用 HTTP, WebSocket, ZeroMQ, ZeroRPC 等与 Client 通信</li>
+<li>实现自己的消息分发逻辑</li>
+<li>持久化层
+<ul>
+<li>每组 Client 指定唯一的 Key 作为标识符，消息保存在 Doing 、Pending 两个列表中，且每个消息有唯一的  标识符</li>
+<li>客户端发布消息到 Broker 后，Broker 根据相应的分发逻辑，将消息投递到对应 Client 的 Doing 列表中</li>
+<li>通过原子操作，从 Doing 列表中取出消息， 并将消息的副本保存在 Pending， Client 消费消息后，需要使  用对应消息的标识符主动进行 <code>ack</code> 操作，标记消费成功，从 Pending 列表中移除对应的消息</li>
+<li>当 Client 进行 <code>nack</code> 操作时，从 Pending 列表中将对应消息重新放入 Doing 队列</li>
+<li>连接关闭时，将 Client 对应的 Pending 队列中的消息，全部移回 Doing 队列</li>
+<li>使用 Redis、Mongodb 等 NoSQL 数据库或者文件系统持久化数据</li>
+</ul>
+</li>
+</ul>
+<h3 id="rushmq"><a class="markdownIt-Anchor" href="#rushmq"></a> RushMQ</h3>
+<p>使用 Redis 存储消息</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://redis.io/topics/persistence">使用 Redis 持久化消息</a></p>
+</blockquote>
+<p>将消息先保存在本地的 Redis broker， 由另一个服务将消息推送到 Events Collector ，推送成功后删除本地消息。</p>
+<p>Redis 持久化方式</p>
+<ul>
+<li>RDB 持久化可以在指定的时间间隔内生成数据集的时间点快照（point-in-time snapshot）</li>
+<li>AOF 持久化记录服务器执行的所有写操作命令，并在服务器启动时，通过重新执行这些命令来还原数据集。(文件相对 RDB 方式更大，需要定期执行 <code>BGREWRITEAOF</code> 命令来缩小文件体积)</li>
+</ul>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://redis.io/commands/rpoplpush">RPOPLPUSH – Redis</a></p>
+<p><a target="_blank" rel="noopener" href="https://redis.io/commands#list">Command reference – Redis</a></p>
+</blockquote>
+<p>Redis 数据库中消息存放逻辑代码示例</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RedisMessageStorage</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, url, *args, **kwargs</span>):</span></span><br><span class="line">        <span class="built_in">super</span>().__init__(self, *args, **kwargs)</span><br><span class="line"></span><br><span class="line">        self.pool = redis.ConnectionPool(url)</span><br><span class="line">        self.r = redis.StrictRedis(connection_pool=self.pool)</span><br><span class="line"></span><br><span class="line">        self.dump = kwargs.get(<span class="string">&#x27;dump&#x27;</span>, msgpack.packb)</span><br><span class="line">        self.load = kwargs.get(<span class="string">&#x27;load&#x27;</span>, msgpack.unpackb)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_pending_queue</span>(<span class="params">queue</span>):</span></span><br><span class="line">        <span class="comment"># type: (<span class="built_in">str</span>) -&gt; <span class="built_in">str</span></span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;由 Doing 队列获取对应 Pending 队列的 Key</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;&#123;&#125;&#123;&#125;&#x27;</span>.<span class="built_in">format</span>(queue, <span class="string">&#x27;_p&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">redeliver</span>(<span class="params">self, queue</span>):</span></span><br><span class="line">        <span class="comment"># type: (<span class="built_in">str</span>) -&gt; <span class="literal">None</span></span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;重新投递消息</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        dst = self.get_pending_queue(queue)</span><br><span class="line">        start, count = <span class="number">0</span>, <span class="number">5</span></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            arr = self.r.lrange(queue, start, count)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> arr:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            self._enqueue(dst, *arr)</span><br><span class="line">            start += count</span><br><span class="line">        self.r.delete(queue)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">initialize</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;Broker 重启后，将所有 Pending 队列中消息重新放入 Doing 队列</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">for</span> src <span class="keyword">in</span> self.r.scan_iter(<span class="string">&#x27;*_p&#x27;</span>):</span><br><span class="line">            dst = src[:-<span class="number">2</span>]</span><br><span class="line">            <span class="keyword">if</span> self.r.exists(dst):</span><br><span class="line">                self.redeliver(dst)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">append_id</span>(<span class="params">self, obj, obj_id</span>):</span></span><br><span class="line">        <span class="comment"># type: (<span class="built_in">object</span>, <span class="built_in">str</span>) -&gt; <span class="built_in">bytes</span></span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;将消息的 id 和对应消息，组装成一个对象</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        id_bytes = obj_id.encode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line"></span><br><span class="line">        buffer = BytesIO()</span><br><span class="line"></span><br><span class="line">        buffer.write(struct.pack(<span class="string">&#x27;H&#x27;</span>, <span class="built_in">len</span>(id_bytes)))</span><br><span class="line">        buffer.write(id_bytes)</span><br><span class="line"></span><br><span class="line">        buffer.write(self.dump(obj))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> buffer.getvalue()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">trim_id</span>(<span class="params">self, buff</span>):</span></span><br><span class="line">        <span class="comment"># type: (<span class="built_in">bytes</span>) -&gt; (<span class="built_in">object</span>, <span class="built_in">int</span>)</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;将组装后对象，还原会原始对象和对应消息 id</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">        buffer = BytesIO(buff)</span><br><span class="line">        length, = struct.unpack(<span class="string">&#x27;H&#x27;</span>, buffer.read(<span class="number">4</span>))</span><br><span class="line">        obj_id = buffer.read(length).decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line"></span><br><span class="line">        value = buffer.read()</span><br><span class="line">        obj = self.dump(value)</span><br><span class="line">        <span class="keyword">return</span> obj, obj_id</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_enqueue</span>(<span class="params">self, queue, *obj</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;将组装后对象存入队列</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        self.r.rpush(queue, *obj)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">enqueue</span>(<span class="params">self, queue, obj, obj_id</span>):</span></span><br><span class="line">        <span class="comment"># type: (<span class="built_in">str</span>, <span class="built_in">object</span>, <span class="built_in">str</span>) -&gt; <span class="literal">None</span></span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;将组消息存入队列</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        self._enqueue(queue, self.append_id(obj, obj_id))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">dequeue</span>(<span class="params">self, queue</span>):</span></span><br><span class="line">        <span class="comment"># type: (<span class="built_in">str</span>) -&gt; (<span class="built_in">object</span>, <span class="built_in">str</span>)</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;从 Doing 队列中取出消息</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        buff = self.r.rpoplpush(queue, self.get_pending_queue(queue))</span><br><span class="line">        <span class="keyword">if</span> buff:</span><br><span class="line">            <span class="keyword">return</span> self.load(buff)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_search_pending_queue</span>(<span class="params">self, queue, obj_id</span>):</span></span><br><span class="line">        <span class="comment"># type: (<span class="built_in">str</span>, <span class="built_in">str</span>) -&gt; <span class="built_in">bytes</span></span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;在 Pending 队列中查找具有指定 id 的消息</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        p_queue = self.get_pending_queue(queue)</span><br><span class="line">        buff = self.r.lpop(p_queue)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> buff:</span><br><span class="line">            <span class="comment"># pending 队列为空</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">        result, _obj_id = self.trim_id(buff)</span><br><span class="line">        <span class="keyword">if</span> _obj_id == obj_id:</span><br><span class="line">            <span class="keyword">return</span> buff</span><br><span class="line"></span><br><span class="line">        _que = deque()</span><br><span class="line">        _que.append(result)</span><br><span class="line"></span><br><span class="line">        buff = self.r.lpop(p_queue)</span><br><span class="line">        <span class="keyword">while</span> buff:</span><br><span class="line">            result, _obj_id = self.trim_id(buff)</span><br><span class="line">            <span class="keyword">if</span> _obj_id == obj_id:</span><br><span class="line">                self._enqueue(p_queue, *_que)</span><br><span class="line">                <span class="keyword">return</span> buff</span><br><span class="line"></span><br><span class="line">            _que.append(result)</span><br><span class="line">            buff = self.r.lpop(p_queue)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">ack</span>(<span class="params">self, queue, obj_id</span>):</span></span><br><span class="line">        <span class="comment"># type: (<span class="built_in">str</span>, <span class="built_in">str</span>) -&gt; <span class="literal">None</span></span></span><br><span class="line">        self. _search_pending_queue(queue, obj_id)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">nack</span>(<span class="params">self, queue, obj_id</span>):</span></span><br><span class="line">        <span class="comment"># type: (<span class="built_in">str</span>, <span class="built_in">str</span>) -&gt; <span class="literal">None</span></span></span><br><span class="line"></span><br><span class="line">        buff = self. _search_pending_queue(queue, obj_id)</span><br><span class="line">        <span class="keyword">if</span> buff:</span><br><span class="line">            self._enqueue(queue, buff)</span><br></pre></td></tr></table></figure>
+<h3 id="filemq"><a class="markdownIt-Anchor" href="#filemq"></a> FileMQ</h3>
+<p>学习 Kafka</p>
+<blockquote>
+<p>Kafka的整个设计中，Partition相当于一个非常长的数组，而Broker接收到的所有消息顺序写入这个大数组中。同时Consumer通过Offset顺序消费这些数据，并且不删除已经消费的数据，从而避免了随机写磁盘的过程。</p>
+<p>由于磁盘有限，不可能保存所有数据，实际上作为消息系统Kafka也没必要保存所有数据，需要删除旧的数据。而这个删除过程，并非通过使用“读-写”模式去修改文件，而是将Partition分为多个Segment，每个Segment对应一个物理文件，通过删除整个文件的方式去删除Partition内的数据。这种方式清除旧数据的方式，也避免了对文件的随机写操作。</p>
+<p>Kafka删除Segment的方式，是直接删除Segment对应的整个log文件和整个index文件而非删除文件中的部分内容。</p>
+<p><a target="_blank" rel="noopener" href="http://www.jasongj.com/kafka/high_throughput/">Kafka设计解析（六）- Kafka高性能架构之道</a></p>
+</blockquote>
+<p>存储逻辑</p>
+<ul>
+<li>直接使用文件存储消息，每个 Topic 对应一个文件夹，文件夹内以递增的形式存放 Segment ，主文件以追加写入到当前 Segment 的方式保存消息。写入消息前先写入消息长度和校验码。</li>
+<li>并使用另外一个文件记录 主文件最后一条记录的所在的 Segment 和 Offset</li>
+<li>Broker 每次启动前校验最后一条消息是否完整</li>
+<li>为每组 Client ，在其订阅的 Topic 文件下使用两个文件，分别记录 Doing、Pending 队列在主文件中的 Segment 和 Offset，采用先写临时文件再改名的方式保证每条被正确持久化的消息至少被消费一次</li>
+</ul>
+<h4 id="优势"><a class="markdownIt-Anchor" href="#优势"></a> 优势</h4>
+<ul>
+<li>突然断电对 Broker 影响较小，只会丢失未及时写入磁盘的消息（发生概率极小）</li>
+</ul>
+<h4 id="缺点"><a class="markdownIt-Anchor" href="#缺点"></a> 缺点</h4>
+<ul>
+<li>消息只能按顺序消费， 每组 Client 必须先消费掉前一条消息，才能继续消费之后的消息</li>
+</ul>
+<h3 id="moonmq"><a class="markdownIt-Anchor" href="#moonmq"></a> MoonMQ</h3>
+<p>使用 MongoDB 存储消息</p>
+<p>特点与 RushMQ 相似</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/message-queue/" rel="tag"># message-queue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/10/22/git-hooks/" rel="prev" title="利用 GitHook 构建持续交付和部署">
+                  <i class="fa fa-chevron-left"></i> 利用 GitHook 构建持续交付和部署
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/02/21/aria2/" rel="next" title="使用 aria2 搭建离线下载服务器">
+                  使用 aria2 搭建离线下载服务器 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LRH3321</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+<script>
+var mermaidElements = document.querySelectorAll('.mermaid');
+if (mermaidElements.length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaidElements.forEach(element => {
+      const newElement = document.createElement('div');
+      newElement.innerHTML = element.innerHTML;
+      newElement.className = element.className;
+      element.parentNode.replaceChild(newElement, element);
+    });
+
+    mermaid.init({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    }, '.mermaid');
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+
+
+
+  
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/asuna/asuna_04.model.json"},"display":{"position":"right","width":300,"height":600},"mobile":{"show":true},"react":{"opacity":0.7},"log":false});</script></body>
+</html>

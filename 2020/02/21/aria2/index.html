@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.lrh3321.win","root":"/","images":"/images","scheme":"Gemini","version":"8.3.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="使用 aria2 搭建离线下载服务器 在VPS主机上安装 aria2 下载软件用作离线下载，能够远程管理下载，下载完成后能够通过HTTP（或其他任何你愿意的方式）从VPS取回。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 aria2 搭建离线下载服务器">
+<meta property="og:url" content="http://www.lrh3321.win/2020/02/21/aria2/index.html">
+<meta property="og:site_name" content="LRH3321&#39;s Blog">
+<meta property="og:description" content="使用 aria2 搭建离线下载服务器 在VPS主机上安装 aria2 下载软件用作离线下载，能够远程管理下载，下载完成后能够通过HTTP（或其他任何你愿意的方式）从VPS取回。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-02-21T15:33:09.000Z">
+<meta property="article:modified_time" content="2020-06-16T15:33:09.000Z">
+<meta property="article:author" content="LRH3321">
+<meta property="article:tag" content="aria2">
+<meta property="article:tag" content="systemd">
+<meta property="article:tag" content="nginx">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://www.lrh3321.win/2020/02/21/aria2/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>使用 aria2 搭建离线下载服务器 | LRH3321's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">LRH3321's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Bug制造者</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">13</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">16</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-aria2-%E6%90%AD%E5%BB%BA%E7%A6%BB%E7%BA%BF%E4%B8%8B%E8%BD%BD%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text"> 使用 aria2 搭建离线下载服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">1.1.</span> <span class="nav-text"> 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ubuntudebian-%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.1.1.</span> <span class="nav-text"> Ubuntu&#x2F;Debian 系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.1.2.</span> <span class="nav-text"> 其他操作系统</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%90%AF%E5%8A%A8"><span class="nav-number">1.2.</span> <span class="nav-text"> 配置&amp;启动</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.1.</span> <span class="nav-text"> 创建配置文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E5%8A%A8"><span class="nav-number">1.3.</span> <span class="nav-text"> 配置开机自启动</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-systemd-%E9%85%8D%E7%BD%AE%E4%B8%BA-service"><span class="nav-number">1.3.1.</span> <span class="nav-text"> 使用 Systemd 配置为 Service</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0-web-%E7%AE%A1%E7%90%86%E7%95%8C%E9%9D%A2"><span class="nav-number">1.4.</span> <span class="nav-text"> 添加 Web 管理界面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E8%BF%87-ariang-%E7%AE%A1%E7%90%86-aria2"><span class="nav-number">1.4.1.</span> <span class="nav-text"> 通过 AriaNG 管理 Aria2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-nginx"><span class="nav-number">1.4.2.</span> <span class="nav-text"> 安装 Nginx</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD-ariang"><span class="nav-number">1.4.3.</span> <span class="nav-text"> 下载 AriaNg</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-nginx-%E7%AB%99%E7%82%B9"><span class="nav-number">1.4.4.</span> <span class="nav-text"> 创建 Nginx 站点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81%E7%99%BB%E5%BD%95"><span class="nav-number">1.4.4.1.</span> <span class="nav-text"> 添加用户密码登录</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%BA%E9%BB%98%E8%AE%A4%E7%AB%99%E7%82%B9"><span class="nav-number">1.4.4.2.</span> <span class="nav-text"> 创建为默认站点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%8F%96%E5%9B%9E%E5%8A%9F%E8%83%BD"><span class="nav-number">1.5.</span> <span class="nav-text"> 配置文件取回功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#all-in-one"><span class="nav-number">1.6.</span> <span class="nav-text"> All in One</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LRH3321</p>
+  <div class="site-description" itemprop="description">常年挖坑不填</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrh3321" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrh3321@gmail.com" title="E-Mail → mailto:lrh3321@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/lrh3321" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://coding.net/u/lrh3321" title="Coding → https:&#x2F;&#x2F;coding.net&#x2F;u&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>Coding</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://leetcode.com/lrh3321/" title="LeetCode → https:&#x2F;&#x2F;leetcode.com&#x2F;lrh3321&#x2F;" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>LeetCode</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.lrh3321.win/2020/02/21/aria2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LRH3321">
+      <meta itemprop="description" content="常年挖坑不填">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LRH3321's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用 aria2 搭建离线下载服务器
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-02-21 23:33:09" itemprop="dateCreated datePublished" datetime="2020-02-21T23:33:09+08:00">2020-02-21</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-06-16 23:33:09" itemprop="dateModified" datetime="2020-06-16T23:33:09+08:00">2020-06-16</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/aria2/" itemprop="url" rel="index"><span itemprop="name">aria2</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="使用-aria2-搭建离线下载服务器"><a class="markdownIt-Anchor" href="#使用-aria2-搭建离线下载服务器"></a> 使用 aria2 搭建离线下载服务器</h1>
+<p>在VPS主机上安装 aria2 下载软件用作离线下载，能够远程管理下载，下载完成后能够通过HTTP（或其他任何你愿意的方式）从VPS取回。</p>
+<span id="more"></span>
+<h2 id="安装"><a class="markdownIt-Anchor" href="#安装"></a> 安装</h2>
+<h3 id="ubuntudebian-系统"><a class="markdownIt-Anchor" href="#ubuntudebian-系统"></a> Ubuntu/Debian 系统</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt-get install -y aria2</span><br></pre></td></tr></table></figure>
+<h3 id="其他操作系统"><a class="markdownIt-Anchor" href="#其他操作系统"></a> 其他操作系统</h3>
+<p>可以访问<a target="_blank" rel="noopener" href="https://aria2.github.io/">Aria2 官网</a>获取下载、安装信息。</p>
+<h2 id="配置启动"><a class="markdownIt-Anchor" href="#配置启动"></a> 配置&amp;启动</h2>
+<p>aria2 最简单的运行方式是 <code>aria2c &lt;download-url-path&gt;</code>，即会从给出的url下载文件。但我们希望它能记住一些设置，常驻后台运行。aria2 启动时会首先尝试从<code>$HOME/.aria2/aria2.conf</code>读取配置文件。此外，可以在启动时加入<code>--conf-path</code>参数手动指定配置文件位置，也可以通过<code>--no-conf</code>强制不读取配置文件。</p>
+<h3 id="创建配置文件"><a class="markdownIt-Anchor" href="#创建配置文件"></a> 创建配置文件</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p ~/.aria2</span><br><span class="line">mkdir -p ~/Downloads          <span class="comment"># 下载文件保存目录</span></span><br><span class="line">touch ~/.aria2/aria2.conf     <span class="comment"># 创建配置文件</span></span><br><span class="line">touch ~/.aria2/aria2.session  <span class="comment"># 会话文件，若开启session会用到</span></span><br></pre></td></tr></table></figure>
+<p>使用编辑器编辑配置文件</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##### RPC Options #####</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 开启JSON-RPC/XML-RPC服务，从而能够通过其接口控制aria2，默认为true</span></span><br><span class="line"><span class="attr">enable-rpc</span>=<span class="literal">true</span></span><br><span class="line"><span class="comment"># 指定访问端口号，默认6800</span></span><br><span class="line"><span class="attr">rpc-listen-port</span>=<span class="number">6800</span></span><br><span class="line"><span class="comment"># 允许所有访问来源，web控制界面跨域需要，默认false</span></span><br><span class="line"><span class="attr">rpc-allow-origin-all</span>=<span class="literal">true</span></span><br><span class="line"><span class="comment"># 允许除local loopback以外的网卡访问，默认false，远程控制需要</span></span><br><span class="line"><span class="attr">rpc-listen-all</span>=<span class="literal">true</span></span><br><span class="line"><span class="comment"># 外部访问安全令牌，强烈建议设置token并记住</span></span><br><span class="line"><span class="attr">rpc-secret</span>=<span class="number">123456</span></span><br><span class="line"><span class="comment"># 若不设置token，也可通过用户名密码访问，现版本不建议使用</span></span><br><span class="line"><span class="comment"># rpc-user=&lt;username&gt;</span></span><br><span class="line"><span class="comment"># rpc-passwd=&lt;passwd&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">##### Advance Options #####</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 以守护进程方式后台运行，默认为false，也可在启动aria2c时加上-D选项达到相同效果</span></span><br><span class="line"><span class="attr">daemon</span>=<span class="literal">true</span></span><br><span class="line"><span class="comment"># 磁盘缓存，可设为0禁用，默认16M。</span></span><br><span class="line"><span class="attr">disk-cache</span>=<span class="number">16</span>M</span><br><span class="line"><span class="comment"># 磁盘空间分配模式，可选none，prealloc，trunc，falloc，默认prealloc</span></span><br><span class="line"><span class="comment"># 若完整分配，官方建议ext4、NTFS使用falloc快速分配，可以瞬间完成分配</span></span><br><span class="line"><span class="comment"># FAT32、ext3建议使用prealloc，如果此时使用falloc分配时间和prealloc相当，分配时会造成aria2卡顿</span></span><br><span class="line"><span class="attr">file-allocation</span>=falloc</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用会话文件保存信息，并能够从意外错误（断电等）错误中恢复</span></span><br><span class="line"><span class="attr">save-session</span>=~/.aria2/aria2.session</span><br><span class="line"><span class="comment"># 指定开启时读取会话文件的位置</span></span><br><span class="line"><span class="attr">input-file</span>=~/.aria2/aria2.session</span><br><span class="line"><span class="comment"># 定期保存会话，默认0为只在退出时保存</span></span><br><span class="line"><span class="attr">save-session-interval</span>=<span class="number">60</span></span><br><span class="line"></span><br><span class="line"><span class="comment">##### Basic Options #####</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 下载路径</span></span><br><span class="line"><span class="attr">dir</span>=~/Downloads</span><br><span class="line"><span class="comment"># 最大同时下载任务数量，默认为5</span></span><br><span class="line"><span class="attr">max-concurrent-downloads</span>=<span class="number">20</span></span><br><span class="line"><span class="comment"># 若下载速度低于此值（Byte/s），会被自动暂停，速度可以有K或M等后缀，对BT下载无效</span></span><br><span class="line"><span class="comment">#lowest-speed-limit=0</span></span><br><span class="line"><span class="comment"># 每个下载任务对单个服务器最大的链接数量，默认为1</span></span><br><span class="line"><span class="attr">max-connection-per-server</span>=<span class="number">10</span></span><br><span class="line"><span class="comment"># 任务分块大小，当下载文件大小大于两倍于此设置时，会被分块下载，默认20M</span></span><br><span class="line"><span class="attr">min-split-size</span>=<span class="number">20</span>M</span><br><span class="line"><span class="comment"># 任务分块数量，默认为5</span></span><br><span class="line"><span class="attr">split</span>=<span class="number">10</span></span><br><span class="line"><span class="comment"># 可以通过伪装方式进行PT下载，参考下列设置，但请谨慎尝试</span></span><br><span class="line"><span class="comment"># DHT（若torrent禁用，即使设置为true也不会启用）</span></span><br><span class="line"><span class="comment"># enable-dht=false</span></span><br><span class="line"><span class="comment"># enable-dht6=false</span></span><br><span class="line"><span class="comment"># 本地查找（若torrent禁用，即使设置为true也不会启用）</span></span><br><span class="line"><span class="comment"># bt-enable-lpd=false</span></span><br><span class="line"><span class="comment"># 本地peer交换（若torrent禁用，即使设置为true也不会启用）</span></span><br><span class="line"><span class="comment"># enable-peer-exchange=false</span></span><br><span class="line"><span class="comment"># 客户端伪装</span></span><br><span class="line"><span class="attr">peer-id-prefix</span>=-TR2770-</span><br><span class="line"><span class="attr">user-agent</span>=Transmission/<span class="number">2.77</span></span><br></pre></td></tr></table></figure>
+<h2 id="配置开机自启动"><a class="markdownIt-Anchor" href="#配置开机自启动"></a> 配置开机自启动</h2>
+<h3 id="使用-systemd-配置为-service"><a class="markdownIt-Anchor" href="#使用-systemd-配置为-service"></a> 使用 Systemd 配置为 Service</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建 service 文件</span></span><br><span class="line">tee ~/.aria2/aria2.service &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">[Unit]</span></span><br><span class="line"><span class="string">Description=Aria2 Service</span></span><br><span class="line"><span class="string">After=network.target</span></span><br><span class="line"><span class="string">Wants=network.target</span></span><br><span class="line"><span class="string">[Install]</span></span><br><span class="line"><span class="string">WantedBy=multi-user.target</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">[Service]</span></span><br><span class="line"><span class="string"># 使用当前用户运行程序</span></span><br><span class="line"><span class="string">User=$USER</span></span><br><span class="line"><span class="string">Group=$USER</span></span><br><span class="line"><span class="string">Type=simple</span></span><br><span class="line"><span class="string">PIDFile=/run/aria2.pid</span></span><br><span class="line"><span class="string">ExecStart=/usr/bin/aria2c --conf-path $HOME/.aria2/aria2.conf</span></span><br><span class="line"><span class="string">Restart=on-failure</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 加入 Systemd</span></span><br><span class="line">sudo ln -s <span class="variable">$&#123;HOME&#125;</span>/.aria2/aria2.service /lib/systemd/system/</span><br><span class="line"><span class="comment"># 重新加载 unit 文件</span></span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line"><span class="comment"># 开启开机自启，并启用服务</span></span><br><span class="line">sudo systemctl <span class="built_in">enable</span> --now aria2</span><br></pre></td></tr></table></figure>
+<h2 id="添加-web-管理界面"><a class="markdownIt-Anchor" href="#添加-web-管理界面"></a> 添加 Web 管理界面</h2>
+<p>这里以 <a target="_blank" rel="noopener" href="http://ariang.mayswind.net/zh_Hans/">AriaNG</a> 为例</p>
+<h3 id="通过-ariang-管理-aria2"><a class="markdownIt-Anchor" href="#通过-ariang-管理-aria2"></a> 通过 AriaNG 管理 Aria2</h3>
+<p>AriaNG 其官网如下：</p>
+<p><a target="_blank" rel="noopener" href="http://ariang.mayswind.net/zh_Hans/">http://ariang.mayswind.net/zh_Hans/</a></p>
+<p>Release 发布地址：</p>
+<p><a target="_blank" rel="noopener" href="http://ariang.mayswind.net/zh_Hans/">https://github.com/mayswind/AriaNg/releases</a></p>
+<p>最新每日构建：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/mayswind/AriaNg-DailyBuild/archive/master.zip">https://github.com/mayswind/AriaNg-DailyBuild/archive/master.zip</a></p>
+<h3 id="安装-nginx"><a class="markdownIt-Anchor" href="#安装-nginx"></a> 安装 Nginx</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install nignx</span><br></pre></td></tr></table></figure>
+<h3 id="下载-ariang"><a class="markdownIt-Anchor" href="#下载-ariang"></a> 下载 AriaNg</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 下载，可以修改需要的版本</span></span><br><span class="line">version=<span class="variable">$&#123;version:-&quot;1.1.6&quot;&#125;</span></span><br><span class="line">wget https://github.com/mayswind/AriaNg/releases/download/<span class="variable">$&#123;version&#125;</span>/AriaNg-<span class="variable">$&#123;version&#125;</span>.zip -O /tmp/AriaNg.zip</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建前端文件保存目录</span></span><br><span class="line">sudo mkdir -p /var/www/html/airang</span><br><span class="line">sudo chown -R <span class="variable">$&#123;USER&#125;</span>:<span class="variable">$&#123;USER&#125;</span> /var/www/html/airang</span><br><span class="line">rm -rf /var/www/html/airang/*</span><br><span class="line"><span class="built_in">pushd</span> /var/www/html/airang</span><br><span class="line"><span class="comment"># 解压文件</span></span><br><span class="line">sudo unzip /tmp/AriaNg.zip</span><br><span class="line"><span class="built_in">popd</span></span><br></pre></td></tr></table></figure>
+<h3 id="创建-nginx-站点"><a class="markdownIt-Anchor" href="#创建-nginx-站点"></a> 创建 Nginx 站点</h3>
+<h4 id="添加用户密码登录"><a class="markdownIt-Anchor" href="#添加用户密码登录"></a> 添加用户密码登录</h4>
+<p>可选步骤</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 指定用户名，这里为 admin</span></span><br><span class="line">user=<span class="variable">$&#123;user:-&quot;admin&quot;&#125;</span></span><br><span class="line">sudo mkdir -p /var/www/auth</span><br><span class="line">sudo htpasswd -c -d /var/www/auth/nginx_auth <span class="variable">$&#123;user&#125;</span></span><br></pre></td></tr></table></figure>
+<h4 id="创建为默认站点"><a class="markdownIt-Anchor" href="#创建为默认站点"></a> 创建为默认站点</h4>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">port=<span class="variable">$&#123;port:-&quot;80&quot;&#125;</span></span><br><span class="line">sudo tee /etc/nginx/sites-enabled/default &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">map \$http_upgrade \$connection_upgrade &#123;</span></span><br><span class="line"><span class="string">    default upgrade;</span></span><br><span class="line"><span class="string">    &#x27;&#x27; close;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">server &#123;</span></span><br><span class="line"><span class="string">    listen $&#123;port&#125; default_server;</span></span><br><span class="line"><span class="string">    listen [::]:$&#123;port&#125; default_server;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    # 可设置域名</span></span><br><span class="line"><span class="string">    server_name _;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    root /var/www/html/airang;</span></span><br><span class="line"><span class="string">    index index.html;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    # 注释以下两行可取消用户密码登录</span></span><br><span class="line"><span class="string">    auth_basic &quot;Authrization&quot;;</span></span><br><span class="line"><span class="string">    auth_basic_user_file /var/www/auth/nginx_auth;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    # 为 aria2 JSON-RPC 配置反向代理，可选。</span></span><br><span class="line"><span class="string">    # 配置后可以少对外开放一个端口</span></span><br><span class="line"><span class="string">    location /jsonrpc &#123;</span></span><br><span class="line"><span class="string">        proxy_pass http://127.0.0.1:6800;</span></span><br><span class="line"><span class="string">        # 反代 WebSocket 协议</span></span><br><span class="line"><span class="string">        proxy_http_version 1.1;</span></span><br><span class="line"><span class="string">        proxy_set_header Upgrade \$http_upgrade;</span></span><br><span class="line"><span class="string">        proxy_set_header Connection &quot;Upgrade&quot;;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    # 配置 HTTP 文件服务，用于取回文件</span></span><br><span class="line"><span class="string">    location /downloads &#123;</span></span><br><span class="line"><span class="string">        alias $&#123;HOME&#125;/Downloads;</span></span><br><span class="line"><span class="string">        # 防止乱码</span></span><br><span class="line"><span class="string">        charset utf-8;        </span></span><br><span class="line"><span class="string">        autoindex on;</span></span><br><span class="line"><span class="string">        autoindex_exact_size on;</span></span><br><span class="line"><span class="string">        autoindex_localtime on;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看配置是否正确</span></span><br><span class="line">sudo nginx -t</span><br><span class="line"><span class="comment"># 让 Nginx 重新加载配置</span></span><br><span class="line">sudo nginx -s reload</span><br></pre></td></tr></table></figure>
+<p>在浏览器中打开站点，查看效果。</p>
+<p><strong>出现认证失败的情况</strong></p>
+<p>在 Web 界面 &gt; AriaNg 设置 &gt; RPC 中配置 Aria2 RPC 密钥。即 aria2 配置文件中的 <code>rpc-secret</code></p>
+<h2 id="配置文件取回功能"><a class="markdownIt-Anchor" href="#配置文件取回功能"></a> 配置文件取回功能</h2>
+<p>我们希望 aria2 下载好文件后，我们能够通过浏览器访问下载目录，并能下载文件。可以搭建 HTTP 或 FTP 服务来实现这一功能。通常 HTTP 和 FTP 搭建的文件服务，可以使用下载工具，一些服务软件（如 nginx ）还可以支持多线程下载、断点续传。</p>
+<h2 id="all-in-one"><a class="markdownIt-Anchor" href="#all-in-one"></a> All in One</h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"></span><br><span class="line">port=$&#123;port:-&quot;9100&quot;&#125;</span><br><span class="line">version=$&#123;version:-&quot;1.1.6&quot;&#125;</span><br><span class="line">user=$&#123;user:-&quot;admin&quot;&#125;</span><br><span class="line">password=$&#123;user:-&quot;123456&quot;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">apt update</span><br><span class="line">apt install -y aria2</span><br><span class="line"></span><br><span class="line">mkdir -p ~/.aria2</span><br><span class="line">mkdir -p ~/Downloads          # 下载文件保存目录</span><br><span class="line">touch ~/.aria2/aria2.conf     # 创建配置文件</span><br><span class="line">touch ~/.aria2/aria2.session  # 会话文件，若开启session会用到</span><br><span class="line"></span><br><span class="line">tee ~/.aria2/aria2.conf &lt;&lt;EOF</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#### RPC Options #####</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 开启JSON-RPC/XML-RPC服务，从而能够通过其接口控制 aria2, 默认为 <span class="literal">true</span></span></span><br><span class="line">enable-rpc=true</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定访问端口号，默认6800</span></span><br><span class="line">rpc-listen-port=6800</span><br><span class="line"><span class="meta">#</span><span class="bash"> 允许所有访问来源，web控制界面跨域需要，默认<span class="literal">false</span></span></span><br><span class="line">rpc-allow-origin-all=true</span><br><span class="line"><span class="meta">#</span><span class="bash"> 允许除<span class="built_in">local</span> loopback以外的网卡访问，默认<span class="literal">false</span>，远程控制需要</span></span><br><span class="line">rpc-listen-all=true</span><br><span class="line"><span class="meta">#</span><span class="bash"> 外部访问安全令牌，强烈建议设置token并记住</span></span><br><span class="line">rpc-secret=123456</span><br><span class="line"><span class="meta">#</span><span class="bash"> 若不设置token，也可通过用户名密码访问，现版本不建议使用</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> rpc-user=&lt;username&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> rpc-passwd=&lt;passwd&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#### Advance Options #####</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 以守护进程方式后台运行，默认为<span class="literal">false</span>，也可在启动aria2c时加上-D选项达到相同效果</span></span><br><span class="line">daemon=true</span><br><span class="line"><span class="meta">#</span><span class="bash"> 磁盘缓存，可设为0禁用，默认16M。</span></span><br><span class="line">disk-cache=16M</span><br><span class="line"><span class="meta">#</span><span class="bash"> 磁盘空间分配模式，可选none，prealloc，trunc，falloc，默认prealloc</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 若完整分配，官方建议ext4、NTFS使用falloc快速分配，可以瞬间完成分配</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> FAT32、ext3建议使用prealloc，如果此时使用falloc分配时间和prealloc相当，分配时会造成aria2卡顿</span></span><br><span class="line">file-allocation=falloc</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用会话文件保存信息，并能够从意外错误（断电等）错误中恢复</span></span><br><span class="line">save-session=$&#123;HOME&#125;/.aria2/aria2.session</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定开启时读取会话文件的位置</span></span><br><span class="line">input-file=$&#123;HOME&#125;/.aria2/aria2.session</span><br><span class="line"><span class="meta">#</span><span class="bash"> 定期保存会话，默认0为只在退出时保存</span></span><br><span class="line">save-session-interval=60</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#### Basic Options #####</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载路径</span></span><br><span class="line">dir=$&#123;HOME&#125;/Downloads</span><br><span class="line"><span class="meta">#</span><span class="bash"> 最大同时下载任务数量，默认为5</span></span><br><span class="line">max-concurrent-downloads=20</span><br><span class="line"><span class="meta">#</span><span class="bash"> 若下载速度低于此值（Byte/s），会被自动暂停，速度可以有K或M等后缀，对BT下载无效</span></span><br><span class="line"><span class="meta">#</span><span class="bash">lowest-speed-limit=0</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 每个下载任务对单个服务器最大的链接数量，默认为1</span></span><br><span class="line">max-connection-per-server=10</span><br><span class="line"><span class="meta">#</span><span class="bash"> 任务分块大小，当下载文件大小大于两倍于此设置时，会被分块下载，默认20M</span></span><br><span class="line">min-split-size=20M</span><br><span class="line"><span class="meta">#</span><span class="bash"> 任务分块数量，默认为5</span></span><br><span class="line">split=10</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以通过伪装方式进行PT下载，参考下列设置，但请谨慎尝试</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> DHT（若torrent禁用，即使设置为<span class="literal">true</span>也不会启用）</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> enable-dht=<span class="literal">false</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> enable-dht6=<span class="literal">false</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 本地查找（若torrent禁用，即使设置为<span class="literal">true</span>也不会启用）</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bt-enable-lpd=<span class="literal">false</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 本地peer交换（若torrent禁用，即使设置为<span class="literal">true</span>也不会启用）</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> enable-peer-exchange=<span class="literal">false</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 客户端伪装</span></span><br><span class="line">peer-id-prefix=-TR2770-</span><br><span class="line">user-agent=Transmission/2.77</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建 service 文件</span></span><br><span class="line">tee ~/.aria2/aria2.service &lt;&lt;EOF</span><br><span class="line">[Unit]</span><br><span class="line">Description=Aria2 Service</span><br><span class="line">After=network.target</span><br><span class="line">Wants=network.target</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用当前用户运行程序</span></span><br><span class="line">User=$USER</span><br><span class="line">Group=$USER</span><br><span class="line">Type=simple</span><br><span class="line">PIDFile=/run/aria2.pid</span><br><span class="line">ExecStart=/usr/bin/aria2c --conf-path $HOME/.aria2/aria2.conf</span><br><span class="line">Restart=on-failure</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭守护进程选项</span></span><br><span class="line">sed -i s/daemon=true/daemon=false/ /root/.aria2/aria2.conf</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入 Systemd</span></span><br><span class="line">ln -s $&#123;HOME&#125;/.aria2/aria2.service /lib/systemd/system/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 重新加载 unit 文件</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line"><span class="meta">#</span><span class="bash"> 开启开机自启，并启用服务</span></span><br><span class="line">systemctl enable --now aria2</span><br><span class="line"></span><br><span class="line">apt-get install -y nginx wget apache2-utils</span><br><span class="line"></span><br><span class="line">mkdir -p /var/www/auth</span><br><span class="line">htpasswd -b -c -d /var/www/auth/nginx_auth $&#123;user&#125; $&#123;password&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载，可以修改需要的版本</span></span><br><span class="line">wget https://github.com/mayswind/AriaNg/releases/download/$&#123;version&#125;/AriaNg-$&#123;version&#125;.zip -O /tmp/AriaNg.zip</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建前端文件保存目录</span></span><br><span class="line">mkdir -p /var/www/html/airang</span><br><span class="line">chown -R $&#123;USER&#125;:$&#123;USER&#125; /var/www/html/airang</span><br><span class="line">rm -rf /var/www/html/airang/*</span><br><span class="line">pushd /var/www/html/airang</span><br><span class="line"><span class="meta">#</span><span class="bash"> 解压文件</span></span><br><span class="line">unzip /tmp/AriaNg.zip</span><br><span class="line">popd</span><br><span class="line"></span><br><span class="line">ln -s $&#123;HOME&#125;/Downloads/ /var/www/html/downloads</span><br><span class="line">chown www-data:www-data /var/www/html/downloads</span><br><span class="line"></span><br><span class="line">tee /etc/nginx/conf.d/aria2.conf &lt;&lt;EOF</span><br><span class="line">map \$http_upgrade \$connection_upgrade &#123;</span><br><span class="line">    default upgrade;</span><br><span class="line">    &#x27;&#x27; close;</span><br><span class="line">&#125;</span><br><span class="line">server &#123;</span><br><span class="line">    listen $&#123;port&#125; default_server;</span><br><span class="line">    listen [::]:$&#123;port&#125; default_server;</span><br><span class="line"></span><br><span class="line">    # 可设置域名</span><br><span class="line">    server_name _;</span><br><span class="line"></span><br><span class="line">    root /var/www/html/airang;</span><br><span class="line">    index index.html;</span><br><span class="line"></span><br><span class="line">    # 注释以下两行可取消用户密码登录</span><br><span class="line">    auth_basic &quot;Authrization&quot;;</span><br><span class="line">    auth_basic_user_file /var/www/auth/nginx_auth;</span><br><span class="line"></span><br><span class="line">    # 为 aria2 JSON-RPC 配置反向代理，可选。</span><br><span class="line">    # 配置后可以少对外开放一个端口</span><br><span class="line">    location /jsonrpc &#123;</span><br><span class="line">        proxy_pass http://127.0.0.1:6800;</span><br><span class="line">        # 反代 WebSocket 协议</span><br><span class="line">        proxy_http_version 1.1;</span><br><span class="line">        proxy_set_header Upgrade \$http_upgrade;</span><br><span class="line">        proxy_set_header Connection &quot;Upgrade&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    # 配置 HTTP 文件服务，用于取回文件</span><br><span class="line">    location /downloads &#123;</span><br><span class="line">        alias /var/www/html/downloads/;</span><br><span class="line">        # 防止乱码</span><br><span class="line">        charset utf-8;        </span><br><span class="line">        autoindex on;</span><br><span class="line">        autoindex_exact_size on;</span><br><span class="line">        autoindex_localtime on;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/aria2/" rel="tag"># aria2</a>
+              <a href="/tags/systemd/" rel="tag"># systemd</a>
+              <a href="/tags/nginx/" rel="tag"># nginx</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/07/09/message-queue/" rel="prev" title="物联网设备消息队列选型">
+                  <i class="fa fa-chevron-left"></i> 物联网设备消息队列选型
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/02/22/ssh-forwarding/" rel="next" title="SSH 端口转发">
+                  SSH 端口转发 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LRH3321</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+<script>
+var mermaidElements = document.querySelectorAll('.mermaid');
+if (mermaidElements.length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaidElements.forEach(element => {
+      const newElement = document.createElement('div');
+      newElement.innerHTML = element.innerHTML;
+      newElement.className = element.className;
+      element.parentNode.replaceChild(newElement, element);
+    });
+
+    mermaid.init({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    }, '.mermaid');
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+
+
+
+  
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/asuna/asuna_04.model.json"},"display":{"position":"right","width":300,"height":600},"mobile":{"show":true},"react":{"opacity":0.7},"log":false});</script></body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.lrh3321.win","root":"/","images":"/images","scheme":"Gemini","version":"8.3.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="为终端设置代理  linux shell 终端代理设置方法 linux 要在 shell 终端为 http https ftp 协议设置代理，值需要设置对应的环境变量即可。 下面是一些关于代理的环境变量：    环境变量 描述 值示例     http_proxy 为http网站设置代理 10.0.0.51:8080     user:pass@10.0.0.10:8080     socks4">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为终端设置代理">
+<meta property="og:url" content="http://www.lrh3321.win/2020/04/13/terminal-proxy/index.html">
+<meta property="og:site_name" content="LRH3321&#39;s Blog">
+<meta property="og:description" content="为终端设置代理  linux shell 终端代理设置方法 linux 要在 shell 终端为 http https ftp 协议设置代理，值需要设置对应的环境变量即可。 下面是一些关于代理的环境变量：    环境变量 描述 值示例     http_proxy 为http网站设置代理 10.0.0.51:8080     user:pass@10.0.0.10:8080     socks4">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-13T06:16:53.000Z">
+<meta property="article:modified_time" content="2020-06-18T06:16:53.000Z">
+<meta property="article:author" content="LRH3321">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://www.lrh3321.win/2020/04/13/terminal-proxy/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>为终端设置代理 | LRH3321's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">LRH3321's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Bug制造者</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">13</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">16</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E7%BB%88%E7%AB%AF%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text"> 为终端设置代理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-shell-%E7%BB%88%E7%AB%AF%E4%BB%A3%E7%90%86%E8%AE%BE%E7%BD%AE%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text"> linux shell 终端代理设置方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#bash-http-%E7%AB%99%E7%82%B9%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%90%86"><span class="nav-number">1.1.1.</span> <span class="nav-text"> bash http 站点设置代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bash-https-%E7%AB%99%E7%82%B9%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%90%86"><span class="nav-number">1.1.2.</span> <span class="nav-text"> bash https 站点设置代理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E7%8B%AC%E4%B8%BA-git-%E5%90%AF%E7%94%A8%E4%BB%A3%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text"> 单独为 Git 启用代理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#http-%E4%BB%A3%E7%90%86"><span class="nav-number">1.2.1.</span> <span class="nav-text"> HTTP 代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#socks-5-%E4%BB%A3%E7%90%86"><span class="nav-number">1.2.2.</span> <span class="nav-text"> Socks 5 代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%96%E6%B6%88%E4%BB%A3%E7%90%86"><span class="nav-number">1.2.3.</span> <span class="nav-text"> 取消代理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.3.</span> <span class="nav-text"> 参考链接</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LRH3321</p>
+  <div class="site-description" itemprop="description">常年挖坑不填</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrh3321" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrh3321@gmail.com" title="E-Mail → mailto:lrh3321@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/lrh3321" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://coding.net/u/lrh3321" title="Coding → https:&#x2F;&#x2F;coding.net&#x2F;u&#x2F;lrh3321" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>Coding</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://leetcode.com/lrh3321/" title="LeetCode → https:&#x2F;&#x2F;leetcode.com&#x2F;lrh3321&#x2F;" rel="noopener" target="_blank"><i class="fas fa-code fa-fw"></i>LeetCode</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.lrh3321.win/2020/04/13/terminal-proxy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LRH3321">
+      <meta itemprop="description" content="常年挖坑不填">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LRH3321's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          为终端设置代理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-04-13 14:16:53" itemprop="dateCreated datePublished" datetime="2020-04-13T14:16:53+08:00">2020-04-13</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-06-18 14:16:53" itemprop="dateModified" datetime="2020-06-18T14:16:53+08:00">2020-06-18</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/proxy/" itemprop="url" rel="index"><span itemprop="name">proxy</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="为终端设置代理"><a class="markdownIt-Anchor" href="#为终端设置代理"></a> 为终端设置代理</h1>
+<h2 id="linux-shell-终端代理设置方法"><a class="markdownIt-Anchor" href="#linux-shell-终端代理设置方法"></a> linux shell 终端代理设置方法</h2>
+<p>linux 要在 shell 终端为 <code>http</code> <code>https</code> <code>ftp</code> 协议设置代理，值需要设置对应的环境变量即可。</p>
+<p>下面是一些关于代理的环境变量：</p>
+<table>
+<thead>
+<tr>
+<th>环境变量</th>
+<th>描述</th>
+<th>值示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>http_proxy</code></td>
+<td>为http网站设置代理</td>
+<td><code>10.0.0.51:8080</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>user:pass@10.0.0.10:8080</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>socks4://10.0.0.51:1080</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>socks5://192.168.1.1:1080</code></td>
+</tr>
+<tr>
+<td><code>https_proxy</code></td>
+<td>为https网站设置代理</td>
+<td>同上</td>
+</tr>
+<tr>
+<td><code>ftp_proxy</code></td>
+<td>为ftp协议设置代理</td>
+<td><code>socks5://192.168.1.1:1080</code></td>
+</tr>
+<tr>
+<td><code>no_proxy</code></td>
+<td>无需代理的主机或域名，可以使用通配符，多个时使用 <code>,</code> 号分隔</td>
+<td><code>*.aiezu.com,10.*.*.*,192.168.*.*,*.local,localhost,127.0.0.1</code></td>
+</tr>
+</tbody>
+</table>
+<p>可以将上面4个环境变量设置项放于 <code>~/.bashrc</code> 文件尾部，这样用户打开bash shell终端时会自动调用此脚本，读入它们。</p>
+<span id="more"></span>
+<h3 id="bash-http-站点设置代理"><a class="markdownIt-Anchor" href="#bash-http-站点设置代理"></a> bash http 站点设置代理</h3>
+<p>根据代理类型，将下面对应的设置项添加到 <code>~/.bashrc</code> 文件末尾，然后运行 <code>. ~/.bashrc</code> 命令使用之在当前环境生效。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 为http站点设置http代理（默认）：</span></span><br><span class="line">export http_proxy=10.0.0.52:8080</span><br><span class="line"><span class="meta">#</span><span class="bash"> 为http站点设置sock4、sock5代理：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置 socks 代理，自动识别socks版本</span></span><br><span class="line">export http_proxy=socks://10.0.0.52:1080</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置 socks4 代理</span></span><br><span class="line">export http_proxy=socks4://10.0.0.52:1080</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置 socks5 代理</span></span><br><span class="line">export http_proxy=socks5://10.0.0.52:1080</span><br><span class="line"><span class="meta">#</span><span class="bash"> 代理使用用户名密码认证：</span></span><br><span class="line">export http_proxy=user:pass@192.158.8.8:8080</span><br></pre></td></tr></table></figure>
+<h3 id="bash-https-站点设置代理"><a class="markdownIt-Anchor" href="#bash-https-站点设置代理"></a> bash https 站点设置代理</h3>
+<p>如果需要为https网站设置代理，设置<code>https_proxy</code>环境变量即可；设置方法完全与<code>http_proxy</code>环境变量相同：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 任意使用一项</span></span><br><span class="line">export https_proxy=10.0.0.52:8080</span><br><span class="line">export https_proxy=user:pass@192.158.8.8:8080</span><br><span class="line">export https_proxy=socks://10.0.0.52:1080</span><br><span class="line">export https_proxy=socks4://10.0.0.52:1080</span><br><span class="line">export https_proxy=socks5://10.0.0.52:1080</span><br></pre></td></tr></table></figure>
+<h2 id="单独为-git-启用代理"><a class="markdownIt-Anchor" href="#单独为-git-启用代理"></a> 单独为 Git 启用代理</h2>
+<h3 id="http-代理"><a class="markdownIt-Anchor" href="#http-代理"></a> HTTP 代理</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 全局</span></span><br><span class="line">git config --global http.proxy http://127.0.0.1:1089</span><br><span class="line">git config --global https.proxy http://127.0.0.1:1089</span><br><span class="line"><span class="meta">#</span><span class="bash"> 仓库</span></span><br><span class="line">git config http.proxy http://127.0.0.1:1089</span><br><span class="line">git config https.proxy http://127.0.0.1:1089</span><br></pre></td></tr></table></figure>
+<h3 id="socks-5-代理"><a class="markdownIt-Anchor" href="#socks-5-代理"></a> Socks 5 代理</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 全局</span></span><br><span class="line">git config --global http.proxy socks5://127.0.0.1:1088</span><br><span class="line">git config --global https.proxy socks5://127.0.0.1:1088</span><br><span class="line"><span class="meta">#</span><span class="bash"> 仓库</span></span><br><span class="line">git config http.proxy socks5://127.0.0.1:1088</span><br><span class="line">git config https.proxy socks5://127.0.0.1:1088</span><br></pre></td></tr></table></figure>
+<h3 id="取消代理"><a class="markdownIt-Anchor" href="#取消代理"></a> 取消代理</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 全局</span></span><br><span class="line">git config --global --unset http.proxy</span><br><span class="line">git config --global --unset https.proxy</span><br><span class="line"><span class="meta">#</span><span class="bash"> 仓库</span></span><br><span class="line">git config --unset http.proxy</span><br><span class="line">git config --unset https.proxy</span><br></pre></td></tr></table></figure>
+<hr />
+<h2 id="参考链接"><a class="markdownIt-Anchor" href="#参考链接"></a> 参考链接</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://aiezu.com/article/linux_bash_set_proxy">Linux bash终端设置代理（proxy）访问</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/02/28/redis-interviews/" rel="prev" title="Redis 常见面试题">
+                  <i class="fa fa-chevron-left"></i> Redis 常见面试题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/06/19/npm-mirror/" rel="next" title="设置 npm 镜像源">
+                  设置 npm 镜像源 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LRH3321</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+<script>
+var mermaidElements = document.querySelectorAll('.mermaid');
+if (mermaidElements.length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaidElements.forEach(element => {
+      const newElement = document.createElement('div');
+      newElement.innerHTML = element.innerHTML;
+      newElement.className = element.className;
+      element.parentNode.replaceChild(newElement, element);
+    });
+
+    mermaid.init({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    }, '.mermaid');
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+
+
+
+  
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/asuna/asuna_04.model.json"},"display":{"position":"right","width":300,"height":600},"mobile":{"show":true},"react":{"opacity":0.7},"log":false});</script></body>
+</html>
