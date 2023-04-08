@@ -2,7 +2,7 @@
 title: 调教 Pip
 categories: pip
 date: 2017-10-21 20:12:08
-updated: 2020-06-21 20:12:08
+updated: 2023-04-08 20:12:08
 tags:
   - pip
   - mirror
@@ -44,6 +44,11 @@ index-url = https://mirrors.aliyun.com/pypi/simple/
 
 [install]
 trusted-host=mirrors.aliyun.com
+```
+
+```shell
+pip config set global.index-url 'https://mirrors.aliyun.com/pypi/simple/'
+pip config set install.trusted-host 'mirrors.aliyun.com'
 ```
 
 ### 豆瓣源
