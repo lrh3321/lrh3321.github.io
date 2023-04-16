@@ -7,6 +7,9 @@ lastmod: 2022-06-19 21:52:43+08:00
 tags:
   - npm
   - mirrors
+keywords:
+  - npm
+  - mirrors
 ---
 
 # NodeJS 使用阿里镜像仓库

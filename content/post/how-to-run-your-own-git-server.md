@@ -5,6 +5,8 @@ categories:
 date: 2017-09-21 20:12:08+08:00
 tags:
   - git
+keywords:
+  - git
 ---
 # 如何自己搭建 git 服务器
 

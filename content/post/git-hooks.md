@@ -6,6 +6,9 @@ date: 2017-10-22 21:16:08+08:00
 lastmod: 2017-10-22 21:16:08+08:00
 tags:
   - git
+keywords:
+  - git
+  - hook
 ---
 # 利用 GitHook 构建持续交付和部署
 

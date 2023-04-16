@@ -15,8 +15,4 @@ keywords: []
 style:
 hidden: false
 draft: true
-
-# https://gohugo.io/content-management/front-matter/
 ---
-
-<!--more-->

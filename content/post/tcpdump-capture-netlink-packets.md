@@ -41,7 +41,7 @@ ip link del dev nlmon0
 rmmod nlmon
 ```
 
-```
+```bash
 modprobe nlmon
 ip netns add testing
 ip -n testing link add nlmon0 type nlmon

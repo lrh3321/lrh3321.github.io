@@ -13,7 +13,8 @@ math: false
 toc: true
 comments: false
 license: 
-keywords: []
+keywords:
+  - git
 style:
 hidden: false
 draft: false

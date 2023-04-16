@@ -8,6 +8,10 @@ tags:
   - flutter
   - dart
   - mirrors
+keywords:
+  - flutter
+  - dart
+  - mirrors
 ---
 
 # 为 Flutter 设定镜像配置

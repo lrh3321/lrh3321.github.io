@@ -7,6 +7,9 @@ lastmod: 2020-06-24 10:14:39+08:00
 tags:
   - jetbrains
   - goland
+keywords:
+  - jetbrains
+  - goland
 ---
 
 # Windows 无限试用 JetBrains 系列产品

@@ -7,6 +7,10 @@ tags:
  - Tampermonkey
 categories:
  - Userscript
+keywords:
+ - chrome
+ - Userscript
+ - Tampermonkey 
 ---
 # 安装一个用户脚本管理器
 
