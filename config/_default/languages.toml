@@ -5,3 +5,9 @@
 #languagedirection = "ltr"
 #title = "Example Site"
 #weight = 1
+
+[zh-cn]
+languageName = "Chinese"
+languagedirection = "ltr"
+title = "LRH3321's 博客"
+weight = 1

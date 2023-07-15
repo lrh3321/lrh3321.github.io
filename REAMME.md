@@ -1,5 +1,17 @@
 # README
 
+## New Post
+
+```bash
+hugo new content post/ipmi.md
+```
+
+## Preview
+
+```bash
+hugo server -D
+```
+
 [Quick Start](https://gohugo.io/getting-started/quick-start/)
 
 [Front Matter](https://gohugo.io/content-management/front-matter/)

@@ -21,7 +21,7 @@ keywords:
 ```bash
 export PUB_HOSTED_URL=https://pub.flutter-io.cn
 export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
-git clone -b dev https://github.com/flutter/flutter.git
+git clone -b stable https://github.com/flutter/flutter.git
 export PATH="$PWD/flutter/bin:$PATH"
 cd ./flutter
 flutter doctor
@@ -32,10 +32,13 @@ flutter doctor
 ```powershell
 $env:PUB_HOSTED_URL="https://pub.flutter-io.cn"
 $env:FLUTTER_STORAGE_BASE_URL="https://storage.flutter-io.cn"
-git clone -b dev https://github.com/flutter/flutter.git
+git clone -b stable https://github.com/flutter/flutter.git
 $env:PATH="$PWD\flutter\bin:$env:PATH"
 cd ./flutter
 flutter doctor
+
+[environment]::SetEnvironmentvariable("PUB_HOSTED_URL", "https://pub.flutter-io.cn", "User")
+[environment]::SetEnvironmentvariable("FLUTTER_STORAGE_BASE_URL", "https://storage.flutter-io.cn", "User")
 ```
 
 <!-- more -->
@@ -94,3 +97,4 @@ export FLUTTER_STORAGE_BASE_URL=https://mirrors.cloud.tencent.com/flutter
 - [Using Flutter in China](https://flutter.dev/community/china)
 - [在中国网络环境下使用 Flutter](https://flutter.cn/community/china)
 - [Flutter 镜像安装帮助](https://mirrors.tuna.tsinghua.edu.cn/help/flutter/)
+- [Windows 10 环境变量：如何通过 CMD 和 PowerShell 写入环境变量](https://zhuanlan.zhihu.com/p/349455443)

@@ -97,6 +97,12 @@ git config --unset http.proxy
 git config --unset https.proxy
 ```
 
+### 取消 SSL Verify
+
+```bash
+git config --global http.sslVerify false
+```
+
 ----
 
 ## 参考链接
