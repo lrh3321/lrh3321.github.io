@@ -14,7 +14,7 @@ tags:
 
 ## Linux/Unix
 
-+ `/etc/pip.con`
++ `/etc/pip.conf`
 + `~/.pip/pip.conf`
 + `~/.config/pip/pip.conf`
 
