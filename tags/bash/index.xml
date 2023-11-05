@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>bash on LRH3321's 博客</title><link>https://www.lrh3321.win/tags/bash/</link><description>Recent content in bash on LRH3321's 博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 30 Aug 2023 22:07:48 +0800</lastBuildDate><atom:link href="https://www.lrh3321.win/tags/bash/index.xml" rel="self" type="application/rss+xml"/><item><title>Bash Shortcuts</title><link>https://www.lrh3321.win/p/bash-shortcuts/</link><pubDate>Wed, 30 Aug 2023 22:07:48 +0800</pubDate><guid>https://www.lrh3321.win/p/bash-shortcuts/</guid><description>&lt;ul>
+&lt;li>&lt;code>Ctrl + C&lt;/code>: Terminate the command&lt;/li>
+&lt;li>&lt;code>Ctrl + Z&lt;/code>: Suspend the command&lt;/li>
+&lt;li>&lt;code>Ctrl + A&lt;/code>: Move to the start of the line&lt;/li>
+&lt;li>&lt;code>Ctrl + E&lt;/code>: Move to the end of the line&lt;/li>
+&lt;li>&lt;code>Ctrl + F&lt;/code>: Move forward one character&lt;/li>
+&lt;li>&lt;code>Ctrl + B&lt;/code>: Move backward one character&lt;/li>
+&lt;li>&lt;code>Ctrl + U&lt;/code>: Delete from the cursor to the start of the line&lt;/li>
+&lt;li>&lt;code>Ctrl + K&lt;/code>: Delete from the cursor to the end of the line&lt;/li>
+&lt;li>&lt;code>Ctrl + W&lt;/code>: Delete from the cursor to the start of the word&lt;/li>
+&lt;li>&lt;code>Ctrl + D&lt;/code>: Delete the character under the cursor&lt;/li>
+&lt;li>&lt;code>Ctrl + H&lt;/code>: Delete the character before the cursor&lt;/li>
+&lt;li>&lt;code>Ctrl + T&lt;/code>: Swap the character under the cursor with the previous one&lt;/li>
+&lt;li>&lt;code>Ctrl + L&lt;/code>: Clear the screen&lt;/li>
+&lt;/ul>
+&lt;h2 id="editing-shortcuts">Editing Shortcuts&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcuts&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Tab&lt;/td>
+&lt;td>&lt;code>Ctrl + I&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>New Line&lt;/td>
+&lt;td>&lt;code>Ctrl + J&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Enter&lt;/td>
+&lt;td>&lt;code>Ctrl + M&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Paste the Last Thing to be Cut&lt;/td>
+&lt;td>&lt;code>Ctrl + Y&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Undo&lt;/td>
+&lt;td>&lt;code>Ctrl + _&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Upper the case Every Character Form Cursor&lt;/td>
+&lt;td>&lt;code>Alt + U&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Lower the case Every Character Form Cursor&lt;/td>
+&lt;td>&lt;code>Alt + L&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Capitalize the Character Under Cursor and Move to the End of the Word&lt;/td>
+&lt;td>&lt;code>Alt + C&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Cancel Changes and Put Back the Line&lt;/td>
+&lt;td>&lt;code>Alt + R&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Delete Character Under Cursor&lt;/td>
+&lt;td>&lt;code>Ctrl + D&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Delete Character From Left&lt;/td>
+&lt;td>&lt;code>Ctrl + H&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Delete Word before Cursor&lt;/td>
+&lt;td>&lt;code>Alt + Delete&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Delete Word after Cursor&lt;/td>
+&lt;td>&lt;code>Alt + D&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Clear Screen&lt;/td>
+&lt;td>&lt;code>Ctrl + L&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Escape&lt;/td>
+&lt;td>&lt;code>Ctrl + [&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Cut Word Before Cursor to Clipboard&lt;/td>
+&lt;td>&lt;code>Ctrl + W&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Cut Line After Cursor to Clipboard&lt;/td>
+&lt;td>&lt;code>Ctrl + K&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Cut Line Before Cursor to Clipboard&lt;/td>
+&lt;td>&lt;code>Ctrl + U&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Swap Current Word with Previous&lt;/td>
+&lt;td>&lt;code>Alt + T&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Swap the Last Character before Cursor&lt;/td>
+&lt;td>&lt;code>Ctrl + T&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Swap the Last Two Words Before the Cursor&lt;/td>
+&lt;td>&lt;code>Esc + T&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Read More: 20 Zendesk Shortcuts You Should Know&lt;/p>
+&lt;h2 id="emacs-and-vi-mode-shortcuts">Emacs and Vi Mode Shortcuts&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcut keys&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Set Emacs Mode&lt;/td>
+&lt;td>&lt;code>$set -o emacs&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Set Vi Mode&lt;/td>
+&lt;td>&lt;code>$set -o vi&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="navigation-shortcuts">Navigation Shortcuts&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcuts&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Go to the Beginning of the Line&lt;/td>
+&lt;td>&lt;code>Home&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Go to the End of the Line&lt;/td>
+&lt;td>&lt;code>End&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Forward one character&lt;/td>
+&lt;td>&lt;code>Ctrl + F&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Backward one character&lt;/td>
+&lt;td>&lt;code>Ctrl + B&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Previous Command&lt;/td>
+&lt;td>&lt;code>Ctrl + P&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Next Command&lt;/td>
+&lt;td>&lt;code>Ctrl + N&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Back one word&lt;/td>
+&lt;td>&lt;code>Alt + B&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Forward one word&lt;/td>
+&lt;td>&lt;code>Alt + F&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Read More: 170 MS Access Shortcut Keys for Windows&lt;/p>
+&lt;h2 id="control-character-shortcuts">Control Character Shortcuts&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcuts&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>^@&lt;/td>
+&lt;td>&lt;code>Ctrl + 2&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^Escape&lt;/td>
+&lt;td>&lt;code>Ctrl + 3&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^\&lt;/td>
+&lt;td>&lt;code>Ctrl + 4&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^&lt;/td>
+&lt;td>&lt;code>Ctrl + 5&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^^&lt;/td>
+&lt;td>&lt;code>Ctrl + 6&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^_Undo&lt;/td>
+&lt;td>&lt;code>Ctrl + 7&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^? Backward Delete Character&lt;/td>
+&lt;td>&lt;code>Ctrl + 8&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Display Sequence for entering Key&lt;/td>
+&lt;td>&lt;code>Ctrl + V&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="history-shortcuts">History Shortcuts&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcuts&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Recall Last Command&lt;/td>
+&lt;td>&lt;code>Ctrl + R&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Previous Command in History&lt;/td>
+&lt;td>&lt;code>Ctrl + P&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Next Command in History&lt;/td>
+&lt;td>&lt;code>Ctrl + N&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Go back to Next Most Recent Command&lt;/td>
+&lt;td>&lt;code>Ctrl + S&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Escape from History Searching Mode&lt;/td>
+&lt;td>&lt;code>Ctrl + O&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Repeat Last Command&lt;/td>
+&lt;td>&lt;code>Ctrl + G&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Run Last Command Starting with &lt;code>ABC&lt;/code>&lt;/td>
+&lt;td>&lt;code>!!&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Print the last Command starting with &lt;code>ABC&lt;/code>&lt;/td>
+&lt;td>&lt;code>!abc&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Last Argument of Previous Command&lt;/td>
+&lt;td>&lt;code>!abc:p&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Last Argument of Previous Command&lt;/td>
+&lt;td>&lt;code>!$&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>All Arguments of Previous Command&lt;/td>
+&lt;td>&lt;code>Alt + .&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Run Previous Command, replacing &lt;code>abc&lt;/code> with &lt;code>def&lt;/code>&lt;/td>
+&lt;td>&lt;code>^abc^def&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Read More: 10 Pandora Shortcuts You Should Know&lt;/p>
+&lt;h2 id="process-controls-shortcuts">Process Controls Shortcuts&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcuts&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Recall Last Command&lt;/td>
+&lt;td>&lt;code>Ctrl + R&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Interrupt or Kill Whatever you are running&lt;/td>
+&lt;td>&lt;code>Ctrl + C&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Clear Screen&lt;/td>
+&lt;td>&lt;code>Ctrl + L&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Stop Output to Screen&lt;/td>
+&lt;td>&lt;code>Ctrl + S&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Allow Output to Screen&lt;/td>
+&lt;td>&lt;code>Ctrl + Q&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Send an EOF Marker&lt;/td>
+&lt;td>&lt;code>Ctrl + D&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Send the signal SIGTSTP to Current Task&lt;/td>
+&lt;td>&lt;code>Ctrl + Z&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>The bash shortcuts will boost maximizing your productivity to around 90%. However, Bash is not the only shell out there. The one that can be the best alternative to bash is ZSH. It is a default shell in macOS. No doubt the experience of using this shell can be quite different. Dig into the ZSH shortcuts list.&lt;/p>
+&lt;hr>
+&lt;p>&lt;a class="link" href="https://tutorialtactic.com/keyboard-shortcuts/bash-shortcuts/" target="_blank" rel="noopener"
+>https://tutorialtactic.com/keyboard-shortcuts/bash-shortcuts/&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/fliptheweb/bash-shortcuts-cheat-sheet" target="_blank" rel="noopener"
+>https://github.com/fliptheweb/bash-shortcuts-cheat-sheet&lt;/a>&lt;/p></description></item></channel></rss>

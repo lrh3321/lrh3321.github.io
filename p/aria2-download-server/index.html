@@ -1,0 +1,655 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Welcome to Hugo Theme Stack"><title>使用 aria2 搭建离线下载服务器</title>
+<link rel=canonical href=https://www.lrh3321.win/p/aria2-download-server/><link rel=stylesheet href=/scss/style.min.abbd69b2908fdfcd5179898beaafd374514a86538d81639ddd2c58c06ae54e40.css><meta property="og:title" content="使用 aria2 搭建离线下载服务器"><meta property="og:description" content="Welcome to Hugo Theme Stack"><meta property="og:url" content="https://www.lrh3321.win/p/aria2-download-server/"><meta property="og:site_name" content="LRH3321's 博客"><meta property="og:type" content="article"><meta property="article:section" content="Post"><meta property="article:tag" content="aria2"><meta property="article:tag" content="systemd"><meta property="article:tag" content="nginx"><meta property="article:published_time" content="2020-02-21T23:33:09+00:00"><meta property="article:modified_time" content="2022-06-16T23:33:09+00:00"><meta property="og:image" content="https://www.lrh3321.win/img/default.jpg"><meta name=twitter:title content="使用 aria2 搭建离线下载服务器"><meta name=twitter:description content="Welcome to Hugo Theme Stack"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://www.lrh3321.win/img/default.jpg"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_huf131be4610ef646f5b980e8a8ce2dbbf_411413_300x0_resize_box_3.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🍥</span></figure><div class=site-meta><h1 class=site-name><a href=/>LRH3321's 博客</a></h1><h2 class=site-description>敬你认真工作的状态，也爱你认真生活的姿态</h2></div></header><ol class=social-menu><li><a href=https://github.com/lrh3321/ target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://twitter.com target=_blank title=Twitter rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg><span>Home</span></a></li><li><a href=/archives/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg><span>Archives</span></a></li><li><a href=/search/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg><span>Search</span></a></li><li><a href=/links/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg><span>Links</span></a></li><div class=menu-bottom-section><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><span>暗色模式</span></li></div></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#安装>安装</a><ol><li><a href=#ubuntudebian-系统>Ubuntu/Debian 系统</a></li><li><a href=#其他操作系统>其他操作系统</a></li></ol></li><li><a href=#配置启动>配置&启动</a><ol><li><a href=#创建配置文件>创建配置文件</a></li></ol></li><li><a href=#配置开机自启动>配置开机自启动</a><ol><li><a href=#使用-systemd-配置为-service>使用 Systemd 配置为 Service</a></li></ol></li><li><a href=#添加-web-管理界面>添加 Web 管理界面</a><ol><li><a href=#通过-ariang-管理-aria2>通过 AriaNG 管理 Aria2</a></li><li><a href=#安装-nginx>安装 Nginx</a></li><li><a href=#下载-ariang>下载 AriaNg</a></li><li><a href=#创建-nginx-站点>创建 Nginx 站点</a><ol><li><a href=#添加用户密码登录>添加用户密码登录</a></li><li><a href=#创建为默认站点>创建为默认站点</a></li></ol></li></ol></li><li><a href=#配置文件取回功能>配置文件取回功能</a></li><li><a href=#all-in-one>All in One</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/aria2/>aria2</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/aria2-download-server/>使用 aria2 搭建离线下载服务器</a></h2><h3 class=article-subtitle>Welcome to Hugo Theme Stack</h3></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg><time class=article-time--published>Feb 21, 2020</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--reading>阅读时长: 7 分钟</time></div></footer></div></header><section class=article-content><h1 id=使用-aria2-搭建离线下载服务器>使用 aria2 搭建离线下载服务器</h1><p>在VPS主机上安装 aria2 下载软件用作离线下载，能够远程管理下载，下载完成后能够通过HTTP（或其他任何你愿意的方式）从VPS取回。</p><h2 id=安装>安装</h2><h3 id=ubuntudebian-系统>Ubuntu/Debian 系统</h3><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-1>1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-2>2</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt update
+</span></span><span style=display:flex><span>sudo apt-get install -y aria2
+</span></span></code></pre></td></tr></table></div></div><h3 id=其他操作系统>其他操作系统</h3><p>可以访问<a class=link href=https://aria2.github.io/ target=_blank rel=noopener>Aria2 官网</a>获取下载、安装信息。</p><h2 id=配置启动>配置&启动</h2><p>aria2 最简单的运行方式是 <code>aria2c &lt;download-url-path></code>，即会从给出的url下载文件。但我们希望它能记住一些设置，常驻后台运行。aria2 启动时会首先尝试从<code>$HOME/.aria2/aria2.conf</code>读取配置文件。此外，可以在启动时加入<code>--conf-path</code>参数手动指定配置文件位置，也可以通过<code>--no-conf</code>强制不读取配置文件。</p><h3 id=创建配置文件>创建配置文件</h3><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-1-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-1-1>1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-1-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-1-2>2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-1-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-1-3>3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-1-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-1-4>4</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir -p ~/.aria2
+</span></span><span style=display:flex><span>mkdir -p ~/Downloads          <span style=color:#7f848e># 下载文件保存目录</span>
+</span></span><span style=display:flex><span>touch ~/.aria2/aria2.conf     <span style=color:#7f848e># 创建配置文件</span>
+</span></span><span style=display:flex><span>touch ~/.aria2/aria2.session  <span style=color:#7f848e># 会话文件，若开启session会用到</span>
+</span></span></code></pre></td></tr></table></div></div><p>使用编辑器编辑配置文件</p><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-1> 1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-2> 2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-3> 3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-4> 4</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-5><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-5> 5</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-6><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-6> 6</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-7><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-7> 7</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-8><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-8> 8</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-9><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-9> 9</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-10><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-10>10</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-11><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-11>11</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-12><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-12>12</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-13><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-13>13</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-14><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-14>14</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-15><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-15>15</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-16><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-16>16</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-17><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-17>17</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-18><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-18>18</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-19><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-19>19</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-20><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-20>20</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-21><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-21>21</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-22><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-22>22</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-23><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-23>23</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-24><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-24>24</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-25><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-25>25</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-26><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-26>26</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-27><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-27>27</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-28><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-28>28</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-29><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-29>29</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-30><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-30>30</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-31><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-31>31</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-32><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-32>32</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-33><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-33>33</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-34><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-34>34</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-35><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-35>35</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-36><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-36>36</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-37><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-37>37</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-38><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-38>38</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-39><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-39>39</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-40><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-40>40</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-41><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-41>41</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-42><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-42>42</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-43><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-43>43</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-44><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-44>44</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-45><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-45>45</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-46><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-46>46</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-47><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-47>47</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-48><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-48>48</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-49><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-49>49</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-50><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-50>50</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-51><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-51>51</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-52><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-52>52</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-53><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-53>53</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-54><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-54>54</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-55><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-55>55</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-56><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-56>56</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-57><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-57>57</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-58><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-58>58</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-59><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-59>59</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#7f848e>##### RPC Options #####</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 开启JSON-RPC/XML-RPC服务，从而能够通过其接口控制aria2，默认为true</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>enable-rpc</span><span style=color:#56b6c2>=</span><span style=color:#98c379>true</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 指定访问端口号，默认6800</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rpc-listen-port</span><span style=color:#56b6c2>=</span><span style=color:#98c379>6800</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 允许所有访问来源，web控制界面跨域需要，默认false</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rpc-allow-origin-all</span><span style=color:#56b6c2>=</span><span style=color:#98c379>true</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 允许除local loopback以外的网卡访问，默认false，远程控制需要</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rpc-listen-all</span><span style=color:#56b6c2>=</span><span style=color:#98c379>true</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 外部访问安全令牌，强烈建议设置token并记住</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rpc-secret</span><span style=color:#56b6c2>=</span><span style=color:#98c379>123456</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 若不设置token，也可通过用户名密码访问，现版本不建议使用</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># rpc-user=&lt;username&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># rpc-passwd=&lt;passwd&gt;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e>##### Advance Options #####</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 以守护进程方式后台运行，默认为false，也可在启动aria2c时加上-D选项达到相同效果</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>daemon</span><span style=color:#56b6c2>=</span><span style=color:#98c379>true</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 磁盘缓存，可设为0禁用，默认16M。</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>disk-cache</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16M</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 磁盘空间分配模式，可选none，prealloc，trunc，falloc，默认prealloc</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 若完整分配，官方建议ext4、NTFS使用falloc快速分配，可以瞬间完成分配</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># FAT32、ext3建议使用prealloc，如果此时使用falloc分配时间和prealloc相当，分配时会造成aria2卡顿</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>file-allocation</span><span style=color:#56b6c2>=</span><span style=color:#98c379>falloc</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 使用会话文件保存信息，并能够从意外错误（断电等）错误中恢复</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>save-session</span><span style=color:#56b6c2>=</span><span style=color:#98c379>~/.aria2/aria2.session</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 指定开启时读取会话文件的位置</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>input-file</span><span style=color:#56b6c2>=</span><span style=color:#98c379>~/.aria2/aria2.session</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 定期保存会话，默认0为只在退出时保存</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>save-session-interval</span><span style=color:#56b6c2>=</span><span style=color:#98c379>60</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e>##### Basic Options #####</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 下载路径</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>dir</span><span style=color:#56b6c2>=</span><span style=color:#98c379>~/Downloads</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 最大同时下载任务数量，默认为5</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>max-concurrent-downloads</span><span style=color:#56b6c2>=</span><span style=color:#98c379>20</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 若下载速度低于此值（Byte/s），会被自动暂停，速度可以有K或M等后缀，对BT下载无效</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e>#lowest-speed-limit=0</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 每个下载任务对单个服务器最大的链接数量，默认为1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>max-connection-per-server</span><span style=color:#56b6c2>=</span><span style=color:#98c379>10</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 任务分块大小，当下载文件大小大于两倍于此设置时，会被分块下载，默认20M</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>min-split-size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>20M</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 任务分块数量，默认为5</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>split</span><span style=color:#56b6c2>=</span><span style=color:#98c379>10</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 可以通过伪装方式进行PT下载，参考下列设置，但请谨慎尝试</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># DHT（若torrent禁用，即使设置为true也不会启用）</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># enable-dht=false</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># enable-dht6=false</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 本地查找（若torrent禁用，即使设置为true也不会启用）</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># bt-enable-lpd=false</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 本地peer交换（若torrent禁用，即使设置为true也不会启用）</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># enable-peer-exchange=false</span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 客户端伪装</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>peer-id-prefix</span><span style=color:#56b6c2>=</span><span style=color:#98c379>-TR2770-</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>user-agent</span><span style=color:#56b6c2>=</span><span style=color:#98c379>Transmission/2.77</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=配置开机自启动>配置开机自启动</h2><h3 id=使用-systemd-配置为-service>使用 Systemd 配置为 Service</h3><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-1> 1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-2> 2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-3> 3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-4> 4</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-5><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-5> 5</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-6><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-6> 6</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-7><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-7> 7</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-8><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-8> 8</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-9><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-9> 9</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-10><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-10>10</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-11><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-11>11</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-12><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-12>12</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-13><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-13>13</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-14><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-14>14</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-15><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-15>15</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-16><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-16>16</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-17><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-17>17</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-18><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-18>18</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-19><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-19>19</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-20><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-20>20</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-21><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-21>21</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-22><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-22>22</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-23><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-23>23</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-24><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-24>24</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-25><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-25>25</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#7f848e># 创建 service 文件</span>
+</span></span><span style=display:flex><span>tee ~/.aria2/aria2.service <span style=color:#98c379>&lt;&lt;EOF
+</span></span></span><span style=display:flex><span><span style=color:#98c379>[Unit]
+</span></span></span><span style=display:flex><span><span style=color:#98c379>Description=Aria2 Service
+</span></span></span><span style=display:flex><span><span style=color:#98c379>After=network.target
+</span></span></span><span style=display:flex><span><span style=color:#98c379>Wants=network.target
+</span></span></span><span style=display:flex><span><span style=color:#98c379>[Install]
+</span></span></span><span style=display:flex><span><span style=color:#98c379>WantedBy=multi-user.target
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>[Service]
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 使用当前用户运行程序
+</span></span></span><span style=display:flex><span><span style=color:#98c379>User=$USER
+</span></span></span><span style=display:flex><span><span style=color:#98c379>Group=$USER
+</span></span></span><span style=display:flex><span><span style=color:#98c379>Type=simple
+</span></span></span><span style=display:flex><span><span style=color:#98c379>PIDFile=/run/aria2.pid
+</span></span></span><span style=display:flex><span><span style=color:#98c379>ExecStart=/usr/bin/aria2c --conf-path $HOME/.aria2/aria2.conf
+</span></span></span><span style=display:flex><span><span style=color:#98c379>Restart=on-failure
+</span></span></span><span style=display:flex><span><span style=color:#98c379>EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 加入 Systemd</span>
+</span></span><span style=display:flex><span>sudo ln -s <span style=color:#98c379>${</span><span style=color:#e06c75>HOME</span><span style=color:#98c379>}</span>/.aria2/aria2.service /lib/systemd/system/
+</span></span><span style=display:flex><span><span style=color:#7f848e># 重新加载 unit 文件</span>
+</span></span><span style=display:flex><span>sudo systemctl daemon-reload
+</span></span><span style=display:flex><span><span style=color:#7f848e># 开启开机自启，并启用服务</span>
+</span></span><span style=display:flex><span>sudo systemctl <span style=color:#e5c07b>enable</span> --now aria2
+</span></span></code></pre></td></tr></table></div></div><h2 id=添加-web-管理界面>添加 Web 管理界面</h2><p>这里以 <a class=link href=http://ariang.mayswind.net/zh_Hans/ target=_blank rel=noopener>AriaNG</a> 为例</p><h3 id=通过-ariang-管理-aria2>通过 AriaNG 管理 Aria2</h3><p>AriaNG 其官网如下：</p><p><a class=link href=http://ariang.mayswind.net/zh_Hans/ target=_blank rel=noopener>http://ariang.mayswind.net/zh_Hans/</a></p><p>Release 发布地址：</p><p><a class=link href=https://github.com/mayswind/AriaNg/releases target=_blank rel=noopener>https://github.com/mayswind/AriaNg/releases</a></p><p>最新每日构建：</p><p><a class=link href=https://github.com/mayswind/AriaNg-DailyBuild/archive/master.zip target=_blank rel=noopener>https://github.com/mayswind/AriaNg-DailyBuild/archive/master.zip</a></p><h3 id=安装-nginx>安装 Nginx</h3><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-1>1</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt install nignx
+</span></span></code></pre></td></tr></table></div></div><h3 id=下载-ariang>下载 AriaNg</h3><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-1> 1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-2> 2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-3> 3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-4> 4</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-5><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-5> 5</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-6><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-6> 6</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-7><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-7> 7</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-8><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-8> 8</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-9><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-9> 9</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-10><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-10>10</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-11><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-11>11</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-12><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-12>12</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#7f848e># 下载，可以修改需要的版本</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>version</span><span style=color:#56b6c2>=</span><span style=color:#98c379>${</span><span style=color:#e06c75>version</span><span style=color:#c678dd>:-</span><span style=color:#98c379>&#34;1.3.4&#34;</span><span style=color:#98c379>}</span>
+</span></span><span style=display:flex><span>wget https://github.com/mayswind/AriaNg/releases/download/<span style=color:#98c379>${</span><span style=color:#e06c75>version</span><span style=color:#98c379>}</span>/AriaNg-<span style=color:#98c379>${</span><span style=color:#e06c75>version</span><span style=color:#98c379>}</span>.zip -O /tmp/AriaNg.zip
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 创建前端文件保存目录</span>
+</span></span><span style=display:flex><span>sudo mkdir -p /var/www/html/airang
+</span></span><span style=display:flex><span>sudo chown -R <span style=color:#98c379>${</span><span style=color:#e06c75>USER</span><span style=color:#98c379>}</span>:<span style=color:#98c379>${</span><span style=color:#e06c75>USER</span><span style=color:#98c379>}</span> /var/www/html/airang
+</span></span><span style=display:flex><span>rm -rf /var/www/html/airang/*
+</span></span><span style=display:flex><span><span style=color:#e5c07b>pushd</span> /var/www/html/airang
+</span></span><span style=display:flex><span><span style=color:#7f848e># 解压文件</span>
+</span></span><span style=display:flex><span>sudo unzip /tmp/AriaNg.zip
+</span></span><span style=display:flex><span><span style=color:#e5c07b>popd</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=创建-nginx-站点>创建 Nginx 站点</h3><h4 id=添加用户密码登录>添加用户密码登录</h4><p>可选步骤</p><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-1>1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-2>2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-3>3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-4>4</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#7f848e># 指定用户名，这里为 admin</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>user</span><span style=color:#56b6c2>=</span><span style=color:#98c379>${</span><span style=color:#e06c75>user</span><span style=color:#c678dd>:-</span><span style=color:#98c379>&#34;admin&#34;</span><span style=color:#98c379>}</span>
+</span></span><span style=display:flex><span>sudo mkdir -p /var/www/auth
+</span></span><span style=display:flex><span>sudo htpasswd -c -d /var/www/auth/nginx_auth <span style=color:#98c379>${</span><span style=color:#e06c75>user</span><span style=color:#98c379>}</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=创建为默认站点>创建为默认站点</h4><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-1> 1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-2> 2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-3> 3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-4> 4</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-5><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-5> 5</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-6><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-6> 6</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-7><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-7> 7</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-8><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-8> 8</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-9><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-9> 9</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-10><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-10>10</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-11><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-11>11</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-12><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-12>12</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-13><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-13>13</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-14><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-14>14</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-15><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-15>15</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-16><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-16>16</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-17><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-17>17</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-18><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-18>18</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-19><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-19>19</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-20><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-20>20</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-21><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-21>21</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-22><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-22>22</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-23><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-23>23</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-24><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-24>24</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-25><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-25>25</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-26><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-26>26</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-27><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-27>27</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-28><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-28>28</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-29><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-29>29</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-30><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-30>30</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-31><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-31>31</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-32><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-32>32</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-33><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-33>33</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-34><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-34>34</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-35><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-35>35</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-36><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-36>36</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-37><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-37>37</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-38><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-38>38</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-39><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-39>39</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-40><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-40>40</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-41><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-41>41</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-42><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-42>42</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-43><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-43>43</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-44><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-44>44</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-45><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-45>45</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-46><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-46>46</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#e06c75>port</span><span style=color:#56b6c2>=</span><span style=color:#98c379>${</span><span style=color:#e06c75>port</span><span style=color:#c678dd>:-</span><span style=color:#98c379>&#34;80&#34;</span><span style=color:#98c379>}</span>
+</span></span><span style=display:flex><span>sudo tee /etc/nginx/sites-enabled/default <span style=color:#98c379>&lt;&lt;EOF
+</span></span></span><span style=display:flex><span><span style=color:#98c379>map \$http_upgrade \$connection_upgrade {
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    default upgrade;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    &#39;&#39; close;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>}
+</span></span></span><span style=display:flex><span><span style=color:#98c379>server {
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    listen ${port} default_server;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    listen [::]:${port} default_server;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    # 可设置域名
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    server_name _;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    root /var/www/html/airang;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    index index.html;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    # 注释以下两行可取消用户密码登录
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    auth_basic &#34;Authrization&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    auth_basic_user_file /var/www/auth/nginx_auth;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    # 为 aria2 JSON-RPC 配置反向代理，可选。
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    # 配置后可以少对外开放一个端口
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    location /jsonrpc {
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        proxy_pass http://127.0.0.1:6800;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        # 反代 WebSocket 协议
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        proxy_http_version 1.1;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        proxy_set_header Upgrade \$http_upgrade;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        proxy_set_header Connection &#34;Upgrade&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    }
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    # 配置 HTTP 文件服务，用于取回文件
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    location /downloads {
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        alias ${HOME}/Downloads;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        # 防止乱码
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        charset utf-8;        
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        autoindex on;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        autoindex_exact_size on;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        autoindex_localtime on;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    }
+</span></span></span><span style=display:flex><span><span style=color:#98c379>}
+</span></span></span><span style=display:flex><span><span style=color:#98c379>EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 查看配置是否正确</span>
+</span></span><span style=display:flex><span>sudo nginx -t
+</span></span><span style=display:flex><span><span style=color:#7f848e># 让 Nginx 重新加载配置</span>
+</span></span><span style=display:flex><span>sudo nginx -s reload
+</span></span></code></pre></td></tr></table></div></div><p>在浏览器中打开站点，查看效果。</p><p><strong>出现认证失败的情况</strong></p><p>在 Web 界面 > AriaNg 设置 > RPC 中配置 Aria2 RPC 密钥。即 aria2 配置文件中的 <code>rpc-secret</code></p><h2 id=配置文件取回功能>配置文件取回功能</h2><p>我们希望 aria2 下载好文件后，我们能够通过浏览器访问下载目录，并能下载文件。可以搭建 HTTP 或 FTP 服务来实现这一功能。通常 HTTP 和 FTP 搭建的文件服务，可以使用下载工具，一些服务软件（如 nginx ）还可以支持多线程下载、断点续传。</p><h2 id=all-in-one>All in One</h2><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-1>  1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-2>  2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-3>  3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-4>  4</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-5><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-5>  5</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-6><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-6>  6</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-7><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-7>  7</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-8><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-8>  8</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-9><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-9>  9</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-10><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-10> 10</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-11><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-11> 11</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-12><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-12> 12</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-13><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-13> 13</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-14><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-14> 14</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-15><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-15> 15</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-16><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-16> 16</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-17><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-17> 17</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-18><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-18> 18</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-19><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-19> 19</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-20><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-20> 20</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-21><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-21> 21</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-22><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-22> 22</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-23><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-23> 23</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-24><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-24> 24</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-25><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-25> 25</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-26><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-26> 26</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-27><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-27> 27</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-28><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-28> 28</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-29><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-29> 29</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-30><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-30> 30</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-31><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-31> 31</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-32><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-32> 32</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-33><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-33> 33</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-34><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-34> 34</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-35><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-35> 35</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-36><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-36> 36</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-37><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-37> 37</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-38><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-38> 38</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-39><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-39> 39</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-40><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-40> 40</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-41><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-41> 41</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-42><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-42> 42</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-43><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-43> 43</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-44><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-44> 44</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-45><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-45> 45</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-46><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-46> 46</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-47><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-47> 47</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-48><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-48> 48</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-49><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-49> 49</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-50><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-50> 50</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-51><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-51> 51</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-52><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-52> 52</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-53><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-53> 53</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-54><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-54> 54</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-55><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-55> 55</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-56><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-56> 56</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-57><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-57> 57</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-58><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-58> 58</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-59><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-59> 59</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-60><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-60> 60</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-61><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-61> 61</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-62><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-62> 62</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-63><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-63> 63</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-64><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-64> 64</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-65><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-65> 65</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-66><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-66> 66</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-67><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-67> 67</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-68><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-68> 68</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-69><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-69> 69</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-70><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-70> 70</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-71><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-71> 71</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-72><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-72> 72</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-73><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-73> 73</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-74><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-74> 74</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-75><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-75> 75</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-76><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-76> 76</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-77><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-77> 77</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-78><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-78> 78</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-79><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-79> 79</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-80><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-80> 80</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-81><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-81> 81</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-82><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-82> 82</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-83><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-83> 83</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-84><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-84> 84</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-85><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-85> 85</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-86><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-86> 86</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-87><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-87> 87</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-88><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-88> 88</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-89><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-89> 89</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-90><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-90> 90</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-91><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-91> 91</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-92><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-92> 92</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-93><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-93> 93</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-94><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-94> 94</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-95><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-95> 95</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-96><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-96> 96</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-97><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-97> 97</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-98><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-98> 98</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-99><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-99> 99</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-100><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-100>100</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-101><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-101>101</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-102><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-102>102</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-103><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-103>103</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-104><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-104>104</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-105><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-105>105</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-106><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-106>106</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-107><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-107>107</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-108><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-108>108</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-109><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-109>109</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-110><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-110>110</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-111><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-111>111</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-112><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-112>112</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-113><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-113>113</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-114><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-114>114</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-115><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-115>115</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-116><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-116>116</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-117><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-117>117</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-118><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-118>118</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-119><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-119>119</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-120><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-120>120</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-121><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-121>121</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-122><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-122>122</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-123><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-123>123</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-124><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-124>124</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-125><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-125>125</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-126><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-126>126</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-127><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-127>127</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-128><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-128>128</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-129><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-129>129</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-130><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-130>130</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-131><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-131>131</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-132><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-132>132</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-133><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-133>133</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-134><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-134>134</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-135><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-135>135</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-136><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-136>136</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-137><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-137>137</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-138><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-138>138</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-139><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-139>139</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-140><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-140>140</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-141><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-141>141</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-142><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-142>142</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-143><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-143>143</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-144><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-144>144</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-145><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-145>145</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-146><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-146>146</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-147><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-147>147</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-148><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-148>148</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-149><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-149>149</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-150><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-150>150</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-151><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-151>151</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-152><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-152>152</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-153><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-153>153</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-154><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-154>154</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-155><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-155>155</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-156><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-156>156</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-157><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-157>157</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-158><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-158>158</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-159><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-159>159</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-160><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-160>160</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-161><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-161>161</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-162><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-162>162</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-163><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-163>163</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-164><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-164>164</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-165><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-165>165</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-166><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-166>166</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-167><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-167>167</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-8-168><a style=outline:none;text-decoration:none;color:inherit href=#hl-8-168>168</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#7f848e>#!/bin/bash
+</span></span></span><span style=display:flex><span><span style=color:#7f848e></span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>port</span><span style=color:#56b6c2>=</span><span style=color:#98c379>${</span><span style=color:#e06c75>port</span><span style=color:#c678dd>:-</span><span style=color:#98c379>&#34;9100&#34;</span><span style=color:#98c379>}</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>version</span><span style=color:#56b6c2>=</span><span style=color:#98c379>${</span><span style=color:#e06c75>version</span><span style=color:#c678dd>:-</span><span style=color:#98c379>&#34;1.1.6&#34;</span><span style=color:#98c379>}</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>USER</span><span style=color:#56b6c2>=</span><span style=color:#98c379>${</span><span style=color:#e06c75>user</span><span style=color:#c678dd>:-</span><span style=color:#98c379>&#34;admin&#34;</span><span style=color:#98c379>}</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>password</span><span style=color:#56b6c2>=</span><span style=color:#98c379>${</span><span style=color:#e06c75>user</span><span style=color:#c678dd>:-</span><span style=color:#98c379>&#34;123456&#34;</span><span style=color:#98c379>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>apt update
+</span></span><span style=display:flex><span>apt install -y aria2
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>mkdir -p ~/.aria2
+</span></span><span style=display:flex><span>mkdir -p ~/Downloads          <span style=color:#7f848e># 下载文件保存目录</span>
+</span></span><span style=display:flex><span>touch ~/.aria2/aria2.conf     <span style=color:#7f848e># 创建配置文件</span>
+</span></span><span style=display:flex><span>touch ~/.aria2/aria2.session  <span style=color:#7f848e># 会话文件，若开启session会用到</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>tee ~/.aria2/aria2.conf <span style=color:#98c379>&lt;&lt;EOF
+</span></span></span><span style=display:flex><span><span style=color:#98c379>##### RPC Options #####
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 开启JSON-RPC/XML-RPC服务，从而能够通过其接口控制 aria2, 默认为 true
+</span></span></span><span style=display:flex><span><span style=color:#98c379>enable-rpc=true
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 指定访问端口号，默认6800
+</span></span></span><span style=display:flex><span><span style=color:#98c379>rpc-listen-port=6800
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 允许所有访问来源，web控制界面跨域需要，默认false
+</span></span></span><span style=display:flex><span><span style=color:#98c379>rpc-allow-origin-all=true
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 允许除local loopback以外的网卡访问，默认false，远程控制需要
+</span></span></span><span style=display:flex><span><span style=color:#98c379>rpc-listen-all=true
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 外部访问安全令牌，强烈建议设置token并记住
+</span></span></span><span style=display:flex><span><span style=color:#98c379>rpc-secret=123456
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 若不设置token，也可通过用户名密码访问，现版本不建议使用
+</span></span></span><span style=display:flex><span><span style=color:#98c379># rpc-user=&lt;username&gt;
+</span></span></span><span style=display:flex><span><span style=color:#98c379># rpc-passwd=&lt;passwd&gt;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>##### Advance Options #####
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 以守护进程方式后台运行，默认为false，也可在启动aria2c时加上-D选项达到相同效果
+</span></span></span><span style=display:flex><span><span style=color:#98c379>daemon=true
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 磁盘缓存，可设为0禁用，默认16M。
+</span></span></span><span style=display:flex><span><span style=color:#98c379>disk-cache=16M
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 磁盘空间分配模式，可选none，prealloc，trunc，falloc，默认prealloc
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 若完整分配，官方建议ext4、NTFS使用falloc快速分配，可以瞬间完成分配
+</span></span></span><span style=display:flex><span><span style=color:#98c379># FAT32、ext3建议使用prealloc，如果此时使用falloc分配时间和prealloc相当，分配时会造成aria2卡顿
+</span></span></span><span style=display:flex><span><span style=color:#98c379>file-allocation=falloc
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 使用会话文件保存信息，并能够从意外错误（断电等）错误中恢复
+</span></span></span><span style=display:flex><span><span style=color:#98c379>save-session=${HOME}/.aria2/aria2.session
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 指定开启时读取会话文件的位置
+</span></span></span><span style=display:flex><span><span style=color:#98c379>input-file=${HOME}/.aria2/aria2.session
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 定期保存会话，默认0为只在退出时保存
+</span></span></span><span style=display:flex><span><span style=color:#98c379>save-session-interval=60
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>##### Basic Options #####
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 下载路径
+</span></span></span><span style=display:flex><span><span style=color:#98c379>dir=${HOME}/Downloads
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 最大同时下载任务数量，默认为5
+</span></span></span><span style=display:flex><span><span style=color:#98c379>max-concurrent-downloads=20
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 若下载速度低于此值（Byte/s），会被自动暂停，速度可以有K或M等后缀，对BT下载无效
+</span></span></span><span style=display:flex><span><span style=color:#98c379>#lowest-speed-limit=0
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 每个下载任务对单个服务器最大的链接数量，默认为1
+</span></span></span><span style=display:flex><span><span style=color:#98c379>max-connection-per-server=10
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 任务分块大小，当下载文件大小大于两倍于此设置时，会被分块下载，默认20M
+</span></span></span><span style=display:flex><span><span style=color:#98c379>min-split-size=20M
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 任务分块数量，默认为5
+</span></span></span><span style=display:flex><span><span style=color:#98c379>split=10
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 可以通过伪装方式进行PT下载，参考下列设置，但请谨慎尝试
+</span></span></span><span style=display:flex><span><span style=color:#98c379># DHT（若torrent禁用，即使设置为true也不会启用）
+</span></span></span><span style=display:flex><span><span style=color:#98c379># enable-dht=false
+</span></span></span><span style=display:flex><span><span style=color:#98c379># enable-dht6=false
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 本地查找（若torrent禁用，即使设置为true也不会启用）
+</span></span></span><span style=display:flex><span><span style=color:#98c379># bt-enable-lpd=false
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 本地peer交换（若torrent禁用，即使设置为true也不会启用）
+</span></span></span><span style=display:flex><span><span style=color:#98c379># enable-peer-exchange=false
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 客户端伪装
+</span></span></span><span style=display:flex><span><span style=color:#98c379>peer-id-prefix=-TR2770-
+</span></span></span><span style=display:flex><span><span style=color:#98c379>user-agent=Transmission/2.77
+</span></span></span><span style=display:flex><span><span style=color:#98c379>EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 创建 service 文件</span>
+</span></span><span style=display:flex><span>tee ~/.aria2/aria2.service <span style=color:#98c379>&lt;&lt;EOF
+</span></span></span><span style=display:flex><span><span style=color:#98c379>[Unit]
+</span></span></span><span style=display:flex><span><span style=color:#98c379>Description=Aria2 Service
+</span></span></span><span style=display:flex><span><span style=color:#98c379>After=network.target
+</span></span></span><span style=display:flex><span><span style=color:#98c379>Wants=network.target
+</span></span></span><span style=display:flex><span><span style=color:#98c379>[Install]
+</span></span></span><span style=display:flex><span><span style=color:#98c379>WantedBy=multi-user.target
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>[Service]
+</span></span></span><span style=display:flex><span><span style=color:#98c379># 使用当前用户运行程序
+</span></span></span><span style=display:flex><span><span style=color:#98c379>User=$USER
+</span></span></span><span style=display:flex><span><span style=color:#98c379>Group=$USER
+</span></span></span><span style=display:flex><span><span style=color:#98c379>Type=simple
+</span></span></span><span style=display:flex><span><span style=color:#98c379>PIDFile=/run/aria2.pid
+</span></span></span><span style=display:flex><span><span style=color:#98c379>ExecStart=/usr/bin/aria2c --conf-path $HOME/.aria2/aria2.conf
+</span></span></span><span style=display:flex><span><span style=color:#98c379>Restart=on-failure
+</span></span></span><span style=display:flex><span><span style=color:#98c379>EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 关闭守护进程选项</span>
+</span></span><span style=display:flex><span>sed -i s/daemon<span style=color:#56b6c2>=</span>true/daemon<span style=color:#56b6c2>=</span>false/ /root/.aria2/aria2.conf
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 加入 Systemd</span>
+</span></span><span style=display:flex><span>ln -s <span style=color:#98c379>${</span><span style=color:#e06c75>HOME</span><span style=color:#98c379>}</span>/.aria2/aria2.service /lib/systemd/system/
+</span></span><span style=display:flex><span><span style=color:#7f848e># 重新加载 unit 文件</span>
+</span></span><span style=display:flex><span>systemctl daemon-reload
+</span></span><span style=display:flex><span><span style=color:#7f848e># 开启开机自启，并启用服务</span>
+</span></span><span style=display:flex><span>systemctl <span style=color:#e5c07b>enable</span> --now aria2
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>apt-get install -y nginx wget apache2-utils
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>mkdir -p /var/www/auth
+</span></span><span style=display:flex><span>htpasswd -b -c -d /var/www/auth/nginx_auth <span style=color:#98c379>${</span><span style=color:#e06c75>user</span><span style=color:#98c379>}</span> <span style=color:#98c379>${</span><span style=color:#e06c75>password</span><span style=color:#98c379>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 下载，可以修改需要的版本</span>
+</span></span><span style=display:flex><span>wget https://github.com/mayswind/AriaNg/releases/download/<span style=color:#98c379>${</span><span style=color:#e06c75>version</span><span style=color:#98c379>}</span>/AriaNg-<span style=color:#98c379>${</span><span style=color:#e06c75>version</span><span style=color:#98c379>}</span>.zip -O /tmp/AriaNg.zip
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#7f848e># 创建前端文件保存目录</span>
+</span></span><span style=display:flex><span>mkdir -p /var/www/html/airang
+</span></span><span style=display:flex><span>chown -R <span style=color:#98c379>${</span><span style=color:#e06c75>USER</span><span style=color:#98c379>}</span>:<span style=color:#98c379>${</span><span style=color:#e06c75>USER</span><span style=color:#98c379>}</span> /var/www/html/airang
+</span></span><span style=display:flex><span>rm -rf /var/www/html/airang/*
+</span></span><span style=display:flex><span><span style=color:#e5c07b>pushd</span> /var/www/html/airang
+</span></span><span style=display:flex><span><span style=color:#7f848e># 解压文件</span>
+</span></span><span style=display:flex><span>unzip /tmp/AriaNg.zip
+</span></span><span style=display:flex><span><span style=color:#e5c07b>popd</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>ln -s <span style=color:#98c379>${</span><span style=color:#e06c75>HOME</span><span style=color:#98c379>}</span>/Downloads/ /var/www/html/downloads
+</span></span><span style=display:flex><span>chown www-data:www-data /var/www/html/downloads
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>tee /etc/nginx/conf.d/aria2.conf <span style=color:#98c379>&lt;&lt;EOF
+</span></span></span><span style=display:flex><span><span style=color:#98c379>map \$http_upgrade \$connection_upgrade {
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    default upgrade;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    &#39;&#39; close;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>}
+</span></span></span><span style=display:flex><span><span style=color:#98c379>server {
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    listen ${port} default_server;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    listen [::]:${port} default_server;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    # 可设置域名
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    server_name _;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    root /var/www/html/airang;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    index index.html;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    # 注释以下两行可取消用户密码登录
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    auth_basic &#34;Authrization&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    auth_basic_user_file /var/www/auth/nginx_auth;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    # 为 aria2 JSON-RPC 配置反向代理，可选。
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    # 配置后可以少对外开放一个端口
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    location /jsonrpc {
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        proxy_pass http://127.0.0.1:6800;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        # 反代 WebSocket 协议
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        proxy_http_version 1.1;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        proxy_set_header Upgrade \$http_upgrade;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        proxy_set_header Connection &#34;Upgrade&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    }
+</span></span></span><span style=display:flex><span><span style=color:#98c379>
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    # 配置 HTTP 文件服务，用于取回文件
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    location /downloads {
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        alias /var/www/html/downloads/;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        # 防止乱码
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        charset utf-8;        
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        autoindex on;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        autoindex_exact_size on;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>        autoindex_localtime on;
+</span></span></span><span style=display:flex><span><span style=color:#98c379>    }
+</span></span></span><span style=display:flex><span><span style=color:#98c379>}
+</span></span></span><span style=display:flex><span><span style=color:#98c379>EOF</span>
+</span></span></code></pre></td></tr></table></div></div></section><footer class=article-footer><section class=article-tags><a href=/tags/aria2/>aria2</a>
+<a href=/tags/systemd/>systemd</a>
+<a href=/tags/nginx/>nginx</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under CC BY-NC-SA 4.0</span></section><section class=article-lastmod><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><span>最后更新于 Jun 16, 2022 23:33 UTC</span></section></footer></article><div class=disqus-container></div><style>.disqus-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding)}</style><script>window.addEventListener("onColorSchemeChange",e=>{typeof DISQUS=="object"&&DISQUS.reset({reload:!0})})</script><footer class=site-footer><section class=copyright>&copy;
+2016 -
+2023 LRH3321's 博客</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.21.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://cdn.bootcdn.net/ajax/libs/lato-font/3.0.0/css/lato-font.min.css",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
