@@ -44,11 +44,17 @@ Set-Alias -Name which -Value Show-Full-Path
 Set-Alias -Name grep -Value Select-String
 ```
 
-### [`rg`](https://github.com/BurntSushi/ripgrep)
+### `rg`
+
+[`rg`](https://github.com/BurntSushi/ripgrep)
 
 ripgrep recursively searches directories for a regex pattern while respecting your gitignore
 
 [Latest releases](https://github.com/BurntSushi/ripgrep/releases/latest)
+
+```pwsh
+cargo install ripgrep
+```
 
 ```pwsh
 Set-Alias -Name grep -Value rg
@@ -56,11 +62,29 @@ Set-Alias -Name grep -Value rg
 
 ## `find`
 
-### [`fd`](https://github.com/sharkdp/fd)
+### `findutils`
+
+[findutils](https://github.com/uutils/findutils)
+
+Rust implementation of findutils
+
+#### Install
+
+```pwsh
+cargo install findutils
+```
+
+### `fd`
+
+[`fd`](https://github.com/sharkdp/fd)
 
 A simple, fast and user-friendly alternative to 'find'
 
 #### Install
+
+```pwsh
+cargo install fd-find
+```
 
 ```pwsh
 winget install sharkdp.fd
@@ -72,29 +96,63 @@ Set-Alias -Name find -Value fd
 
 ## `tree`
 
-### [`et`](https://github.com/solidiquis/erdtree)
+### `erd`
+
+[`erd`](https://github.com/solidiquis/erdtree)
 
 A modern, multi-threaded file-tree visualization and disk usage analysis tool that respects hidden file and gitignore rules.
 
 ```pwsh
-Set-Alias -Name tree -Value et
+cargo install erdtree
+```
+
+```pwsh
+Set-Alias -Name tree -Value erd
 ```
 
 ## `ls`
 
-### [`lsd`](https://github.com/lsd-rs/lsd)
+### `lsd`
+
+[`lsd`](https://github.com/lsd-rs/lsd)
 
 The next gen ls command
+
+```pwsh
+cargo install lsd
+```
 
 ```pwsh
 Set-Alias -Name ls -Value lsd
 ```
 
-## [coreutils](https://github.com/uutils/coreutils)
+## `dig`
+
+### `dog`
+
+[`dog`](https://github.com/ogham/dog)
+
+A command-line DNS client.
+
+```pwsh
+cargo install --git https://github.com/ogham/dog.git dog
+```
+
+```pwsh
+Set-Alias -Name dig -Value dog
+```
+
+## `coreutils`
+
+[coreutils](https://github.com/uutils/coreutils)
 
 [uutils Coreutils Documentation](https://uutils.github.io/user/)
 
 Cross-platform Rust rewrite of the GNU coreutils
+
+```pwsh
+cargo install coreutils
+```
 
 ```pwsh
 #  [, arch, b2sum, b3sum, base32, base64, basename, basenc, cat, cksum, comm, cp, csplit, cut,
@@ -127,3 +185,4 @@ foreach ($e in $comands) {
 ----
 
 - [Awesome Rust](https://github.com/rust-unofficial/awesome-rust#system-tools)
+- [Modern Unix](https://github.com/ibraheemdev/modern-unix)

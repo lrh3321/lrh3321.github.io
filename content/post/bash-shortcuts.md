@@ -62,8 +62,6 @@ draft: false
 | Swap the Last Character before Cursor                                 | `Ctrl + T`     |
 | Swap the Last Two Words Before the Cursor                             | `Esc + T`      |
 
-Read More: 20 Zendesk Shortcuts You Should Know
-
 ## Emacs and Vi Mode Shortcuts
 
 | Action         | Bash Shortcut keys |
@@ -83,8 +81,6 @@ Read More: 20 Zendesk Shortcuts You Should Know
 | Next Command                    | `Ctrl + N`     |
 | Back one word                   | `Alt + B`      |
 | Forward one word                | `Alt + F`      |
-
-Read More: 170 MS Access Shortcut Keys for Windows
 
 ## Control Character Shortcuts
 | Action                            | Bash Shortcuts |
@@ -114,8 +110,6 @@ Read More: 170 MS Access Shortcut Keys for Windows
 | Last Argument of Previous Command                | `!$`           |
 | All Arguments of Previous Command                | `Alt + .`      |
 | Run Previous Command, replacing `abc` with `def` | `^abc^def`     |
-
-Read More: 10 Pandora Shortcuts You Should Know
 
 ## Process Controls Shortcuts
 

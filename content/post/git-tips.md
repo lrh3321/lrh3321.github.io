@@ -3,7 +3,7 @@ title: "Git Tips"
 description: Git 使用技巧
 slug: git-tips
 date: 2023-04-15T19:23:03+08:00
-lastmod: 2023-04-15T19:23:03+08:00
+lastmod: 2023-11-15T19:23:03+08:00
 categories:
   - git
 tags:
@@ -49,6 +49,8 @@ git config --global url."git@gitlab.com:groupName/projectName.git".insteadOf "ht
 
 # 全局替换,拉取域名下的所有包
 git config --global url."git@gitlab.yoursite.com:".insteadof "https://gitlab.yoursite.com/"
+
+git config --global url."https://".insteadOf git://
 ```
 
 ## Git 跟踪文件更改
@@ -57,7 +59,14 @@ git config --global url."git@gitlab.yoursite.com:".insteadof "https://gitlab.you
 git log --follow --patch routes/admin/contract_operation.js
 ```
 
+## 使用 HTTP/1.1
+
+```shell
+git --global config http.version HTTP/1.1
+```
 
 ---
 
 - [使用gitlab作为go mod私服](https://www.cnblogs.com/tomtellyou/p/14411214.html)
+- [git-config](https://git-scm.com/docs/git-config/zh_HANS-CN)
+- [github-git-cheat-sheet](https://training.github.com/downloads/zh_CN/github-git-cheat-sheet/)
