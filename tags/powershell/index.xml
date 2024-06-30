@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Powershell on LRH3321's 博客</title><link>https://www.lrh3321.win/tags/powershell/</link><description>Recent content in Powershell on LRH3321's 博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sat, 22 Apr 2023 19:21:22 +0800</lastBuildDate><atom:link href="https://www.lrh3321.win/tags/powershell/index.xml" rel="self" type="application/rss+xml"/><item><title>在 Powershell 中增加命令别名</title><link>https://www.lrh3321.win/p/pwsh-alias/</link><pubDate>Sat, 22 Apr 2023 19:21:22 +0800</pubDate><guid>https://www.lrh3321.win/p/pwsh-alias/</guid><description>&lt;p>打开 Powershell Profile 配置文件&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">code&lt;/span> &lt;span style="color:#e06c75">$PROFILE&lt;/span>.&lt;span style="color:#e06c75">CurrentUserAllHosts&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="which">&lt;code>which&lt;/code>
+&lt;/h2>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-3">3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-4">4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-5">5&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">Function&lt;/span> &lt;span style="color:#e5c07b">Show-Full-Path&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">$&lt;/span>(&lt;span style="color:#e5c07b">Get-Command&lt;/span> &lt;span style="color:#e06c75">$args&lt;/span>[&lt;span style="color:#d19a66">0&lt;/span>]).&lt;span style="color:#e06c75">Source&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">Set-Alias&lt;/span> &lt;span style="color:#e06c75">-Name&lt;/span> &lt;span style="color:#e06c75">which&lt;/span> &lt;span style="color:#e06c75">-Value&lt;/span> &lt;span style="color:#e5c07b">Show-Full&lt;/span>&lt;span style="color:#e06c75">-Path&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="grep">&lt;code>grep&lt;/code>
+&lt;/h2>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">Set-Alias&lt;/span> &lt;span style="color:#e06c75">-Name&lt;/span> &lt;span style="color:#e06c75">grep&lt;/span> &lt;span style="color:#e06c75">-Value&lt;/span> &lt;span style="color:#e5c07b">Select-String&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="rg">&lt;code>rg&lt;/code>
+&lt;/h3>&lt;p>&lt;a class="link" href="https://github.com/BurntSushi/ripgrep" target="_blank" rel="noopener"
+>&lt;code>rg&lt;/code>&lt;/a>&lt;/p>
+&lt;p>ripgrep recursively searches directories for a regex pattern while respecting your gitignore&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/BurntSushi/ripgrep/releases/latest" target="_blank" rel="noopener"
+>Latest releases&lt;/a>&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">cargo&lt;/span> &lt;span style="color:#e06c75">install&lt;/span> &lt;span style="color:#e06c75">ripgrep&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-4-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-4-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">Set-Alias&lt;/span> &lt;span style="color:#e06c75">-Name&lt;/span> &lt;span style="color:#e06c75">grep&lt;/span> &lt;span style="color:#e06c75">-Value&lt;/span> &lt;span style="color:#e06c75">rg&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="find">&lt;code>find&lt;/code>
+&lt;/h2>&lt;h3 id="findutils">&lt;code>findutils&lt;/code>
+&lt;/h3>&lt;p>&lt;a class="link" href="https://github.com/uutils/findutils" target="_blank" rel="noopener"
+>findutils&lt;/a>&lt;/p>
+&lt;p>Rust implementation of findutils&lt;/p>
+&lt;h4 id="install">Install
+&lt;/h4>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">cargo&lt;/span> &lt;span style="color:#e06c75">install&lt;/span> &lt;span style="color:#e06c75">findutils&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="fd">&lt;code>fd&lt;/code>
+&lt;/h3>&lt;p>&lt;a class="link" href="https://github.com/sharkdp/fd" target="_blank" rel="noopener"
+>&lt;code>fd&lt;/code>&lt;/a>&lt;/p>
+&lt;p>A simple, fast and user-friendly alternative to &amp;lsquo;find&amp;rsquo;&lt;/p>
+&lt;h4 id="install-1">Install
+&lt;/h4>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">cargo&lt;/span> &lt;span style="color:#e06c75">install&lt;/span> &lt;span style="color:#e5c07b">fd-find&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">winget&lt;/span> &lt;span style="color:#e06c75">install&lt;/span> &lt;span style="color:#e06c75">sharkdp&lt;/span>.&lt;span style="color:#e06c75">fd&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">Set-Alias&lt;/span> &lt;span style="color:#e06c75">-Name&lt;/span> &lt;span style="color:#e06c75">find&lt;/span> &lt;span style="color:#e06c75">-Value&lt;/span> &lt;span style="color:#e06c75">fd&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="tree">&lt;code>tree&lt;/code>
+&lt;/h2>&lt;h3 id="erd">&lt;code>erd&lt;/code>
+&lt;/h3>&lt;p>&lt;a class="link" href="https://github.com/solidiquis/erdtree" target="_blank" rel="noopener"
+>&lt;code>erd&lt;/code>&lt;/a>&lt;/p>
+&lt;p>A modern, multi-threaded file-tree visualization and disk usage analysis tool that respects hidden file and gitignore rules.&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-9-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-9-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">cargo&lt;/span> &lt;span style="color:#e06c75">install&lt;/span> &lt;span style="color:#e06c75">erdtree&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">Set-Alias&lt;/span> &lt;span style="color:#e06c75">-Name&lt;/span> &lt;span style="color:#e06c75">tree&lt;/span> &lt;span style="color:#e06c75">-Value&lt;/span> &lt;span style="color:#e06c75">erd&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="ls">&lt;code>ls&lt;/code>
+&lt;/h2>&lt;h3 id="lsd">&lt;code>lsd&lt;/code>
+&lt;/h3>&lt;p>&lt;a class="link" href="https://github.com/lsd-rs/lsd" target="_blank" rel="noopener"
+>&lt;code>lsd&lt;/code>&lt;/a>&lt;/p>
+&lt;p>The next gen ls command&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-11-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-11-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">cargo&lt;/span> &lt;span style="color:#e06c75">install&lt;/span> &lt;span style="color:#e06c75">lsd&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-12-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-12-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">Set-Alias&lt;/span> &lt;span style="color:#e06c75">-Name&lt;/span> &lt;span style="color:#e5c07b">ls &lt;/span>&lt;span style="color:#e06c75">-Value&lt;/span> &lt;span style="color:#e06c75">lsd&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="dig">&lt;code>dig&lt;/code>
+&lt;/h2>&lt;h3 id="dog">&lt;code>dog&lt;/code>
+&lt;/h3>&lt;p>&lt;a class="link" href="https://github.com/ogham/dog" target="_blank" rel="noopener"
+>&lt;code>dog&lt;/code>&lt;/a>&lt;/p>
+&lt;p>A command-line DNS client.&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-13-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-13-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">cargo&lt;/span> &lt;span style="color:#e06c75">install&lt;/span> -&lt;span style="color:#e06c75">-git&lt;/span> &lt;span style="color:#e06c75">https&lt;/span>://&lt;span style="color:#e06c75">github&lt;/span>.&lt;span style="color:#e06c75">com&lt;/span>/&lt;span style="color:#e06c75">ogham&lt;/span>/&lt;span style="color:#e06c75">dog&lt;/span>.&lt;span style="color:#e06c75">git&lt;/span> &lt;span style="color:#e06c75">dog&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-14-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-14-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">Set-Alias&lt;/span> &lt;span style="color:#e06c75">-Name&lt;/span> &lt;span style="color:#e06c75">dig&lt;/span> &lt;span style="color:#e06c75">-Value&lt;/span> &lt;span style="color:#e06c75">dog&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="coreutils">&lt;code>coreutils&lt;/code>
+&lt;/h2>&lt;p>&lt;a class="link" href="https://github.com/uutils/coreutils" target="_blank" rel="noopener"
+>coreutils&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://uutils.github.io/user/" target="_blank" rel="noopener"
+>uutils Coreutils Documentation&lt;/a>&lt;/p>
+&lt;p>Cross-platform Rust rewrite of the GNU coreutils&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-15-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-15-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">cargo&lt;/span> &lt;span style="color:#e06c75">install&lt;/span> &lt;span style="color:#e06c75">coreutils&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-1"> 1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-2"> 2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-3"> 3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-4"> 4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-5"> 5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-6"> 6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-7"> 7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-8"> 8&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-9">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-9"> 9&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-10">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-10">10&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-11">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-11">11&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-12">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-12">12&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-13">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-13">13&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-14">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-14">14&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-15">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-15">15&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-16">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-16">16&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-17">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-17">17&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-18">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-18">18&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-19">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-19">19&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-20">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-20">20&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-21">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-21">21&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-22">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-22">22&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-23">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-23">23&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-16-24">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-16-24">24&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-pwsh" data-lang="pwsh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># [, arch, b2sum, b3sum, base32, base64, basename, basenc, cat, cksum, comm, cp, csplit, cut,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># date, dd, df, dir, dircolors, dirname, du, echo, env, expand, expr, factor, false, fmt,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># fold, hashsum, head, hostname, join, link, ln, ls, md5sum, mkdir, mktemp, more, mv, nl,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># nproc, numfmt, od, paste, pr, printenv, printf, ptx, pwd, readlink, realpath, relpath, rm,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># rmdir, seq, sha1sum, sha224sum, sha256sum, sha3-224sum, sha3-256sum, sha3-384sum, sha3-&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 512sum, sha384sum, sha3sum, sha512sum, shake128sum, shake256sum, shred, shuf, sleep, sort,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># split, sum, sync, tac, tail, tee, test, touch, tr, true, truncate, tsort, uname, unexpand,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># uniq, unlink, vdir, wc, whoami, yes&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">Set-Location&lt;/span> &lt;span style="color:#e06c75">$&lt;/span>(&lt;span style="color:#e5c07b">Split-Path&lt;/span> &lt;span style="color:#e06c75">-Path&lt;/span> &lt;span style="color:#e06c75">$&lt;/span>(&lt;span style="color:#e5c07b">Get-Command&lt;/span> &lt;span style="color:#e06c75">coreutils&lt;/span>).&lt;span style="color:#e06c75">Source&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">$comands&lt;/span> = &lt;span style="color:#98c379">&amp;#34;[&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;arch&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;b2sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;b3sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;base32&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;base64&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;basename&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;basenc&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;cksum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;comm&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;csplit&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;cut&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">$comands&lt;/span> += &lt;span style="color:#98c379">&amp;#34;date&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;dd&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;df&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;dir&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;dircolors&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;dirname&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;du&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;echo&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;env&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;expand&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;expr&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;factor&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;false&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;fmt&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">$comands&lt;/span> += &lt;span style="color:#98c379">&amp;#34;fold&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;hashsum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;head&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;hostname&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;join&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;link&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;ln&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;ls&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;md5sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;mkdir&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;mktemp&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;more&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;mv&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;nl&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">$comands&lt;/span> += &lt;span style="color:#98c379">&amp;#34;nproc&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;numfmt&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;od&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;paste&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;pr&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;printenv&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;printf&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;ptx&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;pwd&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;readlink&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;realpath&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;relpath&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;rm&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">$comands&lt;/span> += &lt;span style="color:#98c379">&amp;#34;rmdir&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;seq&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sha1sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sha224sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sha256sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sha3-224sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sha3-256sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sha3-384sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sha3-512sum&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">$comands&lt;/span> += &lt;span style="color:#98c379">&amp;#34;sha384sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sha3sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sha512sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;shake128sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;shake256sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;shred&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;shuf&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sleep&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sort&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">$comands&lt;/span> += &lt;span style="color:#98c379">&amp;#34;split&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sum&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;sync&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;tac&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;tail&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;tee&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;test&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;touch&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;tr&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;true&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;truncate&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;tsort&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;uname&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;unexpand&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">$comands&lt;/span> += &lt;span style="color:#98c379">&amp;#34;uniq&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;unlink&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;vdir&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;wc&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;whoami&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;yes&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">foreach&lt;/span> (&lt;span style="color:#e06c75">$e&lt;/span> &lt;span style="color:#c678dd">in&lt;/span> &lt;span style="color:#e06c75">$comands&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#7f848e"># enumerate over the whole array&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e5c07b">New-Item&lt;/span> &lt;span style="color:#e06c75">-Path&lt;/span> (&lt;span style="color:#98c379">&amp;#34;&lt;/span>&lt;span style="color:#e06c75">${e}&lt;/span>&lt;span style="color:#98c379">&amp;#34;&lt;/span> + &lt;span style="color:#98c379">&amp;#34;.exe&amp;#34;&lt;/span>) &lt;span style="color:#e06c75">-ItemType&lt;/span> &lt;span style="color:#e06c75">SymbolicLink&lt;/span> &lt;span style="color:#e06c75">-Value&lt;/span> &lt;span style="color:#e06c75">coreutils&lt;/span>.&lt;span style="color:#e06c75">exe&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://github.com/rust-unofficial/awesome-rust#system-tools" target="_blank" rel="noopener"
+>Awesome Rust&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/ibraheemdev/modern-unix" target="_blank" rel="noopener"
+>Modern Unix&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

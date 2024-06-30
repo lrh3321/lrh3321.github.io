@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Npm on LRH3321's 博客</title><link>https://www.lrh3321.win/tags/npm/</link><description>Recent content in Npm on LRH3321's 博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Fri, 19 Jun 2020 21:52:43 +0800</lastBuildDate><atom:link href="https://www.lrh3321.win/tags/npm/index.xml" rel="self" type="application/rss+xml"/><item><title>设置 npm 镜像源</title><link>https://www.lrh3321.win/p/%E8%AE%BE%E7%BD%AE-npm-%E9%95%9C%E5%83%8F%E6%BA%90/</link><pubDate>Fri, 19 Jun 2020 21:52:43 +0800</pubDate><guid>https://www.lrh3321.win/p/%E8%AE%BE%E7%BD%AE-npm-%E9%95%9C%E5%83%8F%E6%BA%90/</guid><description>&lt;h1 id="nodejs-使用阿里镜像仓库">NodeJS 使用阿里镜像仓库
+&lt;/h1>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-1"> 1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-2"> 2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-3"> 3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-4"> 4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-5"> 5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-6"> 6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-7"> 7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-8"> 8&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-9">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-9"> 9&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-10">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-10">10&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-11">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-11">11&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>npm config &lt;span style="color:#e5c07b">set&lt;/span> registry https://registry.npmmirror.com/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>npm config &lt;span style="color:#e5c07b">set&lt;/span> disturl https://npmmirror.com/mirrors/node/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>npm config &lt;span style="color:#e5c07b">set&lt;/span> sass_binary_site https://npmmirror.com/mirrors/node-sass/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>npm config &lt;span style="color:#e5c07b">set&lt;/span> sharp_dist_base_url https://npmmirror.com/mirrors/sharp-libvips/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>npm config &lt;span style="color:#e5c07b">set&lt;/span> electron_mirror https://npmmirror.com/mirrors/electron/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>npm config &lt;span style="color:#e5c07b">set&lt;/span> puppeteer_download_host https://npmmirror.com/mirrors/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>npm config &lt;span style="color:#e5c07b">set&lt;/span> phantomjs_cdnurl https://npmmirror.com/mirrors/phantomjs/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>npm config &lt;span style="color:#e5c07b">set&lt;/span> sentrycli_cdnurl https://npmmirror.com/mirrors/sentry-cli/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>npm config &lt;span style="color:#e5c07b">set&lt;/span> sqlite3_binary_site https://npmmirror.com/mirrors/sqlite3/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>npm config &lt;span style="color:#e5c07b">set&lt;/span> python_mirror https://npmmirror.com/mirrors/python/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;!-- raw HTML omitted -->
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>yarn config &lt;span style="color:#e5c07b">set&lt;/span> registry https://registry.npmmirror.com/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

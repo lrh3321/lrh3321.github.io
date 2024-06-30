@@ -1,0 +1,574 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="使用 Fio 进行磁盘性能测试 Flexible I/O Tester 现在 Fio 已经安装到了你的系统中。现在是时候看一些如何使用 Fio 的例子了。我们将进行随机写、读和读写测试。 执行随机写测试"><meta name=keywords content="fio,disk,benchmark"><title>使用 Fio 进行磁盘性能测试</title>
+<link rel=canonical href=https://www.lrh3321.win/p/fio/><link rel=stylesheet href=/scss/style.min.0304c6baf04e01a8fe70693791cb744d56a3578a3120a8796cefc66825aa39c7.css><meta property='og:title' content="使用 Fio 进行磁盘性能测试"><meta property='og:description' content="使用 Fio 进行磁盘性能测试 Flexible I/O Tester 现在 Fio 已经安装到了你的系统中。现在是时候看一些如何使用 Fio 的例子了。我们将进行随机写、读和读写测试。 执行随机写测试"><meta property='og:url' content='https://www.lrh3321.win/p/fio/'><meta property='og:site_name' content="LRH3321's 博客"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='fio'><meta property='article:tag' content='disk'><meta property='article:tag' content='benchmark'><meta property='article:published_time' content='2023-07-15T11:10:37+08:00'><meta property='article:modified_time' content='2023-07-15T11:10:37+08:00'><meta property='og:image' content='https://www.lrh3321.win/img/default.jpg'><meta name=twitter:title content="使用 Fio 进行磁盘性能测试"><meta name=twitter:description content="使用 Fio 进行磁盘性能测试 Flexible I/O Tester 现在 Fio 已经安装到了你的系统中。现在是时候看一些如何使用 Fio 的例子了。我们将进行随机写、读和读写测试。 执行随机写测试"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://www.lrh3321.win/img/default.jpg'></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_huf131be4610ef646f5b980e8a8ce2dbbf_411413_300x0_resize_box_3.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🍥</span></figure><div class=site-meta><h1 class=site-name><a href=/>LRH3321's 博客</a></h1><h2 class=site-description>敬你认真工作的状态，也爱你认真生活的姿态</h2></div></header><ol class=menu-social><li><a href=https://github.com/lrh3321/ target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://twitter.com target=_blank title=Twitter rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/links/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#使用-fio-进行磁盘性能测试>使用 Fio 进行磁盘性能测试</a></li><li><a href=#执行随机写测试>执行随机写测试</a></li><li><a href=#执行随机读测试>执行随机读测试</a></li><li><a href=#读写性能测试>读写性能测试</a></li><li><a href=#使用配置文件>使用配置文件</a><ol><li><a href=#linux>Linux</a></li><li><a href=#windows>Windows</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/disk/>Disk</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/fio/>使用 Fio 进行磁盘性能测试</a></h2></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Jul 15, 2023</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 3 分钟</time></div></footer></div></header><section class=article-content><h2 id=使用-fio-进行磁盘性能测试>使用 Fio 进行磁盘性能测试</h2><p><a class=link href=https://github.com/axboe/fio target=_blank rel=noopener>Flexible I/O Tester</a></p><p>现在 Fio 已经安装到了你的系统中。现在是时候看一些如何使用 Fio 的例子了。我们将进行随机写、读和读写测试。</p><h2 id=执行随机写测试>执行随机写测试</h2><p>执行下面的命令来开始。这个命令将要同一时间执行两个进程，写入共计 4GB（ 4 个任务 x 512MB = 2GB） 文件：</p><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-1> 1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-2> 2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-3> 3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-4> 4</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-5><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-5> 5</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-6><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-6> 6</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-7><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-7> 7</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-8><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-8> 8</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-9><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-9> 9</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-10><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-10>10</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-11><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-11>11</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-12><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-12>12</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-13><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-13>13</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-14><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-14>14</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-15><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-15>15</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-16><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-16>16</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-17><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-17>17</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-18><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-18>18</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-19><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-19>19</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-20><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-20>20</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-21><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-21>21</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-22><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-22>22</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-23><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-23>23</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-24><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-24>24</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-25><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-25>25</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-26><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-26>26</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-27><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-27>27</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-28><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-28>28</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-0-29><a style=outline:none;text-decoration:none;color:inherit href=#hl-0-29>29</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text><span style=display:flex><span>sudo fio --name=randwrite --ioengine=libaio --iodepth=1 --rw=randwrite --bs=4k --direct=0 --size=512M --numjobs=2 --runtime=240 --group_reporting
+</span></span><span style=display:flex><span>...
+</span></span><span style=display:flex><span>fio-2.2.10
+</span></span><span style=display:flex><span>Starting 2 processes
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>randwrite: (groupid=0, jobs=2): err= 0: pid=7271: Sat Aug 5 13:28:44 2017
+</span></span><span style=display:flex><span> write: io=1024.0MB, bw=2485.5MB/s, iops=636271, runt= 412msec
+</span></span><span style=display:flex><span> slat (usec): min=1, max=268, avg= 1.79, stdev= 1.01
+</span></span><span style=display:flex><span> clat (usec): min=0, max=13, avg= 0.20, stdev= 0.40
+</span></span><span style=display:flex><span> lat (usec): min=1, max=268, avg= 2.03, stdev= 1.01
+</span></span><span style=display:flex><span> clat percentiles (usec):
+</span></span><span style=display:flex><span> | 1.00th=[ 0], 5.00th=[ 0], 10.00th=[ 0], 20.00th=[ 0],
+</span></span><span style=display:flex><span> | 30.00th=[ 0], 40.00th=[ 0], 50.00th=[ 0], 60.00th=[ 0],
+</span></span><span style=display:flex><span> | 70.00th=[ 0], 80.00th=[ 1], 90.00th=[ 1], 95.00th=[ 1],
+</span></span><span style=display:flex><span> | 99.00th=[ 1], 99.50th=[ 1], 99.90th=[ 1], 99.95th=[ 1],
+</span></span><span style=display:flex><span> | 99.99th=[ 1]
+</span></span><span style=display:flex><span> lat (usec) : 2=99.99%, 4=0.01%, 10=0.01%, 20=0.01%
+</span></span><span style=display:flex><span> cpu : usr=15.14%, sys=84.00%, ctx=8, majf=0, minf=26
+</span></span><span style=display:flex><span> IO depths : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, &gt;=64=0.0%
+</span></span><span style=display:flex><span> submit : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, &gt;=64=0.0%
+</span></span><span style=display:flex><span> complete : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, &gt;=64=0.0%
+</span></span><span style=display:flex><span> issued : total=r=0/w=262144/d=0, short=r=0/w=0/d=0, drop=r=0/w=0/d=0
+</span></span><span style=display:flex><span> latency : target=0, window=0, percentile=100.00%, depth=1
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Run status group 0 (all jobs):
+</span></span><span style=display:flex><span> WRITE: io=1024.0MB, aggrb=2485.5MB/s, minb=2485.5MB/s, maxb=2485.5MB/s, mint=412msec, maxt=412msec
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Disk stats (read/write):
+</span></span><span style=display:flex><span> sda: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
+</span></span></code></pre></td></tr></table></div></div><h2 id=执行随机读测试>执行随机读测试</h2><p>我们将要执行一个随机读测试，我们将会尝试读取一个随机的 2GB 文件。</p><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-1-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-1-1>1</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text><span style=display:flex><span>sudo fio --name=randread --ioengine=libaio --iodepth=16 --rw=randread --bs=4k --direct=0 --size=512M --numjobs=4 --runtime=240 --group_reporting
+</span></span></code></pre></td></tr></table></div></div><p>你应该会看到下面这样的输出：</p><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-1> 1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-2> 2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-3> 3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-4> 4</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-5><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-5> 5</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-6><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-6> 6</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-7><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-7> 7</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-8><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-8> 8</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-9><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-9> 9</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-10><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-10>10</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-11><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-11>11</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-12><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-12>12</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-13><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-13>13</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-14><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-14>14</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-15><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-15>15</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-16><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-16>16</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-17><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-17>17</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-18><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-18>18</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-19><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-19>19</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-20><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-20>20</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-21><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-21>21</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-22><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-22>22</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-23><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-23>23</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-24><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-24>24</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-25><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-25>25</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-26><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-26>26</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-27><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-27>27</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-28><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-28>28</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-29><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-29>29</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-30><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-30>30</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-31><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-31>31</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-32><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-32>32</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-33><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-33>33</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-34><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-34>34</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-2-35><a style=outline:none;text-decoration:none;color:inherit href=#hl-2-35>35</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text><span style=display:flex><span>...
+</span></span><span style=display:flex><span>fio-2.2.10
+</span></span><span style=display:flex><span>Starting 4 processes
+</span></span><span style=display:flex><span>randread: Laying out IO file(s) (1 file(s) / 512MB)
+</span></span><span style=display:flex><span>randread: Laying out IO file(s) (1 file(s) / 512MB)
+</span></span><span style=display:flex><span>randread: Laying out IO file(s) (1 file(s) / 512MB)
+</span></span><span style=display:flex><span>randread: Laying out IO file(s) (1 file(s) / 512MB)
+</span></span><span style=display:flex><span>Jobs: 4 (f=4): [r(4)] [100.0% done] [71800KB/0KB/0KB /s] [17.1K/0/0 iops] [eta 00m:00s]
+</span></span><span style=display:flex><span>randread: (groupid=0, jobs=4): err= 0: pid=7586: Sat Aug 5 13:30:52 2017
+</span></span><span style=display:flex><span> read : io=2048.0MB, bw=80719KB/s, iops=20179, runt= 25981msec
+</span></span><span style=display:flex><span> slat (usec): min=72, max=10008, avg=195.79, stdev=94.72
+</span></span><span style=display:flex><span> clat (usec): min=2, max=28811, avg=2971.96, stdev=760.33
+</span></span><span style=display:flex><span> lat (usec): min=185, max=29080, avg=3167.96, stdev=798.91
+</span></span><span style=display:flex><span> clat percentiles (usec):
+</span></span><span style=display:flex><span> | 1.00th=[ 2192], 5.00th=[ 2448], 10.00th=[ 2576], 20.00th=[ 2736],
+</span></span><span style=display:flex><span> | 30.00th=[ 2800], 40.00th=[ 2832], 50.00th=[ 2928], 60.00th=[ 3024],
+</span></span><span style=display:flex><span> | 70.00th=[ 3120], 80.00th=[ 3184], 90.00th=[ 3248], 95.00th=[ 3312],
+</span></span><span style=display:flex><span> | 99.00th=[ 3536], 99.50th=[ 6304], 99.90th=[15168], 99.95th=[18816],
+</span></span><span style=display:flex><span> | 99.99th=[22912]
+</span></span><span style=display:flex><span> bw (KB /s): min=17360, max=25144, per=25.05%, avg=20216.90, stdev=1605.65
+</span></span><span style=display:flex><span> lat (usec) : 4=0.01%, 10=0.01%, 250=0.01%, 500=0.01%, 750=0.01%
+</span></span><span style=display:flex><span> lat (usec) : 1000=0.01%
+</span></span><span style=display:flex><span> lat (msec) : 2=0.01%, 4=99.27%, 10=0.44%, 20=0.24%, 50=0.04%
+</span></span><span style=display:flex><span> cpu : usr=1.35%, sys=5.18%, ctx=524309, majf=0, minf=98
+</span></span><span style=display:flex><span> IO depths : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=100.0%, 32=0.0%, &gt;=64=0.0%
+</span></span><span style=display:flex><span> submit : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, &gt;=64=0.0%
+</span></span><span style=display:flex><span> complete : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.1%, 32=0.0%, 64=0.0%, &gt;=64=0.0%
+</span></span><span style=display:flex><span> issued : total=r=524288/w=0/d=0, short=r=0/w=0/d=0, drop=r=0/w=0/d=0
+</span></span><span style=display:flex><span> latency : target=0, window=0, percentile=100.00%, depth=16
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Run status group 0 (all jobs):
+</span></span><span style=display:flex><span> READ: io=2048.0MB, aggrb=80718KB/s, minb=80718KB/s, maxb=80718KB/s, mint=25981msec, maxt=25981msec
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Disk stats (read/write):
+</span></span><span style=display:flex><span> sda: ios=521587/871, merge=0/1142, ticks=96664/612, in_queue=97284, util=99.85%
+</span></span></code></pre></td></tr></table></div></div><p>最后，我们想要展示一个简单的随机读-写测试来看一看 Fio 返回的输出类型。</p><h2 id=读写性能测试>读写性能测试</h2><p>下述命令将会测试 USB Pen 驱动器 (<code>/dev/sdc1</code>) 的随机读写性能：</p><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-3-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-3-1>1</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text><span style=display:flex><span>sudo fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=test --filename=random_read_write.fio --bs=4k --iodepth=64 --size=4G --readwrite=randrw --rwmixread=75
+</span></span></code></pre></td></tr></table></div></div><p>下面的内容是我们从上面的命令得到的输出：</p><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-1> 1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-2> 2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-3> 3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-4> 4</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-5><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-5> 5</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-6><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-6> 6</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-7><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-7> 7</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-8><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-8> 8</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-9><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-9> 9</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-10><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-10>10</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-11><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-11>11</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-12><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-12>12</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-13><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-13>13</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-14><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-14>14</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-15><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-15>15</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-16><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-16>16</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-17><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-17>17</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-18><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-18>18</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-4-19><a style=outline:none;text-decoration:none;color:inherit href=#hl-4-19>19</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text><span style=display:flex><span>fio-2.2.10
+</span></span><span style=display:flex><span>Starting 1 process
+</span></span><span style=display:flex><span>Jobs: 1 (f=1): [m(1)] [100.0% done] [217.8MB/74452KB/0KB /s] [55.8K/18.7K/0 iops] [eta 00m:00s]
+</span></span><span style=display:flex><span>test: (groupid=0, jobs=1): err= 0: pid=8475: Sat Aug 5 13:36:04 2017
+</span></span><span style=display:flex><span> read : io=3071.7MB, bw=219374KB/s, iops=54843, runt= 14338msec
+</span></span><span style=display:flex><span> write: io=1024.4MB, bw=73156KB/s, iops=18289, runt= 14338msec
+</span></span><span style=display:flex><span> cpu : usr=6.78%, sys=20.81%, ctx=1007218, majf=0, minf=9
+</span></span><span style=display:flex><span> IO depths : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=0.1%, &gt;=64=100.0%
+</span></span><span style=display:flex><span> submit : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, &gt;=64=0.0%
+</span></span><span style=display:flex><span> complete : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.1%, &gt;=64=0.0%
+</span></span><span style=display:flex><span> issued : total=r=786347/w=262229/d=0, short=r=0/w=0/d=0, drop=r=0/w=0/d=0
+</span></span><span style=display:flex><span> latency : target=0, window=0, percentile=100.00%, depth=64
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Run status group 0 (all jobs):
+</span></span><span style=display:flex><span> READ: io=3071.7MB, aggrb=219374KB/s, minb=219374KB/s, maxb=219374KB/s, mint=14338msec, maxt=14338msec
+</span></span><span style=display:flex><span> WRITE: io=1024.4MB, aggrb=73156KB/s, minb=73156KB/s, maxb=73156KB/s, mint=14338msec, maxt=14338msec
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Disk stats (read/write):
+</span></span><span style=display:flex><span> sda: ios=774141/258944, merge=1463/899, ticks=748800/150316, in_queue=900720, util=99.35%
+</span></span></code></pre></td></tr></table></div></div><h2 id=使用配置文件>使用配置文件</h2><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-5-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-5-1>1</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>fio fio.conf
+</span></span></code></pre></td></tr></table></div></div><h3 id=linux>Linux</h3><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-1> 1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-2> 2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-3> 3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-4> 4</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-5><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-5> 5</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-6><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-6> 6</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-7><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-7> 7</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-8><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-8> 8</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-9><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-9> 9</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-10><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-10>10</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-11><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-11>11</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-12><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-12>12</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-13><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-13>13</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-14><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-14>14</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-15><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-15>15</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-16><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-16>16</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-17><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-17>17</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-18><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-18>18</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-19><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-19>19</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-20><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-20>20</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-21><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-21>21</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-22><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-22>22</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-23><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-23>23</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-24><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-24>24</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-25><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-25>25</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-26><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-26>26</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-27><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-27>27</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-28><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-28>28</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-29><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-29>29</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-30><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-30>30</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-31><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-31>31</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-32><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-32>32</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-33><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-33>33</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-34><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-34>34</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-35><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-35>35</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-36><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-36>36</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-37><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-37>37</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-38><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-38>38</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-39><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-39>39</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-40><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-40>40</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-41><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-41>41</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-42><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-42>42</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-43><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-43>43</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-44><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-44>44</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-45><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-45>45</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-46><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-46>46</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-47><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-47>47</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-48><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-48>48</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-49><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-49>49</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-50><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-50>50</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-51><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-51>51</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-52><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-52>52</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-53><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-53>53</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-54><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-54>54</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-55><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-55>55</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-56><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-56>56</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-57><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-57>57</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-58><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-58>58</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-59><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-59>59</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-60><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-60>60</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-61><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-61>61</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-62><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-62>62</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-63><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-63>63</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-64><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-64>64</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-65><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-65>65</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-66><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-66>66</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-67><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-67>67</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-68><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-68>68</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-69><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-69>69</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-70><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-70>70</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-71><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-71>71</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-72><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-72>72</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-73><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-73>73</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-74><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-74>74</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-75><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-75>75</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-76><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-76>76</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-77><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-77>77</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-78><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-78>78</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-79><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-79>79</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-80><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-80>80</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-81><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-81>81</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-82><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-82>82</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-83><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-83>83</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-84><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-84>84</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-85><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-85>85</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-86><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-86>86</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-87><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-87>87</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-88><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-88>88</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-89><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-89>89</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-90><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-90>90</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-91><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-91>91</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-92><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-92>92</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-93><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-93>93</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-94><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-94>94</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-6-95><a style=outline:none;text-decoration:none;color:inherit href=#hl-6-95>95</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#c678dd>[global]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>ioengine</span><span style=color:#56b6c2>=</span><span style=color:#98c379>libaio</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>direct</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>thread</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>time_based</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>group_reporting</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>128</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>filename</span><span style=color:#56b6c2>=</span><span style=color:#98c379>/dev/vdb</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>runtime</span><span style=color:#56b6c2>=</span><span style=color:#98c379>300</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1g</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[4k-randwrite]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>4k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randwrite</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[8k-randwrite]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>8k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randwrite</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[64k-16p-randwrite]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>64k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randwrite</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[4k-write]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>4k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>write</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[8k-write]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>8k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>write</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[64k-16p-write]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>64k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>write</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[4k-randread]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>4k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randread</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[8k-randread]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>8k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randread</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[64k-16p-randread]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>64k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randread</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[4k-read]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>4k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>read</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[8k-read]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>8k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>read</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[64k-16p-read]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>64k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>read</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=windows>Windows</h3><div class=highlight><div style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-1><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-1> 1</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-2><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-2> 2</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-3><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-3> 3</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-4><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-4> 4</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-5><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-5> 5</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-6><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-6> 6</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-7><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-7> 7</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-8><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-8> 8</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-9><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-9> 9</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-10><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-10>10</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-11><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-11>11</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-12><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-12>12</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-13><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-13>13</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-14><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-14>14</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-15><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-15>15</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-16><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-16>16</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-17><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-17>17</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-18><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-18>18</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-19><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-19>19</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-20><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-20>20</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-21><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-21>21</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-22><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-22>22</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-23><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-23>23</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-24><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-24>24</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-25><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-25>25</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-26><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-26>26</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-27><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-27>27</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-28><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-28>28</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-29><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-29>29</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-30><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-30>30</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-31><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-31>31</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-32><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-32>32</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-33><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-33>33</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-34><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-34>34</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-35><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-35>35</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-36><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-36>36</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-37><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-37>37</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-38><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-38>38</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-39><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-39>39</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-40><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-40>40</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-41><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-41>41</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-42><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-42>42</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-43><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-43>43</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-44><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-44>44</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-45><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-45>45</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-46><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-46>46</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-47><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-47>47</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-48><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-48>48</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-49><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-49>49</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-50><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-50>50</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-51><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-51>51</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-52><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-52>52</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-53><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-53>53</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-54><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-54>54</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-55><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-55>55</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-56><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-56>56</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-57><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-57>57</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-58><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-58>58</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-59><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-59>59</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-60><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-60>60</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-61><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-61>61</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-62><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-62>62</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-63><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-63>63</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-64><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-64>64</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-65><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-65>65</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-66><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-66>66</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-67><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-67>67</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-68><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-68>68</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-69><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-69>69</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-70><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-70>70</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-71><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-71>71</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-72><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-72>72</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-73><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-73>73</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-74><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-74>74</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-75><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-75>75</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-76><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-76>76</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-77><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-77>77</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-78><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-78>78</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-79><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-79>79</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-80><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-80>80</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-81><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-81>81</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-82><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-82>82</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-83><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-83>83</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-84><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-84>84</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-85><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-85>85</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-86><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-86>86</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-87><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-87>87</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-88><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-88>88</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-89><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-89>89</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-90><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-90>90</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-91><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-91>91</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-92><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-92>92</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-93><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-93>93</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-94><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-94>94</a>
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#55595f" id=hl-7-95><a style=outline:none;text-decoration:none;color:inherit href=#hl-7-95>95</a>
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#c678dd>[global]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>ioengine</span><span style=color:#56b6c2>=</span><span style=color:#98c379>windowsaio</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>direct</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>thread</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>time_based</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>group_reporting</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>128</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>filename</span><span style=color:#56b6c2>=</span><span style=color:#98c379>fiojob</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>runtime</span><span style=color:#56b6c2>=</span><span style=color:#98c379>300</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1g</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[4k-randwrite]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>4k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randwrite</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[8k-randwrite]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>8k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randwrite</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[64k-16p-randwrite]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>64k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randwrite</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[4k-write]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>4k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>write</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[8k-write]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>8k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>write</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[64k-16p-write]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>64k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>write</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[4k-randread]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>4k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randread</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[8k-randread]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>8k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randread</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[64k-16p-randread]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>64k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>randread</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[4k-read]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>4k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>read</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[8k-read]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>8k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>1</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>read</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span><span style=display:flex><span><span style=color:#c678dd>[64k-16p-read]</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>bs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>64k</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>size</span><span style=color:#56b6c2>=</span><span style=color:#98c379>256m</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>numjobs</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>iodepth</span><span style=color:#56b6c2>=</span><span style=color:#98c379>16</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>rw</span><span style=color:#56b6c2>=</span><span style=color:#98c379>read</span>
+</span></span><span style=display:flex><span><span style=color:#e06c75>stonewall</span>
+</span></span></code></pre></td></tr></table></div></div><hr><ul><li><a class=link href=https://zhuanlan.zhihu.com/p/41802948 target=_blank rel=noopener>如何在 Linux 中使用 Fio 来测评硬盘性能</a></li><li><a class=link href=https://arstechnica.com/gadgets/2020/02/how-fast-are-your-disks-find-out-the-open-source-way-with-fio/ target=_blank rel=noopener>How fast are your disks? Find out the open source way, with fio</a></li><li><a class=link href=https://linux.die.net/man/1/fio target=_blank rel=noopener>fio(1) - Linux man page</a></li></ul></section><footer class=article-footer><section class=article-tags><a href=/tags/fio/>Fio</a>
+<a href=/tags/disk/>Disk</a>
+<a href=/tags/benchmark/>Benchmark</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><footer class=site-footer><section class=copyright>&copy;
+2016 -
+2024 LRH3321's 博客</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.26.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://cdn.bootcdn.net/ajax/libs/lato-font/3.0.0/css/lato-font.min.css",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

@@ -1,0 +1,1052 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Systemd on LRH3321's 博客</title><link>https://www.lrh3321.win/tags/systemd/</link><description>Recent content in Systemd on LRH3321's 博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sun, 16 Apr 2023 08:37:29 +0800</lastBuildDate><atom:link href="https://www.lrh3321.win/tags/systemd/index.xml" rel="self" type="application/rss+xml"/><item><title>如何编写 Systemd 服务文件</title><link>https://www.lrh3321.win/p/how-to-write-a-systemd-service/</link><pubDate>Sun, 16 Apr 2023 08:37:29 +0800</pubDate><guid>https://www.lrh3321.win/p/how-to-write-a-systemd-service/</guid><description>&lt;blockquote>
+&lt;p>本教程简单的描述了如何从零开始编写一个 Systemd 服务文件、SysV init 脚本到 Systemd Service 文件的转换、以及一些后续学习的资源类内容。关于 Systemd 服务的使用，请见管理 Systemd，服务的自动启动以及服务打包问题，请见Systemd 打包指南。&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="什么是-systemd-service">什么是 Systemd service？
+&lt;/h2>&lt;p>一种以 &lt;code>.service&lt;/code> 结尾的单元（unit）配置文件，用于控制由 systemd 控制或监视的进程。简单说，用于后台以守护精灵（daemon）的形式运行程序。&lt;/p>
+&lt;h2 id="编写-systemd-service">编写 Systemd service
+&lt;/h2>&lt;h3 id="基本结构">基本结构
+&lt;/h3>&lt;p>Systemd 服务的内容主要分为三个部分，控制单元（unit）的定义、服务（service）的定义、以及安装部分。&lt;/p>
+&lt;h3 id="和-sysv-init-脚本的差异">和 SysV init 脚本的差异
+&lt;/h3>&lt;p>过去，*nix 服务（守护精灵）都是用 SysV 启动脚本启动的。SysV 启动脚本就是 Bash 脚本，通常在 /etc/init.d 目录下，可以被一些标准参数如 start，stop，restart 等调用。启动该脚本通常意味着启动一个后台守护精灵（daemon）。shell 脚本常见的缺点就是，慢、可读性不强、太详细又很傲娇。虽然它们很灵活（毕竟那就是代码呀），但是有些事只用脚本做还是显得太困难了，比如安排并列执行、正确监视进程，或者配置详细执行环境。&lt;/p>
+&lt;p>SysV 启动脚本还有一个硬伤就是，臃肿，重复代码太多。因为上述的“标准参数”必须要靠各个脚本来实现，而且各个脚本之间的实现都差不多（根本就是从一个 skeleton 骨架来的）。而 Systemd 则进行了统一实现，也就是说在 Systemd service 中完全就不需要、也看不到这部分内容。这使得 Systemd 服务非常简明易读，例如 NetworkManager 这一重量级程序的服务，算上注释一共才有 19 行。而它相应的 SysV 启动脚本头 100 行连标准参数都没实现完。&lt;/p>
+&lt;p>Systemd 兼容 Sysv 启动脚本，这也是为什么这么久我们仍然需要一个 systemd-sysvinit 软件包的原因。但是根据以上理由，最好针对所有您安装的守护精灵都使用原生 Systemd 服务来启动。另外，Systemd 服务可无缝用于所有使用 Systemd 的发行版，意思是 Arch 下编写的脚本拿过来依然能够使用。&lt;/p>
+&lt;p>通常来说，上游应该在发布源代码的同时发布 Systemd 服务，但如果没发布，你可以对照本教学来为它们写一个并贡献给它们。&lt;/p>
+&lt;p>关于 SysV init 启动脚本的编写可见&lt;a class="link" href="https://zh.opensuse.org/openSUSE:Packaging_init_scripts" target="_blank" rel="noopener"
+>SysVinit 引导脚本&lt;/a>，这主要用于你的服务器，毕竟服务器追求稳定软件更新的不是很勤（但你一定不知道欧盟汽车里的车载系统必须是 Systemd）。&lt;/p>
+&lt;h3 id="真正开始前需要注意的问题">真正开始前需要注意的问题
+&lt;/h3>&lt;p>如上所述，Systemd 的 service 文件是完全跨发行版的，所以有时候没有必要重造轮子。真正编写你的服务前，请确认它在各大发行版中完全就不存在：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="http://en.opensuse.org/openSUSE:Systemd_services" target="_blank" rel="noopener"
+>我们的 Systemd 服务集合&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://fedoraproject.org/wiki/User:Johannbg/Features/SysVtoSystemd" target="_blank" rel="noopener"
+>Fedora Systemd 服务集合&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://wiki.archlinux.org/index.php/Systemd/Services" target="_blank" rel="noopener"
+>Arch Linux Systemd 服务集合&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://wiki.gentoo.org/wiki/Systemd#Services" target="_blank" rel="noopener"
+>Gentoo Systemd 服务集合&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://wiki.debian.org/systemd#Debian_packages_with_native_systemd_support" target="_blank" rel="noopener"
+>Debian 中的少量 Systemd 服务&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://wiki.ubuntu.com/systemd" target="_blank" rel="noopener"
+>ubuntu 中的少量 Systemd 服务&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h3 id="systemd-语法">Systemd 语法
+&lt;/h3>&lt;p>Systemd 语法和 .desktop 文件的语法比较像，也比较类似 Windows 下的 .ini 文件，因此无论对于打包者还是最终用户都是非常容易上手的。&lt;/p>
+&lt;p>主要格式请见下面的小例子，这里需要说明三点：&lt;/p>
+&lt;p>Systemd 单元文件中的以 &lt;code>#&lt;/code> 开头的行后面的内容会被认为是注释&lt;/p>
+&lt;p>Systemd 下的布尔值，&lt;code>1&lt;/code>、&lt;code>yes&lt;/code>、&lt;code>on&lt;/code>、&lt;code>true&lt;/code> 都是开启，&lt;code>0&lt;/code>、&lt;code>no&lt;/code>、&lt;code>off&lt;/code>、&lt;code>false&lt;/code> 都是关闭。注：&lt;/p>
+&lt;p>仅限于 Systemd 文件，比如：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">RemainOnExit&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">yes&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>并不适用于该文件中嵌入的 shell 语句，比如：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">ExecStartPre&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">/usr/bin/test &amp;#34;x${NETWORKMANAGER}&amp;#34; = xyes&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里的 &lt;code>yes&lt;/code> 就不能替换。因为等号后面是一条嵌入的 shell 语句。&lt;/p>
+&lt;p>Systemd 下的时间单位默认是秒，所以要用毫秒（&lt;code>ms&lt;/code>）分钟（&lt;code>m&lt;/code>）等请显式说明。&lt;/p>
+&lt;h3 id="一个小例子">一个小例子
+&lt;/h3>&lt;p>NetworkManager 的 Systemd service：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-1"> 1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-2"> 2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-3"> 3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-4"> 4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-5"> 5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-6"> 6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-7"> 7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-8"> 8&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-9">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-9"> 9&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-10">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-10">10&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-11">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-11">11&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-12">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-12">12&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-13">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-13">13&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-14">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-14">14&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-15">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-15">15&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-16">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-16">16&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-17">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-17">17&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-18">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-18">18&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-19">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-19">19&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">[Unit]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Description&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">Network Manager&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">After&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">syslog.target&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Wants&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">remote-fs.target network.target&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">[Service]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Type&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">dbus&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">BusName&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">org.freedesktop.NetworkManager&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">ExecStart&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">/usr/sbin/NetworkManager --no-daemon&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">EnvironmentFile&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">/etc/sysconfig/network/config&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">ExecStartPre&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">/usr/bin/test &amp;#34;x${NETWORKMANAGER}&amp;#34; = xyes&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># Suppress stderr to eliminate duplicated messages in syslog. NM calls openlog()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># with LOG_PERROR when run in foreground. But systemd redirects stderr to&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># syslog by default, which results in logging each message twice.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">StandardError&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">null&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">[Install]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">WantedBy&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">multi-user.target&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Also&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">NetworkManager-wait-online.service&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>以下我们以编写&lt;a class="link" href="https://forum.suse.org.cn" target="_blank" rel="noopener"
+>我们论坛&lt;/a>所使用的 He.net IPv6 单元文件为例。&lt;/p>
+&lt;h3 id="定义控制单元-unit">定义控制单元 [Unit]
+&lt;/h3>&lt;p>在 Systemd 中，所有引导过程中 Systemd 要控制的东西都是一个单元。Systemd 单元类型有：&lt;/p>
+&lt;ul>
+&lt;li>系统服务&lt;/li>
+&lt;li>套接字（socket）&lt;/li>
+&lt;li>设备&lt;/li>
+&lt;li>挂载点&lt;/li>
+&lt;li>自动挂载点&lt;/li>
+&lt;li>SWAP 文件&lt;/li>
+&lt;li>分区&lt;/li>
+&lt;li>启动对象（startup target）&lt;/li>
+&lt;li>文件系统路径&lt;/li>
+&lt;li>定时器&lt;/li>
+&lt;/ul>
+&lt;p>简单说，Systemd 把 *nix 里那些分散开发因此宏观看变成一团杂碎的东西重新统一命名了。单元名就是你写的这个 .service 文件的名称。但不只有 .service 后缀的文件才可以是一个单元，单元还可以有 .target, .path 等后缀，具体可以去 &lt;code>/usr/lib/systemd/system&lt;/code> 下了解。但那种后缀要么由 Systemd 上游开发者写好随 systemd 软件包分发，要么由我们的 Base:system 团队添加，一般用户是不太需要写其它后缀的控制单元的。&lt;/p>
+&lt;p>我们先要声明我们在定义控制单元：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">[Unit]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>单元名称就不用写了，我们要写一条单元描述：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-4-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-4-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-4-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-4-2">2&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">[Unit]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Description&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">Daemon to start He.net IPv6&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>下面我们要讲解一下 Systemd 是如何控制各个单元之间的关系的。它和 RPM 的 specfile 的依赖关系控制的语法非常相似（毕竟都是红帽一家的）：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>Requires&lt;/code>: 这个单元启动了，那么它“需要”的单元也会被启动; 它“需要”的单元被停止了，它自己也活不了。但是请注意，这个设定并不能控制某单元与它“需要”的单元的启动顺序（启动顺序是另外控制的），即 Systemd 不是先启动 &lt;code>Requires&lt;/code> 再启动本单元，而是在本单元被激活时，并行启动两者。于是会产生争分夺秒的问题，如果 &lt;code>Requires&lt;/code> 先启动成功，那么皆大欢喜; 如果 &lt;code>Requires&lt;/code> 启动得慢，那本单元就会失败（Systemd 没有自动重试）。所以为了系统的健壮性，不建议使用这个标记，而建议使用 &lt;code>Wants&lt;/code> 标记。可以使用多个 &lt;code>Requires&lt;/code>。&lt;/li>
+&lt;li>&lt;code>RequiresOverridable&lt;/code>: 跟 &lt;code>Requires&lt;/code> 很像。但是如果这条服务是由用户手动启动的，那么 &lt;code>RequiresOverridable&lt;/code> 后面的服务即使启动不成功也不报错。跟 &lt;code>Requires&lt;/code> 比增加了一定容错性，但是你要确定你的服务是有等待功能的。另外，如果不由用户手动启动而是随系统开机启动，那么依然会有 &lt;code>Requires&lt;/code> 面临的问题。&lt;/li>
+&lt;li>&lt;code>Requisite&lt;/code>: 强势版本的 &lt;code>Requires&lt;/code>。要是这里需要的服务启动不成功，那本单元文件不管能不能检测等不能等待都立刻就会失败。&lt;/li>
+&lt;li>&lt;code>Wants&lt;/code>: 推荐使用。本单元启动了，它“想要”的单元也会被启动。但是启动不成功，对本单元没有影响。&lt;/li>
+&lt;li>&lt;code>Conflicts&lt;/code>: 一个单元的启动会停止与它“冲突”的单元，反之亦然。注意这里和后面的启动顺序是“正交”的：
+&lt;ul>
+&lt;li>两个相互冲突的单元被同时启动，要么两个都启动不了（两者都是第三个单元的 &lt;code>Requires&lt;/code>），要么启动一个（有一个是第三个单元的 &lt;code>Requires&lt;/code>，另一个不是），不是 &lt;code>Requires&lt;/code> 的那个会被停止。要是两者都不是任何一个单元的 &lt;code>Requires&lt;/code>，那么 &lt;code>Conflicts&lt;/code> 别的那个单元优先启动，被 &lt;code>Conflicts&lt;/code> 的后启动，要是互相写了，那么两个都启动不了。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>OnFailure&lt;/code>：很明显，如果本单元失败了，那么启动什么单元作为折衷。&lt;/li>
+&lt;/ul>
+&lt;p>好了，现在我们来想象一下，我们的单元（Ipv6 隧道）应该想要什么呢？很显然是一个连通着的网络。有一个 Systemd 默认提供的对象叫做 &lt;code>network-online.target&lt;/code>（默认的 target 列表可见 &lt;a class="link" href="http://www.freedesktop.org/software/systemd/man/systemd.special.html" target="_blank" rel="noopener"
+>systemd.special&lt;/a>，必看，因为你大多数时候 &lt;code>Wants&lt;/code> 的都是一个固定的系统状态而不是其它 systemd 服务），正正好好能够提供我们需要的环境。于是：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-3">3&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">[Unit]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Description&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">Daemon to start He.net IPv6&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Wants&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">network-online.target&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>下面我们需要定义一下服务启动顺序，不然连 / 目录所在的硬盘都没挂载就开始干活，上哪儿找程序去呀。Systemd 服务启动顺序主要使用以下两个标记定义的：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>Before&lt;/code>/&lt;code>After&lt;/code>：要是一个服务 &lt;code>Before&lt;/code> 另一个服务，那么在并行启动时（Systemd 总是用进程 0 并行启动所有东西，然后通过这两个标记来二次等待排序），那另一个服务这时就会等这个服务先启动并返回状态，注意是先启动而不是启动成功，因为失败也是一种状态，一定要成功才启动另一个服务是通过依赖关系定义的。反之 &lt;code>After&lt;/code> 亦然。&lt;/li>
+&lt;/ul>
+&lt;p>下面说下“关机”（可以是挂起，这时候有些服务是依然在跑的，比如网络唤醒）时候的顺序：如果两个服务都是要关掉的，&lt;code>Before&lt;/code> 是先关自己，&lt;code>After&lt;/code> 是先关别人，这很好理解; 但如果一个服务是要关，而另一个是要开的，那么不管 &lt;code>Before&lt;/code>/&lt;code>After&lt;/code> 写了什么，总是优先关闭而不是开始。也就是比如服务 A Before 服务 B，但是服务 B 是在关，而服务 A 是在 &lt;code>restart&lt;/code>，那么服务 B 的顺序在服务 A 的前面。&lt;/p>
+&lt;p>好啦，我们的单元应该在什么的前后启动呢？它不需要一定在什么服务前面跑起来，这不像 &lt;code>ifup&lt;/code> 和 &lt;code>dhcp&lt;/code>，网络起不来获取 &lt;code>ip&lt;/code> 肯定没用。我们只需要有网就可以了。“有网”在 Systemd 中也是由一个默认 target：&lt;code>network.target&lt;/code> 提供的，于是我们的控制单元就定义好了：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-3">3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-4">4&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">[Unit]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Description&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">Daemon to start He.net IPv6&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Wants&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">network-online.target&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">After&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">network.target&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="定义服务本体-service">定义服务本体 [service]
+&lt;/h3>&lt;p>在定义完了 Systemd 用来识别服务的单元后，我们来定义服务本体，依然是声明：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">[Service]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后是声明服务类型：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-2">2&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">[Service]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Type&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Systemd 支持的服务类型有以下几类：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>simple&lt;/code> 默认，这是最简单的服务类型。意思就是说启动的程序就是主体程序，这个程序要是退出那么一切皆休。这在图形界面里非常好理解，我打开 Amarok，退出它就没有了。但是命令行的大部分程序都不会那么设计，因为命令行的一个最基本原则就是一个好的程序不能独占命令行窗口。所以输入命令，回车，接着马上返回给你提示符，但程序已经执行了。所以只有少数程序比如 python xxx.py 还使用这种方式。在这种类型下面，如果你的主程序是要响应其它程序的，那么你的通信频道应该在启动本服务前就设好（套接字等），因此这种类型的服务，Systemd 运行它后会立刻就运行下面的服务（需要它的服务），这时没有套接字后面的服务会失败，写 &lt;code>After&lt;/code> 也没用，因为 simple 类型不存在主进程退出的情况也就不存在有返回状态的情况，所以它一旦启动就认为是成功的，除非没起来。&lt;/li>
+&lt;li>&lt;code>forking&lt;/code> 标准 Unix Daemon 使用的启动方式。启动程序后会调用 fork() 函数，把必要的通信频道都设置好之后父进程退出，留下守护精灵的子进程。你要是使用的这种方式，最好也指定下 &lt;code>PIDFILE=&lt;/code>，不要让 Systemd 去猜，非要猜也可以，把 &lt;code>GuessMainPID&lt;/code> 设为 &lt;code>yes&lt;/code>。&lt;/li>
+&lt;/ul>
+&lt;p>判断是 &lt;code>forking&lt;/code> 还是 &lt;code>simple&lt;/code> 类型非常简单，命令行里运行下你的程序，持续占用命令行要按 Ctrl + C 才可以的，就不会是 &lt;code>forking&lt;/code> 类型。&lt;/p>
+&lt;p>创建 &lt;code>PIDFILE&lt;/code> 是你为它写服务的程序的任务而不是 Systemd 的功能，甚至也不是 Sysvinit 脚本的功能。参考 &lt;a class="link" href="https://forum.suse.org.cn/viewtopic.php?f=27&amp;amp;t=914&amp;amp;sid=363447a3c2490bbc2975b0b890152c33" target="_blank" rel="noopener"
+>startproc创建pid file的问题&lt;/a>了解进一步的知识。因此如果你的程序确实是 &lt;code>forking&lt;/code> 类型，但就是没实现创建 &lt;code>PIDFILE&lt;/code> 的功能，那么建议使用 &lt;code>ExecStartPost=&lt;/code> 结合 shell 命令来手动抓取进程编号并写到 &lt;code>/var/run/xxx.pid&lt;/code>。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>oneshot&lt;/code> 顾名思义，打一枪换一个地方。所以这种服务类型就是启动，完成，没进程了。常见比如你设置网络，&lt;code>ifup eth0 up&lt;/code>，就是一次性的，不存在 ifup 的子进程（&lt;code>forking&lt;/code> 那样），也不存在主进程（&lt;code>simple&lt;/code> 那样），它运行完成后便了无痕迹。因为这类服务运行完就没进程了，我们经常会需要 &lt;code>RemainAfterExit=yes&lt;/code>。后面配置的意思是说，即使没进程了，我们也要 Systemd 认为该服务是存在并成功了的。所以如果你有一个这样的服务，服务启动后，你再去 &lt;code>ifup eth0 up&lt;/code>，这时你再看服务，依然显示是 &lt;code>running&lt;/code> 的。因为只要在执行那条一次性命令的时候没出错，那么它就永远认为它是成功并一直存在的，直到你关闭服务。&lt;/li>
+&lt;li>&lt;code>dbus&lt;/code> 这个程序启动时需要获取一块 DBus 空间，所以需要和 &lt;code>BusName=&lt;/code> 一起用。只有它成功获得了 DBus 空间，依赖它的程序才会被启动。&lt;/li>
+&lt;/ul>
+&lt;p>一般人也就能用到上面四个，还有两种少见的类型：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>notify&lt;/code> 这个程序在启动完成后会通过 &lt;code>sd_notify&lt;/code> 发送一个通知消息。所以还需要配合 &lt;code>NotifyAccess&lt;/code> 来让 Systemd 接收消息，后者有三个级别：&lt;code>none&lt;/code>，所有消息都忽略掉; &lt;code>main&lt;/code>，只接受我们程序的主进程发过去的消息; &lt;code>all&lt;/code>，我们程序的所有进程发过去的消息都算。&lt;code>NotifyAccess&lt;/code> 要是不写的话默认是 &lt;code>main&lt;/code>。&lt;/li>
+&lt;li>&lt;code>idle&lt;/code> 这个程序要等它里面调度的全部其它东西都跑完才会跑它自己。比如你 &lt;code>ExecStart&lt;/code> 的是个 shell 脚本，里面可能跑了一些别的东西，如果不这样的话，那很可能别的东西的控制台输出里会多一个“启动成功”这样的 Systemd 消息。&lt;/li>
+&lt;/ul>
+&lt;p>由于 &lt;code>He.net&lt;/code> 的 IPv6 是用 &lt;code>iproute2&lt;/code> 的 &lt;code>ip&lt;/code> 命令来弄的，所以是一个 &lt;code>oneshot&lt;/code> 一次性服务。&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-9-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-9-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-9-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-9-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-9-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-9-3">3&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">[Service]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Type&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">oneshot&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">RemainAfterExit&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">yes&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>接下来要设置 &lt;code>ExecStart&lt;/code>, &lt;code>ExecStop&lt;/code>。如果程序支持的话，你还可以去设置 &lt;code>ExecReload&lt;/code>，&lt;code>Restart&lt;/code> 等。注意，这里设置的是它们 Reload/Restart 的方式，但并不代表没有它们 Systemd 就不能完成比如 &lt;code>systemctl restart xxx.service&lt;/code> 这样的任务，程序有支持自然最好，程序不支持那就先 stop 再 start 咯。同样有特殊要求的时候你也可以去设置比如 &lt;code>ExecStartPre&lt;/code>/&lt;code>ExecStartPost&lt;/code>,&lt;code>RestartSec&lt;/code>,&lt;code>TimeoutSec&lt;/code> 等其它东西，参考链接里都有使用方法。&lt;/p>
+&lt;p>这里要特殊讲一下 &lt;code>ExecStart&lt;/code>：&lt;/p>
+&lt;ul>
+&lt;li>如果你服务的类型不是 &lt;code>oneshot&lt;/code>，那么它只可以接受一个命令，参数不限，比如你先 &lt;code>ip tunnel create&lt;/code> 再 &lt;code>ip tunnel0 up&lt;/code>，那是两个 &lt;code>ip&lt;/code> 命令，如果你不是 &lt;code>oneshot&lt;/code> 类型这样是不行的。&lt;/li>
+&lt;li>如果有多条命令（&lt;code>oneshot&lt;/code> 类型），命令之间以分号 &lt;code>;&lt;/code> 分隔，跨行可用反斜杠 &lt;code>\&lt;/code>。&lt;/li>
+&lt;li>除非你的服务类型是 &lt;code>forking&lt;/code>，否则你在这里输入的命令都会被认为是主进程，不管它是不是。&lt;/li>
+&lt;/ul>
+&lt;p>于是我们的 &lt;code>[Service]&lt;/code> 就写好了：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-1"> 1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-2"> 2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-3"> 3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-4"> 4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-5"> 5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-6"> 6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-7"> 7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-8"> 8&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-9">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-9"> 9&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-10">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-10">10&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-11">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-11">11&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-10-12">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-10-12">12&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">[Service]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">Type&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">oneshot
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> RemainAfterExit=yes
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> ExecStart=/usr/sbin/ip tunnel add he-ipv6 mode sit remote 66.220.18.42 local 108.170.7.158 ttl 255 ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> /usr/sbin/ip link set he-ipv6 up ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> /usr/sbin/ip addr add 2001:470:c:1184::2/64 dev he-ipv6 ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> /usr/sbin/ip route add ::/0 dev he-ipv6 ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> /usr/sbin/ip -6 addr
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> ExecStop=/usr/sbin/ip route delete ::/0 dev he-ipv6 ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> /usr/sbin/ip -6 addr del 2001:470:c:1184::2/64 dev he-ipv6 ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> /usr/sbin/ip link set he-ipv6 down ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> /usr/sbin/ip tunnel del he-ipv6&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="安装服务-install">安装服务 [install]
+&lt;/h3>&lt;p>这可能有点绕，我服务文件都弄好了，放到 &lt;code>/etc/systemd/system&lt;/code>（供系统管理员和用户使用），&lt;code>/usr/lib/systemd/system&lt;/code>（供发行版打包者使用）了，不就是安装好了嘛。&lt;/p>
+&lt;p>这里说的是一种内部状态，默认你放对位置它显示的是 &lt;code>disabled&lt;/code>，&lt;code>unloaded&lt;/code>，所以我们要在 Systemd 内部对它进行一下 load，没人要的东西是不需要安装的（我们不收渣渣），所以我们要告诉 Systemd 它是有人要的，被谁要。一般都是被&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-11-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-11-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-11-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-11-2">2&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">[Install]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">WantedBy&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">multi-user.target&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>要（&lt;code>multi-user.target&lt;/code> 表示多用户系统好了，简单理解就是你可以登入了）。这样在 &lt;code>multi-user.target&lt;/code> 启用时，我们的服务也就会被启用了。&lt;/p>
+&lt;p>[Install] 部分下除了 &lt;code>WantedBy&lt;/code> 还有两种属性，分别是：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>Alias=&lt;/code> 给你自己的别名，这样 &lt;code>systemctl command xxx.service&lt;/code> 的时候就可以不输入完整的单元名称。比如你给 &lt;code>NetworkManager&lt;/code> 一个别名叫 &lt;code>Alias=nm&lt;/code>，那你就可以 &lt;code>systemctl status nm.service&lt;/code> 查看实际是 &lt;code>NetworkManager.service&lt;/code> 的服务了。&lt;/li>
+&lt;li>&lt;code>Also=&lt;/code> 安装本服务的时候还要安装别的什么服务。比如我们的 &lt;code>He.net&lt;/code> 脚本按理应该需要一个 &lt;code>iproute2.service&lt;/code> 作为 also，但是 &lt;code>iproute2&lt;/code> 实际上不需要 systemd 控制，所以就没写。它和 [Unit] 定义里面的依赖关系相比，它管理的不是运行时依赖，而是安装时。安装好了之后启动谁先谁后，谁依赖谁，和 &lt;code>Also=&lt;/code> 都没有关系。&lt;/li>
+&lt;/ul>
+&lt;h2 id="参考文献">参考文献
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="http://www.freedesktop.org/software/systemd/man/systemd.service.html" target="_blank" rel="noopener"
+>systemd.service 手册页&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://www.freedesktop.org/software/systemd/man/systemd.unit.html" target="_blank" rel="noopener"
+>systemd.unit 手册页&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://www.freedesktop.org/software/systemd/man/systemd.special.html" target="_blank" rel="noopener"
+>systemd.special 手册页&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://0pointer.de/blog/projects/systemd-for-admins-3.html" target="_blank" rel="noopener"
+>Systemd 作者 Lennart 博客连载的“给系统管理员的 Systemd 教学之三”&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="作者">作者
+&lt;/h2>&lt;p>&lt;a class="link" href="https://zh.opensuse.org/User:MargueriteSu" target="_blank" rel="noopener"
+>MargueriteSu&lt;/a>&lt;/p>
+&lt;hr>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://zh.opensuse.org/openSUSE:How_to_write_a_systemd_service" target="_blank" rel="noopener"
+>openSUSE:How to write a systemd service&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://wiki.archlinux.org/title/System" target="_blank" rel="noopener"
+>systemd - ArchWiki&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://wiki.archlinux.org/title/Systemd/Timers" target="_blank" rel="noopener"
+>systemd/Timers - ArchWiki&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>使用 aria2 搭建离线下载服务器</title><link>https://www.lrh3321.win/p/aria2-download-server/</link><pubDate>Fri, 21 Feb 2020 23:33:09 +0000</pubDate><guid>https://www.lrh3321.win/p/aria2-download-server/</guid><description>&lt;h1 id="使用-aria2-搭建离线下载服务器">使用 aria2 搭建离线下载服务器
+&lt;/h1>&lt;p>在VPS主机上安装 aria2 下载软件用作离线下载，能够远程管理下载，下载完成后能够通过HTTP（或其他任何你愿意的方式）从VPS取回。&lt;/p>
+&lt;!-- raw HTML omitted -->
+&lt;h2 id="安装">安装
+&lt;/h2>&lt;h3 id="ubuntudebian-系统">Ubuntu/Debian 系统
+&lt;/h3>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-2">2&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo apt update
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y aria2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="其他操作系统">其他操作系统
+&lt;/h3>&lt;p>可以访问&lt;a class="link" href="https://aria2.github.io/" target="_blank" rel="noopener"
+>Aria2 官网&lt;/a>获取下载、安装信息。&lt;/p>
+&lt;h2 id="配置启动">配置&amp;amp;启动
+&lt;/h2>&lt;p>aria2 最简单的运行方式是 &lt;code>aria2c &amp;lt;download-url-path&amp;gt;&lt;/code>，即会从给出的url下载文件。但我们希望它能记住一些设置，常驻后台运行。aria2 启动时会首先尝试从&lt;code>$HOME/.aria2/aria2.conf&lt;/code>读取配置文件。此外，可以在启动时加入&lt;code>--conf-path&lt;/code>参数手动指定配置文件位置，也可以通过&lt;code>--no-conf&lt;/code>强制不读取配置文件。&lt;/p>
+&lt;h3 id="创建配置文件">创建配置文件
+&lt;/h3>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-3">3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-4">4&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>mkdir -p ~/.aria2
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>mkdir -p ~/Downloads &lt;span style="color:#7f848e"># 下载文件保存目录&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>touch ~/.aria2/aria2.conf &lt;span style="color:#7f848e"># 创建配置文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>touch ~/.aria2/aria2.session &lt;span style="color:#7f848e"># 会话文件，若开启session会用到&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用编辑器编辑配置文件&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-1"> 1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-2"> 2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-3"> 3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-4"> 4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-5"> 5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-6"> 6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-7"> 7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-8"> 8&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-9">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-9"> 9&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-10">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-10">10&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-11">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-11">11&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-12">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-12">12&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-13">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-13">13&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-14">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-14">14&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-15">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-15">15&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-16">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-16">16&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-17">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-17">17&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-18">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-18">18&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-19">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-19">19&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-20">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-20">20&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-21">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-21">21&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-22">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-22">22&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-23">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-23">23&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-24">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-24">24&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-25">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-25">25&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-26">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-26">26&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-27">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-27">27&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-28">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-28">28&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-29">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-29">29&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-30">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-30">30&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-31">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-31">31&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-32">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-32">32&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-33">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-33">33&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-34">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-34">34&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-35">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-35">35&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-36">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-36">36&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-37">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-37">37&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-38">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-38">38&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-39">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-39">39&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-40">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-40">40&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-41">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-41">41&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-42">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-42">42&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-43">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-43">43&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-44">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-44">44&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-45">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-45">45&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-46">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-46">46&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-47">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-47">47&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-48">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-48">48&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-49">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-49">49&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-50">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-50">50&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-51">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-51">51&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-52">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-52">52&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-53">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-53">53&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-54">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-54">54&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-55">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-55">55&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-56">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-56">56&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-57">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-57">57&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-58">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-58">58&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-59">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-59">59&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e">##### RPC Options #####&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 开启JSON-RPC/XML-RPC服务，从而能够通过其接口控制aria2，默认为true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">enable-rpc&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 指定访问端口号，默认6800&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">rpc-listen-port&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">6800&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 允许所有访问来源，web控制界面跨域需要，默认false&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">rpc-allow-origin-all&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 允许除local loopback以外的网卡访问，默认false，远程控制需要&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">rpc-listen-all&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 外部访问安全令牌，强烈建议设置token并记住&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">rpc-secret&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">123456&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 若不设置token，也可通过用户名密码访问，现版本不建议使用&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># rpc-user=&amp;lt;username&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># rpc-passwd=&amp;lt;passwd&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e">##### Advance Options #####&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 以守护进程方式后台运行，默认为false，也可在启动aria2c时加上-D选项达到相同效果&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">daemon&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 磁盘缓存，可设为0禁用，默认16M。&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">disk-cache&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">16M&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 磁盘空间分配模式，可选none，prealloc，trunc，falloc，默认prealloc&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 若完整分配，官方建议ext4、NTFS使用falloc快速分配，可以瞬间完成分配&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># FAT32、ext3建议使用prealloc，如果此时使用falloc分配时间和prealloc相当，分配时会造成aria2卡顿&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">file-allocation&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">falloc&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 使用会话文件保存信息，并能够从意外错误（断电等）错误中恢复&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">save-session&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">~/.aria2/aria2.session&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 指定开启时读取会话文件的位置&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">input-file&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">~/.aria2/aria2.session&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 定期保存会话，默认0为只在退出时保存&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">save-session-interval&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">60&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e">##### Basic Options #####&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 下载路径&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">dir&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">~/Downloads&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 最大同时下载任务数量，默认为5&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">max-concurrent-downloads&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">20&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 若下载速度低于此值（Byte/s），会被自动暂停，速度可以有K或M等后缀，对BT下载无效&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e">#lowest-speed-limit=0&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 每个下载任务对单个服务器最大的链接数量，默认为1&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">max-connection-per-server&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 任务分块大小，当下载文件大小大于两倍于此设置时，会被分块下载，默认20M&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">min-split-size&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">20M&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 任务分块数量，默认为5&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">split&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 可以通过伪装方式进行PT下载，参考下列设置，但请谨慎尝试&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># DHT（若torrent禁用，即使设置为true也不会启用）&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># enable-dht=false&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># enable-dht6=false&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 本地查找（若torrent禁用，即使设置为true也不会启用）&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># bt-enable-lpd=false&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 本地peer交换（若torrent禁用，即使设置为true也不会启用）&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># enable-peer-exchange=false&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 客户端伪装&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">peer-id-prefix&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">-TR2770-&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">user-agent&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">Transmission/2.77&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="配置开机自启动">配置开机自启动
+&lt;/h2>&lt;h3 id="使用-systemd-配置为-service">使用 Systemd 配置为 Service
+&lt;/h3>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-1"> 1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-2"> 2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-3"> 3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-4"> 4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-5"> 5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-6"> 6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-7"> 7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-8"> 8&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-9">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-9"> 9&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-10">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-10">10&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-11">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-11">11&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-12">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-12">12&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-13">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-13">13&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-14">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-14">14&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-15">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-15">15&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-16">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-16">16&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-17">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-17">17&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-18">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-18">18&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-19">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-19">19&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-20">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-20">20&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-21">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-21">21&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-22">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-22">22&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-23">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-23">23&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-24">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-24">24&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-25">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-25">25&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 创建 service 文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>tee ~/.aria2/aria2.service &lt;span style="color:#98c379">&amp;lt;&amp;lt;EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">[Unit]
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">Description=Aria2 Service
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">After=network.target
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">Wants=network.target
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">[Install]
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">WantedBy=multi-user.target
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">[Service]
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 使用当前用户运行程序
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">User=$USER
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">Group=$USER
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">Type=simple
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">PIDFile=/run/aria2.pid
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">ExecStart=/usr/bin/aria2c --conf-path $HOME/.aria2/aria2.conf
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">Restart=on-failure
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 加入 Systemd&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo ln -s &lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">HOME&lt;/span>&lt;span style="color:#98c379">}&lt;/span>/.aria2/aria2.service /lib/systemd/system/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 重新加载 unit 文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo systemctl daemon-reload
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 开启开机自启，并启用服务&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo systemctl &lt;span style="color:#e5c07b">enable&lt;/span> --now aria2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="添加-web-管理界面">添加 Web 管理界面
+&lt;/h2>&lt;p>这里以 &lt;a class="link" href="http://ariang.mayswind.net/zh_Hans/" target="_blank" rel="noopener"
+>AriaNG&lt;/a> 为例&lt;/p>
+&lt;h3 id="通过-ariang-管理-aria2">通过 AriaNG 管理 Aria2
+&lt;/h3>&lt;p>AriaNG 其官网如下：&lt;/p>
+&lt;p>&lt;a class="link" href="http://ariang.mayswind.net/zh_Hans/" target="_blank" rel="noopener"
+>http://ariang.mayswind.net/zh_Hans/&lt;/a>&lt;/p>
+&lt;p>Release 发布地址：&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/mayswind/AriaNg/releases" target="_blank" rel="noopener"
+>https://github.com/mayswind/AriaNg/releases&lt;/a>&lt;/p>
+&lt;p>最新每日构建：&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/mayswind/AriaNg-DailyBuild/archive/master.zip" target="_blank" rel="noopener"
+>https://github.com/mayswind/AriaNg-DailyBuild/archive/master.zip&lt;/a>&lt;/p>
+&lt;h3 id="安装-nginx">安装 Nginx
+&lt;/h3>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-4-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-4-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo apt install nignx
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="下载-ariang">下载 AriaNg
+&lt;/h3>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-1"> 1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-2"> 2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-3"> 3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-4"> 4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-5"> 5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-6"> 6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-7"> 7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-8"> 8&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-9">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-9"> 9&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-10">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-10">10&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-11">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-11">11&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-12">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-12">12&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 下载，可以修改需要的版本&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">version&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">version&lt;/span>&lt;span style="color:#c678dd">:-&lt;/span>&lt;span style="color:#98c379">&amp;#34;1.3.4&amp;#34;&lt;/span>&lt;span style="color:#98c379">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>wget https://github.com/mayswind/AriaNg/releases/download/&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">version&lt;/span>&lt;span style="color:#98c379">}&lt;/span>/AriaNg-&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">version&lt;/span>&lt;span style="color:#98c379">}&lt;/span>.zip -O /tmp/AriaNg.zip
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 创建前端文件保存目录&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo mkdir -p /var/www/html/airang
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo chown -R &lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">USER&lt;/span>&lt;span style="color:#98c379">}&lt;/span>:&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">USER&lt;/span>&lt;span style="color:#98c379">}&lt;/span> /var/www/html/airang
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>rm -rf /var/www/html/airang/*
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">pushd&lt;/span> /var/www/html/airang
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 解压文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo unzip /tmp/AriaNg.zip
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">popd&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="创建-nginx-站点">创建 Nginx 站点
+&lt;/h3>&lt;h4 id="添加用户密码登录">添加用户密码登录
+&lt;/h4>&lt;p>可选步骤&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-3">3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-4">4&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 指定用户名，这里为 admin&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">user&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">user&lt;/span>&lt;span style="color:#c678dd">:-&lt;/span>&lt;span style="color:#98c379">&amp;#34;admin&amp;#34;&lt;/span>&lt;span style="color:#98c379">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo mkdir -p /var/www/auth
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo htpasswd -c -d /var/www/auth/nginx_auth &lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">user&lt;/span>&lt;span style="color:#98c379">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="创建为默认站点">创建为默认站点
+&lt;/h4>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-1"> 1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-2"> 2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-3"> 3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-4"> 4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-5"> 5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-6"> 6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-7"> 7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-8"> 8&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-9">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-9"> 9&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-10">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-10">10&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-11">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-11">11&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-12">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-12">12&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-13">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-13">13&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-14">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-14">14&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-15">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-15">15&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-16">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-16">16&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-17">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-17">17&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-18">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-18">18&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-19">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-19">19&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-20">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-20">20&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-21">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-21">21&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-22">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-22">22&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-23">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-23">23&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-24">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-24">24&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-25">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-25">25&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-26">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-26">26&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-27">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-27">27&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-28">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-28">28&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-29">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-29">29&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-30">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-30">30&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-31">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-31">31&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-32">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-32">32&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-33">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-33">33&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-34">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-34">34&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-35">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-35">35&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-36">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-36">36&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-37">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-37">37&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-38">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-38">38&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-39">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-39">39&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-40">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-40">40&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-41">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-41">41&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-42">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-42">42&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-43">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-43">43&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-44">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-44">44&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-45">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-45">45&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-46">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-46">46&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">port&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">port&lt;/span>&lt;span style="color:#c678dd">:-&lt;/span>&lt;span style="color:#98c379">&amp;#34;80&amp;#34;&lt;/span>&lt;span style="color:#98c379">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo tee /etc/nginx/sites-enabled/default &lt;span style="color:#98c379">&amp;lt;&amp;lt;EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">map \$http_upgrade \$connection_upgrade {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> default upgrade;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> &amp;#39;&amp;#39; close;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">server {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> listen ${port} default_server;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> listen [::]:${port} default_server;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 可设置域名
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> server_name _;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> root /var/www/html/airang;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> index index.html;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 注释以下两行可取消用户密码登录
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> auth_basic &amp;#34;Authrization&amp;#34;;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> auth_basic_user_file /var/www/auth/nginx_auth;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 为 aria2 JSON-RPC 配置反向代理，可选。
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 配置后可以少对外开放一个端口
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> location /jsonrpc {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> proxy_pass http://127.0.0.1:6800;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 反代 WebSocket 协议
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> proxy_http_version 1.1;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> proxy_set_header Upgrade \$http_upgrade;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> proxy_set_header Connection &amp;#34;Upgrade&amp;#34;;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 配置 HTTP 文件服务，用于取回文件
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> location /downloads {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> alias ${HOME}/Downloads;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 防止乱码
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> charset utf-8;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> autoindex on;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> autoindex_exact_size on;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> autoindex_localtime on;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 查看配置是否正确&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo nginx -t
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 让 Nginx 重新加载配置&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo nginx -s reload
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在浏览器中打开站点，查看效果。&lt;/p>
+&lt;p>&lt;strong>出现认证失败的情况&lt;/strong>&lt;/p>
+&lt;p>在 Web 界面 &amp;gt; AriaNg 设置 &amp;gt; RPC 中配置 Aria2 RPC 密钥。即 aria2 配置文件中的 &lt;code>rpc-secret&lt;/code>&lt;/p>
+&lt;h2 id="配置文件取回功能">配置文件取回功能
+&lt;/h2>&lt;p>我们希望 aria2 下载好文件后，我们能够通过浏览器访问下载目录，并能下载文件。可以搭建 HTTP 或 FTP 服务来实现这一功能。通常 HTTP 和 FTP 搭建的文件服务，可以使用下载工具，一些服务软件（如 nginx ）还可以支持多线程下载、断点续传。&lt;/p>
+&lt;h2 id="all-in-one">All in One
+&lt;/h2>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-1"> 1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-2"> 2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-3"> 3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-4"> 4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-5"> 5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-6"> 6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-7"> 7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-8"> 8&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-9">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-9"> 9&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-10">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-10"> 10&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-11">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-11"> 11&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-12">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-12"> 12&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-13">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-13"> 13&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-14">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-14"> 14&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-15">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-15"> 15&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-16">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-16"> 16&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-17">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-17"> 17&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-18">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-18"> 18&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-19">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-19"> 19&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-20">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-20"> 20&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-21">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-21"> 21&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-22">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-22"> 22&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-23">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-23"> 23&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-24">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-24"> 24&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-25">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-25"> 25&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-26">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-26"> 26&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-27">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-27"> 27&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-28">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-28"> 28&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-29">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-29"> 29&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-30">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-30"> 30&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-31">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-31"> 31&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-32">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-32"> 32&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-33">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-33"> 33&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-34">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-34"> 34&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-35">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-35"> 35&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-36">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-36"> 36&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-37">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-37"> 37&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-38">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-38"> 38&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-39">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-39"> 39&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-40">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-40"> 40&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-41">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-41"> 41&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-42">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-42"> 42&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-43">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-43"> 43&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-44">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-44"> 44&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-45">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-45"> 45&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-46">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-46"> 46&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-47">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-47"> 47&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-48">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-48"> 48&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-49">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-49"> 49&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-50">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-50"> 50&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-51">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-51"> 51&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-52">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-52"> 52&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-53">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-53"> 53&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-54">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-54"> 54&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-55">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-55"> 55&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-56">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-56"> 56&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-57">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-57"> 57&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-58">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-58"> 58&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-59">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-59"> 59&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-60">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-60"> 60&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-61">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-61"> 61&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-62">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-62"> 62&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-63">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-63"> 63&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-64">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-64"> 64&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-65">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-65"> 65&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-66">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-66"> 66&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-67">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-67"> 67&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-68">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-68"> 68&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-69">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-69"> 69&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-70">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-70"> 70&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-71">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-71"> 71&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-72">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-72"> 72&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-73">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-73"> 73&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-74">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-74"> 74&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-75">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-75"> 75&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-76">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-76"> 76&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-77">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-77"> 77&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-78">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-78"> 78&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-79">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-79"> 79&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-80">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-80"> 80&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-81">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-81"> 81&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-82">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-82"> 82&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-83">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-83"> 83&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-84">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-84"> 84&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-85">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-85"> 85&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-86">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-86"> 86&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-87">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-87"> 87&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-88">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-88"> 88&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-89">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-89"> 89&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-90">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-90"> 90&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-91">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-91"> 91&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-92">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-92"> 92&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-93">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-93"> 93&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-94">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-94"> 94&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-95">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-95"> 95&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-96">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-96"> 96&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-97">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-97"> 97&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-98">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-98"> 98&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-99">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-99"> 99&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-100">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-100">100&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-101">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-101">101&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-102">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-102">102&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-103">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-103">103&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-104">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-104">104&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-105">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-105">105&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-106">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-106">106&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-107">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-107">107&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-108">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-108">108&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-109">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-109">109&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-110">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-110">110&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-111">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-111">111&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-112">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-112">112&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-113">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-113">113&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-114">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-114">114&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-115">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-115">115&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-116">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-116">116&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-117">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-117">117&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-118">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-118">118&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-119">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-119">119&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-120">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-120">120&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-121">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-121">121&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-122">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-122">122&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-123">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-123">123&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-124">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-124">124&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-125">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-125">125&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-126">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-126">126&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-127">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-127">127&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-128">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-128">128&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-129">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-129">129&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-130">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-130">130&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-131">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-131">131&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-132">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-132">132&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-133">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-133">133&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-134">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-134">134&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-135">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-135">135&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-136">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-136">136&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-137">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-137">137&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-138">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-138">138&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-139">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-139">139&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-140">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-140">140&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-141">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-141">141&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-142">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-142">142&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-143">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-143">143&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-144">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-144">144&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-145">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-145">145&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-146">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-146">146&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-147">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-147">147&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-148">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-148">148&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-149">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-149">149&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-150">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-150">150&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-151">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-151">151&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-152">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-152">152&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-153">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-153">153&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-154">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-154">154&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-155">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-155">155&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-156">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-156">156&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-157">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-157">157&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-158">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-158">158&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-159">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-159">159&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-160">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-160">160&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-161">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-161">161&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-162">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-162">162&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-163">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-163">163&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-164">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-164">164&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-165">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-165">165&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-166">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-166">166&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-167">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-167">167&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-8-168">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-8-168">168&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e">#!/bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">port&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">port&lt;/span>&lt;span style="color:#c678dd">:-&lt;/span>&lt;span style="color:#98c379">&amp;#34;9100&amp;#34;&lt;/span>&lt;span style="color:#98c379">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">version&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">version&lt;/span>&lt;span style="color:#c678dd">:-&lt;/span>&lt;span style="color:#98c379">&amp;#34;1.1.6&amp;#34;&lt;/span>&lt;span style="color:#98c379">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">USER&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">user&lt;/span>&lt;span style="color:#c678dd">:-&lt;/span>&lt;span style="color:#98c379">&amp;#34;admin&amp;#34;&lt;/span>&lt;span style="color:#98c379">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">password&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">user&lt;/span>&lt;span style="color:#c678dd">:-&lt;/span>&lt;span style="color:#98c379">&amp;#34;123456&amp;#34;&lt;/span>&lt;span style="color:#98c379">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>apt update
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>apt install -y aria2
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>mkdir -p ~/.aria2
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>mkdir -p ~/Downloads &lt;span style="color:#7f848e"># 下载文件保存目录&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>touch ~/.aria2/aria2.conf &lt;span style="color:#7f848e"># 创建配置文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>touch ~/.aria2/aria2.session &lt;span style="color:#7f848e"># 会话文件，若开启session会用到&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>tee ~/.aria2/aria2.conf &lt;span style="color:#98c379">&amp;lt;&amp;lt;EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">##### RPC Options #####
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 开启JSON-RPC/XML-RPC服务，从而能够通过其接口控制 aria2, 默认为 true
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">enable-rpc=true
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 指定访问端口号，默认6800
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">rpc-listen-port=6800
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 允许所有访问来源，web控制界面跨域需要，默认false
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">rpc-allow-origin-all=true
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 允许除local loopback以外的网卡访问，默认false，远程控制需要
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">rpc-listen-all=true
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 外部访问安全令牌，强烈建议设置token并记住
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">rpc-secret=123456
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 若不设置token，也可通过用户名密码访问，现版本不建议使用
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># rpc-user=&amp;lt;username&amp;gt;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># rpc-passwd=&amp;lt;passwd&amp;gt;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">##### Advance Options #####
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 以守护进程方式后台运行，默认为false，也可在启动aria2c时加上-D选项达到相同效果
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">daemon=true
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 磁盘缓存，可设为0禁用，默认16M。
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">disk-cache=16M
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 磁盘空间分配模式，可选none，prealloc，trunc，falloc，默认prealloc
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 若完整分配，官方建议ext4、NTFS使用falloc快速分配，可以瞬间完成分配
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># FAT32、ext3建议使用prealloc，如果此时使用falloc分配时间和prealloc相当，分配时会造成aria2卡顿
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">file-allocation=falloc
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 使用会话文件保存信息，并能够从意外错误（断电等）错误中恢复
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">save-session=${HOME}/.aria2/aria2.session
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 指定开启时读取会话文件的位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">input-file=${HOME}/.aria2/aria2.session
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 定期保存会话，默认0为只在退出时保存
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">save-session-interval=60
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">##### Basic Options #####
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 下载路径
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">dir=${HOME}/Downloads
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 最大同时下载任务数量，默认为5
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">max-concurrent-downloads=20
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 若下载速度低于此值（Byte/s），会被自动暂停，速度可以有K或M等后缀，对BT下载无效
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">#lowest-speed-limit=0
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 每个下载任务对单个服务器最大的链接数量，默认为1
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">max-connection-per-server=10
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 任务分块大小，当下载文件大小大于两倍于此设置时，会被分块下载，默认20M
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">min-split-size=20M
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 任务分块数量，默认为5
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">split=10
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 可以通过伪装方式进行PT下载，参考下列设置，但请谨慎尝试
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># DHT（若torrent禁用，即使设置为true也不会启用）
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># enable-dht=false
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># enable-dht6=false
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 本地查找（若torrent禁用，即使设置为true也不会启用）
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># bt-enable-lpd=false
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 本地peer交换（若torrent禁用，即使设置为true也不会启用）
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># enable-peer-exchange=false
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 客户端伪装
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">peer-id-prefix=-TR2770-
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">user-agent=Transmission/2.77
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 创建 service 文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>tee ~/.aria2/aria2.service &lt;span style="color:#98c379">&amp;lt;&amp;lt;EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">[Unit]
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">Description=Aria2 Service
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">After=network.target
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">Wants=network.target
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">[Install]
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">WantedBy=multi-user.target
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">[Service]
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"># 使用当前用户运行程序
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">User=$USER
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">Group=$USER
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">Type=simple
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">PIDFile=/run/aria2.pid
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">ExecStart=/usr/bin/aria2c --conf-path $HOME/.aria2/aria2.conf
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">Restart=on-failure
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 关闭守护进程选项&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sed -i s/daemon&lt;span style="color:#56b6c2">=&lt;/span>true/daemon&lt;span style="color:#56b6c2">=&lt;/span>false/ /root/.aria2/aria2.conf
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 加入 Systemd&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>ln -s &lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">HOME&lt;/span>&lt;span style="color:#98c379">}&lt;/span>/.aria2/aria2.service /lib/systemd/system/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 重新加载 unit 文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>systemctl daemon-reload
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 开启开机自启，并启用服务&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>systemctl &lt;span style="color:#e5c07b">enable&lt;/span> --now aria2
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>apt-get install -y nginx wget apache2-utils
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>mkdir -p /var/www/auth
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>htpasswd -b -c -d /var/www/auth/nginx_auth &lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">user&lt;/span>&lt;span style="color:#98c379">}&lt;/span> &lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">password&lt;/span>&lt;span style="color:#98c379">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 下载，可以修改需要的版本&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>wget https://github.com/mayswind/AriaNg/releases/download/&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">version&lt;/span>&lt;span style="color:#98c379">}&lt;/span>/AriaNg-&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">version&lt;/span>&lt;span style="color:#98c379">}&lt;/span>.zip -O /tmp/AriaNg.zip
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 创建前端文件保存目录&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>mkdir -p /var/www/html/airang
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>chown -R &lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">USER&lt;/span>&lt;span style="color:#98c379">}&lt;/span>:&lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">USER&lt;/span>&lt;span style="color:#98c379">}&lt;/span> /var/www/html/airang
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>rm -rf /var/www/html/airang/*
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">pushd&lt;/span> /var/www/html/airang
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 解压文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>unzip /tmp/AriaNg.zip
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">popd&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>ln -s &lt;span style="color:#98c379">${&lt;/span>&lt;span style="color:#e06c75">HOME&lt;/span>&lt;span style="color:#98c379">}&lt;/span>/Downloads/ /var/www/html/downloads
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>chown www-data:www-data /var/www/html/downloads
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>tee /etc/nginx/conf.d/aria2.conf &lt;span style="color:#98c379">&amp;lt;&amp;lt;EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">map \$http_upgrade \$connection_upgrade {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> default upgrade;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> &amp;#39;&amp;#39; close;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">server {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> listen ${port} default_server;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> listen [::]:${port} default_server;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 可设置域名
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> server_name _;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> root /var/www/html/airang;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> index index.html;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 注释以下两行可取消用户密码登录
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> auth_basic &amp;#34;Authrization&amp;#34;;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> auth_basic_user_file /var/www/auth/nginx_auth;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 为 aria2 JSON-RPC 配置反向代理，可选。
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 配置后可以少对外开放一个端口
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> location /jsonrpc {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> proxy_pass http://127.0.0.1:6800;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 反代 WebSocket 协议
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> proxy_http_version 1.1;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> proxy_set_header Upgrade \$http_upgrade;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> proxy_set_header Connection &amp;#34;Upgrade&amp;#34;;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 配置 HTTP 文件服务，用于取回文件
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> location /downloads {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> alias /var/www/html/downloads/;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> # 防止乱码
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> charset utf-8;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> autoindex on;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> autoindex_exact_size on;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> autoindex_localtime on;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

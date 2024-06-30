@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Dart on LRH3321's 博客</title><link>https://www.lrh3321.win/tags/dart/</link><description>Recent content in Dart on LRH3321's 博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sat, 21 Nov 2020 13:50:44 +0800</lastBuildDate><atom:link href="https://www.lrh3321.win/tags/dart/index.xml" rel="self" type="application/rss+xml"/><item><title>为 Flutter 设定镜像配置</title><link>https://www.lrh3321.win/p/%E4%B8%BA-flutter-%E8%AE%BE%E5%AE%9A%E9%95%9C%E5%83%8F%E9%85%8D%E7%BD%AE/</link><pubDate>Sat, 21 Nov 2020 13:50:44 +0800</pubDate><guid>https://www.lrh3321.win/p/%E4%B8%BA-flutter-%E8%AE%BE%E5%AE%9A%E9%95%9C%E5%83%8F%E9%85%8D%E7%BD%AE/</guid><description>&lt;h1 id="为-flutter-设定镜像配置">为 Flutter 设定镜像配置
+&lt;/h1>&lt;h2 id="macos--linux">macOS / Linux
+&lt;/h2>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-3">3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-4">4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-5">5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-6">6&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">PUB_HOSTED_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>https://pub.flutter-io.cn
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">FLUTTER_STORAGE_BASE_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>https://storage.flutter-io.cn
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git clone -b stable https://github.com/flutter/flutter.git
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">PATH&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;&lt;/span>&lt;span style="color:#e06c75">$PWD&lt;/span>&lt;span style="color:#98c379">/flutter/bin:&lt;/span>&lt;span style="color:#e06c75">$PATH&lt;/span>&lt;span style="color:#98c379">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">cd&lt;/span> ./flutter
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>flutter doctor
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="windows">Windows
+&lt;/h2>&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-3">3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-4">4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-5">5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-6">6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-7">7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-8">8&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-9">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-9">9&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">$env:PUB_HOSTED_URL&lt;/span>=&lt;span style="color:#98c379">&amp;#34;https://pub.flutter-io.cn&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">$env:FLUTTER_STORAGE_BASE_URL&lt;/span>=&lt;span style="color:#98c379">&amp;#34;https://storage.flutter-io.cn&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">git&lt;/span> &lt;span style="color:#e06c75">clone&lt;/span> &lt;span style="color:#e06c75">-b&lt;/span> &lt;span style="color:#e06c75">stable&lt;/span> &lt;span style="color:#e06c75">https&lt;/span>://&lt;span style="color:#e06c75">github&lt;/span>.&lt;span style="color:#e06c75">com&lt;/span>/&lt;span style="color:#e06c75">flutter&lt;/span>/&lt;span style="color:#e06c75">flutter&lt;/span>.&lt;span style="color:#e06c75">git&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">$env:PATH&lt;/span>=&lt;span style="color:#98c379">&amp;#34;&lt;/span>&lt;span style="color:#e06c75">$PWD&lt;/span>&lt;span style="color:#98c379">\flutter\bin:&lt;/span>&lt;span style="color:#e06c75">$env:PATH&lt;/span>&lt;span style="color:#98c379">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">cd &lt;/span>./&lt;span style="color:#e06c75">flutter&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">flutter&lt;/span> &lt;span style="color:#e06c75">doctor&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>[&lt;span style="color:#e06c75">environment&lt;/span>]::&lt;span style="color:#e06c75">SetEnvironmentvariable&lt;/span>(&lt;span style="color:#98c379">&amp;#34;PUB_HOSTED_URL&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;https://pub.flutter-io.cn&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;User&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>[&lt;span style="color:#e06c75">environment&lt;/span>]::&lt;span style="color:#e06c75">SetEnvironmentvariable&lt;/span>(&lt;span style="color:#98c379">&amp;#34;FLUTTER_STORAGE_BASE_URL&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;https://storage.flutter-io.cn&amp;#34;&lt;/span>, &lt;span style="color:#98c379">&amp;#34;User&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;!-- raw HTML omitted -->
+&lt;h2 id="社区运行的镜像站点">社区运行的镜像站点
+&lt;/h2>&lt;h3 id="flutter-社区">Flutter 社区
+&lt;/h3>&lt;p>社区主镜像，采用多种方式同步 Flutter 开发者资源（推荐）。&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-2">2&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">PUB_HOSTED_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>https://pub.flutter-io.cn
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">FLUTTER_STORAGE_BASE_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>https://storage.flutter-io.cn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="上海交大-linux-用户组">上海交大 Linux 用户组
+&lt;/h3>&lt;p>使用反向代理方式建立 Flutter 镜像，数据与站源实时同步。 Pub API 返回值未做处理，可能造成无法访问的情况。&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-2">2&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">PUB_HOSTED_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>https://dart-pub.mirrors.sjtug.sjtu.edu.cn
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">FLUTTER_STORAGE_BASE_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>https://mirrors.sjtug.sjtu.edu.cn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="清华大学-tuna-协会">清华大学 TUNA 协会
+&lt;/h3>&lt;p>采取自定义脚本定时主动抓取策略，并配置了完善的回源策略（推荐）。查看帮助文档： Flutter 镜像安装帮助， Pub 镜像安装帮助。&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-4-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-4-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-4-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-4-2">2&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">PUB_HOSTED_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>https://mirrors.tuna.tsinghua.edu.cn/dart-pub
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">FLUTTER_STORAGE_BASE_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>https://mirrors.tuna.tsinghua.edu.cn/flutter
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="cnnic">CNNIC
+&lt;/h3>&lt;p>基于 TUNA 协会的镜像服务，数据策略与 TUNA 一致，通过非教育网的域名访问（建议选择 TUNA）。&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-2">2&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">PUB_HOSTED_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>http://mirrors.cnnic.cn/dart-pub
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">FLUTTER_STORAGE_BASE_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>http://mirrors.cnnic.cn/flutter
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="腾讯云开源镜像站">腾讯云开源镜像站
+&lt;/h3>&lt;p>使用 TUNA 开源的脚本每天凌晨 0 - 2 点定时与站源同步，未配置回源策略。&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-2">2&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">PUB_HOSTED_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>https://mirrors.cloud.tencent.com/dart-pub
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">export&lt;/span> &lt;span style="color:#e06c75">FLUTTER_STORAGE_BASE_URL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>https://mirrors.cloud.tencent.com/flutter
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="参考">参考
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://flutter.dev/community/china" target="_blank" rel="noopener"
+>Using Flutter in China&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://flutter.cn/community/china" target="_blank" rel="noopener"
+>在中国网络环境下使用 Flutter&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://mirrors.tuna.tsinghua.edu.cn/help/flutter/" target="_blank" rel="noopener"
+>Flutter 镜像安装帮助&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://zhuanlan.zhihu.com/p/349455443" target="_blank" rel="noopener"
+>Windows 10 环境变量：如何通过 CMD 和 PowerShell 写入环境变量&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

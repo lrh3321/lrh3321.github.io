@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ssh on LRH3321's 博客</title><link>https://www.lrh3321.win/tags/ssh/</link><description>Recent content in Ssh on LRH3321's 博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 17 Jun 2021 11:44:17 +0800</lastBuildDate><atom:link href="https://www.lrh3321.win/tags/ssh/index.xml" rel="self" type="application/rss+xml"/><item><title>复用已建立的 SSH 连接，减少输入密码次数</title><link>https://www.lrh3321.win/p/%E5%A4%8D%E7%94%A8%E5%B7%B2%E5%BB%BA%E7%AB%8B%E7%9A%84-ssh-%E8%BF%9E%E6%8E%A5%E5%87%8F%E5%B0%91%E8%BE%93%E5%85%A5%E5%AF%86%E7%A0%81%E6%AC%A1%E6%95%B0/</link><pubDate>Thu, 17 Jun 2021 11:44:17 +0800</pubDate><guid>https://www.lrh3321.win/p/%E5%A4%8D%E7%94%A8%E5%B7%B2%E5%BB%BA%E7%AB%8B%E7%9A%84-ssh-%E8%BF%9E%E6%8E%A5%E5%87%8F%E5%B0%91%E8%BE%93%E5%85%A5%E5%AF%86%E7%A0%81%E6%AC%A1%E6%95%B0/</guid><description>&lt;h1 id="复用已建立的-ssh-连接减少输入密码次数">复用已建立的 SSH 连接，减少输入密码次数
+&lt;/h1>&lt;p>有时候登录ssh机器是一个动态口令，频繁输入密码特别不方便。可以通过连接复用的方式来达到不用每次输入密码的目的。&lt;/p>
+&lt;!-- raw HTML omitted -->
+&lt;p>Mac上没有诸如xshell之类的客户端，对于非免密登录的主机来说，多个相同主机的连接就要输入多次密码，无法实现会话克隆，非常难受。
+终端的ssh是标准的OpenSSH client
+如果需要克隆会话功能，可以通过配置打开:&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vi ~/.ssh/config
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>增加：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-3">3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-4">4&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>Host *
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ControlMaster auto
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ControlPath ~/.ssh/socket/%h-%p-%r
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ControlPersist yes
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这样每连上一个服务器都会自动在&lt;code>~/.ssh/socket/&lt;/code>下创建一个socket文件，下次用相同用户名、端口、主机名进行连接就会自动复用，为防止意外，请事先使用对应用户创建好该目录&lt;/p>
+&lt;p>&lt;code>ControlMaster&lt;/code> 默认是关闭的，通过上述配置可以打开,我们可以通过&lt;code>ControlMaster&lt;/code>字段，让新建的SSH Session复用已有的socket通信文件。当我们将该字段值设置为&lt;code>auto&lt;/code>时，每次建立SSH连接时程序都会检查是否存在已有到socket文件，有即复用，没有的话就创建一个符合ControlPath规则的socket文件。&lt;/p>
+&lt;p>&lt;code>ControlPath&lt;/code> 用来描述socket文件路径，其中：&lt;/p>
+&lt;p>&lt;code>%r&lt;/code> 是用户名，
+&lt;code>%h&lt;/code> 是远程主机 IP
+&lt;code>%p&lt;/code> 是端口&lt;/p>
+&lt;p>&lt;code>ControlPersist yes&lt;/code> 打开之后即使关闭了所有的已连接ssh连接，一段时间内也能无需密码重新连接。也可以写作：
+&lt;code>ControlPersist 4h&lt;/code> 每次通过SSH与服务器建立连接之后，这条连接将被保持4个小时，即使在你退出服务器之后这条连接依然可以重用，因此，在你下一次(4小时之内)登录服务器时，你会发现连接以闪电般的速度建立完成，这个选项对于通过scp拷贝多个文件提速尤其明显，因为你不在需要为每个文件做单独的认证了&lt;/p>
+&lt;p>注：SSH版本必须是5.6或以上版本才可使用&lt;code>ControlPersist&lt;/code>特性
+配置文件最终如下：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-3">3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-4">4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-5">5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-6">6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-7">7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-8">8&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>Host *
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Compression yes
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ServerAliveInterval 30
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ServerAliveCountMax 360
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ControlMaster auto
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ControlPath ~/.ssh/socket/%h-%p-%r
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ControlPersist yes
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ForwardAgent yes
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="参考链接">参考链接
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://blog.bbzhh.com/index.php/archives/162.html" target="_blank" rel="noopener"
+>Mac/Linux下SSH管理&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.hi-linux.com/posts/21998.html" target="_blank" rel="noopener"
+>开启 ControlPersist 来大幅度提升 SSH 的连接速度&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>SSH 端口转发</title><link>https://www.lrh3321.win/p/ssh-forward/</link><pubDate>Sat, 22 Feb 2020 15:34:40 +0800</pubDate><guid>https://www.lrh3321.win/p/ssh-forward/</guid><description>&lt;h1 id="ssh-端口转发">SSH 端口转发
+&lt;/h1>&lt;p>SSH 会自动加密和解密所有 SSH 客户端与服务端之间的网络数据。但是，SSH 还同时提供了一个非常有用的功能，这就是端口转发。它能够将其他 TCP 端口的网络数据通过 SSH 链接来转发，并且自动提供了相应的加密及解密服务。这一过程有时也被叫做“隧道”（tunneling），这是因为 SSH 为其他 TCP 链接提供了一个安全的通道来进行传输而得名。例如，Telnet，SMTP，LDAP 这些 TCP 应用均能够从中得益，避免了用户名，密码以及隐私信息的明文传输。而与此同时，如果您工作环境中的防火墙限制了一些网络端口的使用，但是允许 SSH 的连接，那么也是能够通过将 TCP 端口转发来使用 SSH 进行通讯。总的来说 SSH 端口转发能够提供两大功能：&lt;/p>
+&lt;ol>
+&lt;li>加密 SSH Client 端至 SSH Server 端之间的通讯数据。&lt;/li>
+&lt;li>突破防火墙的限制完成一些之前无法建立的 TCP 连接。&lt;/li>
+&lt;/ol>
+&lt;p>使用了端口转发之后，TCP 端口 A 与 B 之间现在并不直接通讯，而是转发到了 SSH 客户端及服务端来通讯，从而自动实现了数据加密并同时绕过了防火墙的限制。&lt;/p>
+&lt;!-- raw HTML omitted -->
+&lt;h2 id="ssh端口本地转发">SSH端口本地转发
+&lt;/h2>&lt;p>假设在实验室里有一台 LDAP 服务器（LdapServerHost），但是限制了只有本机上部署的应用才能直接连接此 LDAP 服务器。如果我们由于调试或者测试的需要想临时从远程机器（LdapClientHost）直接连接到这个 LDAP 服务器 , 有什么方法能够实现呢？&lt;/p>
+&lt;p>答案无疑是本地端口转发了，它的命令格式是：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>ssh -L &amp;lt;&lt;span style="color:#e5c07b">local&lt;/span> port&amp;gt;:&amp;lt;remote host&amp;gt;:&amp;lt;remote port&amp;gt; &amp;lt;SSH hostname&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在 LdapClientHost 上执行如下命令即可建立一个 SSH 的本地端口转发，例如：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>ssh -L 7001:localhost:389 LdapServerHost
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里需要注意的是本例中我们选择了 &lt;code>7001&lt;/code> 端口作为本地的监听端口，在选择端口号时要注意非管理员帐号是无权绑定 &lt;code>1-1023&lt;/code> 端口的，所以一般是选用一个 &lt;code>1024-65535&lt;/code> 之间的并且尚未使用的端口号即可。&lt;/p>
+&lt;p>然后我们可以将远程机器（LdapClientHost）上的应用直接配置到本机的 &lt;code>7001&lt;/code> 端口上（而不是 LDAP 服务器的 &lt;code>389&lt;/code> 端口上）。之后的数据流将会是下面这个样子：&lt;/p>
+&lt;ul>
+&lt;li>我们在 LdapClientHost 上的应用将数据发送到本机的 &lt;code>7001&lt;/code> 端口上，
+而本机的 SSH Client 会将 &lt;code>7001&lt;/code> 端口收到的数据加密并转发到 LdapServertHost 的 SSH Server 上。&lt;/li>
+&lt;li>SSH Server 会解密收到的数据并将之转发到监听的 LDAP &lt;code>389&lt;/code> 端口上，&lt;/li>
+&lt;li>最后再将从 LDAP 返回的数据原路返回以完成整个流程。&lt;/li>
+&lt;/ul>
+&lt;p>我们可以看到，这整个流程应用并没有直接连接 LDAP 服务器，而是连接到了本地的一个监听端口，但是 SSH 端口转发完成了剩下的所有事情，加密，转发，解密，通讯。&lt;/p>
+&lt;p>这里有几个地方需要注意：&lt;/p>
+&lt;ol>
+&lt;li>SSH 端口转发是通过 SSH 连接建立起来的，我们必须保持这个 SSH 连接以使端口转发保持生效。一旦关闭了此连接，相应的端口转发也会随之关闭。&lt;/li>
+&lt;li>我们只能在建立 SSH 连接的同时创建端口转发，而不能给一个已经存在的 SSH 连接增加端口转发。&lt;/li>
+&lt;li>你可能会疑惑上面命令中的 &lt;code>&amp;lt;remote host&amp;gt;&lt;/code> 为什么用 &lt;code>localhost&lt;/code>，它指向的是哪台机器呢？在本例中，它指向 LdapServertHost 。我们为什么用 &lt;code>localhost&lt;/code> 而不是 IP 地址或者主机名呢？其实这个取决于我们之前是如何限制 LDAP 只有本机才能访问。如果只允许 lookback 接口访问的话，那么自然就只有 &lt;code>localhost&lt;/code> 或者 IP 为 &lt;code>127.0.0.1&lt;/code> 才能访问了，而不能用真实 IP 或者主机名。&lt;/li>
+&lt;li>命令中的 &lt;code>&amp;lt;remote host&amp;gt;&lt;/code> 和 &lt;code>&amp;lt;SSH hostname&amp;gt;&lt;/code> 必须是同一台机器么？其实是不一定的，它们可以是两台不同的机器。我们在后面的例子里会详细阐述这点。&lt;/li>
+&lt;li>好了，我们已经在 LdapClientHost 建立了端口转发，那么这个端口转发可以被其他机器使用么？比如能否新增加一台 LdapClientHost2 来直接连接 LdapClientHost 的 &lt;code>7001&lt;/code> 端口？答案是不行的，在主流 SSH 实现中，本地端口转发绑定的是 lookback 接口，这意味着只有 &lt;code>localhost&lt;/code> 或者 &lt;code>127.0.0.1&lt;/code> 才能使用本机的端口转发 , 其他机器发起的连接只会得到“ connection refused. ”。好在 SSH 同时提供了 &lt;code>GatewayPorts&lt;/code> 关键字，我们可以通过指定它与其他机器共享这个本地端口转发。&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>ssh -g -L &amp;lt;&lt;span style="color:#e5c07b">local&lt;/span> port&amp;gt;:&amp;lt;remote host&amp;gt;:&amp;lt;remote port&amp;gt; &amp;lt;SSH hostname&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>对应的参数格式:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>-L [bind_address:]port:host:hostport&lt;/code>&lt;/li>
+&lt;li>&lt;code>-L [bind_address:]port:remote_socket&lt;/code>&lt;/li>
+&lt;li>&lt;code>-L local_socket:host:hostport&lt;/code>&lt;/li>
+&lt;li>&lt;code>-L local_socket:remote_socket&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>相关选项：&lt;/p>
+&lt;p>&lt;code>-f&lt;/code> 后台启用
+&lt;code>-N&lt;/code> 不打开远程 shell，处于等待状态
+&lt;code>-g&lt;/code> 启用网关功能&lt;/p>
+&lt;h2 id="ssh端口远程装发">SSH端口远程装发
+&lt;/h2>&lt;p>这次假设由于网络或防火墙的原因我们不能用 SSH 直接从 LdapClientHost 连接到 LDAP 服务器（LdapServertHost），但是反向连接却是被允许的。那此时我们的选择自然就是远程端口转发了。&lt;/p>
+&lt;p>它的命令格式是：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>ssh -R &amp;lt;&lt;span style="color:#e5c07b">local&lt;/span> port&amp;gt;:&amp;lt;remote host&amp;gt;:&amp;lt;remote port&amp;gt; &amp;lt;SSH hostname&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>例如在 LDAP 服务器（LdapServertHost）端执行如下命令：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-4-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-4-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>ssh -R 7001:localhost:389 LdapClientHost
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>和本地端口转发相比，这次的图里，SSH Server 和 SSH Client 的位置对调了一下，但是数据流依然是一样的。我们在 LdapClientHost 上的应用将数据发送到本机的 &lt;code>7001&lt;/code> 端口上，而本机的 SSH Server 会将 &lt;code>7001&lt;/code> 端口收到的数据加密并转发到 LdapServertHost 的 SSH Client 上。 SSH Client 会解密收到的数据并将之转发到监听的 LDAP &lt;code>389&lt;/code> 端口上，最后再将从 LDAP 返回的数据原路返回以完成整个流程。&lt;/p>
+&lt;p>对应的参数格式:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>-R [bind_address:]port:host:hostport&lt;/code>&lt;/li>
+&lt;li>&lt;code>-R [bind_address:]port:local_socket&lt;/code>&lt;/li>
+&lt;li>&lt;code>-R remote_socket:host:hostport&lt;/code>&lt;/li>
+&lt;li>&lt;code>-R remote_socket:local_socket&lt;/code>&lt;/li>
+&lt;li>&lt;code>-R [bind_address:]port&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="动态端口转发">动态端口转发
+&lt;/h2>&lt;p>本地转发和远程转发，的前提是要求有一个固定的应用服务端的端口号，例如前面例子中的 LDAP 服务端的 &lt;code>389&lt;/code> 端口。那如果没有这个端口号怎么办？等等，什么样的应用会没有这个端口号呢？嗯，比如说用浏览器进行 Web 浏览，比如说 MSN 等等。&lt;/p>
+&lt;p>当我们在一个不安全的 WiFi 环境下上网，用 SSH 动态转发来保护我们的网页浏览及 MSN 信息无疑是十分必要的。让我们先来看一下动态转发的命令格式：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>ssh -D &amp;lt;&lt;span style="color:#e5c07b">local&lt;/span> port&amp;gt; &amp;lt;SSH Server&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>SSH 实际是创建了一个 SOCKS 代理服务。而这里需要值得注意的是，此时 SSH 所包护的范围只包括从浏览器端（SSH Client 端）到 SSH Server 端的连接，并不包含从 SSH Server 端 到目标网站的连接。如果后半截连接的安全不能得到充分的保证的话，这种方式仍不是合适的解决方案。&lt;/p>
+&lt;p>对应的参数格式:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>-D [bind_address:]port&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>如果经常使用动态转发，可以将设置写入 SSH 客户端的用户个人配置文件（&lt;code>~/.ssh/config&lt;/code>）。&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-text" data-lang="text">&lt;span style="display:flex;">&lt;span>DynamicForward tunnel-host:local-port
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="参考资料">参考资料
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.ibm.com/developerworks/cn/linux/l-cn-sshforward/index.html" target="_blank" rel="noopener"
+>实战 SSH 端口转发&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://wangdoc.com/ssh/port-forwarding.html" target="_blank" rel="noopener"
+>SSH 端口转发&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>SSH配置文件详解</title><link>https://www.lrh3321.win/p/ssh_config/</link><pubDate>Tue, 15 Aug 2017 20:11:11 +0800</pubDate><guid>https://www.lrh3321.win/p/ssh_config/</guid><description>&lt;h1 id="ssh-配置文件详解">SSH 配置文件详解
+&lt;/h1>&lt;h2 id="配置文件-sshconfig-和-etcsshssh_config">配置文件 &lt;code>~/.ssh/config&lt;/code> 和 &lt;code>/etc/ssh/ssh_config&lt;/code>
+&lt;/h2>&lt;p>一般不需要修改 OpenSSH 客户端配置文件。&lt;/p>
+&lt;p>对于给定用户，共有两个配置文件：&lt;code>~/.ssh/config&lt;/code>（用户专用）和&lt;code>/etc/ssh/ssh_config&lt;/code>（全局共享）。&lt;/p>
+&lt;p>要按照该顺序读取这些文件，对于给定的某个参数，它使用的是读取过程中发现的第一个配置。用户可以通过以下方式将全局参数设置覆盖掉：在自己的用户配置文件中设置同样的参数即可。&lt;/p>
+&lt;p>在&lt;code>ssh&lt;/code>或&lt;code>scp&lt;/code>命令行上给出的参数的优先级要高于这两个文件中所设置的参数的优先级。&lt;/p>
+&lt;p>用户的&lt;code>~/.ssh/config&lt;/code>文件必须由该用户所有（他是目录&amp;quot;&lt;code>~/&lt;/code>&amp;ldquo;的所有者），并且除了所有者之外任何人都不能写入该文件。&lt;/p>
+&lt;p>否则客户端就会给出一条错误消息然后退出。&lt;/p>
+&lt;p>这个文件的模式通常被设为 &lt;code>600&lt;/code>，这是因为除了它的所有者之外任何人没有理由能够读取它。&lt;/p>
+&lt;p>这些配置文件中的配置行包含着声明，这些声明均以某个关键字（不区分大小写）开头，后面跟着空格，最后是参数（区分大小写）。&lt;/p>
+&lt;p>可以使用关键字&lt;code>Host&lt;/code>，让声明只作用于特定的系统。&lt;code>Host&lt;/code>声明作用于它与下一条&lt;code>Host&lt;/code>声明之间的所有配置行。&lt;/p>
+&lt;!-- raw HTML omitted -->
+&lt;h3 id="checkhostip">CheckHostIP
+&lt;/h3>&lt;p>&lt;code>yes | no&lt;/code>&lt;/p>
+&lt;p>如果将其设置为&lt;code>yes&lt;/code>（默认值），那么除了用&lt;strong>known_hosts&lt;/strong>文件中的主机名之外，还可以采用IP地址来识别远程系统。&lt;/p>
+&lt;p>若设置为&lt;code>no&lt;/code>，则只使用主机名。&lt;/p>
+&lt;p>将&lt;code>CheckHostIP&lt;/code>设置为yes可以提高系统的安全性。&lt;/p>
+&lt;h3 id="forwardx11">ForwardX11
+&lt;/h3>&lt;p>&lt;code>yes | no&lt;/code>&lt;/p>
+&lt;p>如果设置为&lt;code>yes&lt;/code>，那么自动通过一条安全通道以不可信模式来转发X11连接，但是并不设置shell变量&lt;code>DISPLAY&lt;/code>。如果&lt;code>ForwardX11Trusted&lt;/code>也设置为&lt;code>yes&lt;/code>,那么连接以可信模式转发。此外，可以在命令行上使用选项-X以不可信模式重定向X11连接。&lt;/p>
+&lt;p>这个参数的默认值是&lt;code>no&lt;/code>。要想让X11转发起作用，还必须将服务器上的&lt;code>/etc/sshd_config&lt;/code>文件中的&lt;code>X11Forwarding&lt;/code>设置为&lt;code>yes&lt;/code>。&lt;/p>
+&lt;h3 id="forwardx11trusted">ForwardX11Trusted
+&lt;/h3>&lt;p>&lt;code>yes | no&lt;/code>&lt;/p>
+&lt;p>与ForwardX11一块使用时，ForwardX11必须设置为 &lt;code>yes&lt;/code>（默认），这个声明才能起作用。
+当这个声明设置为&lt;code>yes&lt;/code>（默认），而&lt;code>ForwardX11&lt;/code>也设置为&lt;code>yes&lt;/code>时，这个声明将设置shell变量&lt;code>DISPLAY&lt;/code>，并给予远程X11客户端对原来的（服务器）X11显示的完全访问权限。
+此外，可以在命令行上使用选项&lt;code>-Y&lt;/code>以可信模式重定向X11连接。&lt;/p>
+&lt;p>这个声明的默认值是&lt;code>no&lt;/code>。要想让X11转发起作用，必须将服务器上的&lt;code>/etc/sshd_config&lt;/code>文件中的&lt;code>X11Forwarding&lt;/code>设置为&lt;code>yes&lt;/code>。&lt;/p>
+&lt;h3 id="hashknownhosts">HashKnownHosts
+&lt;/h3>&lt;ul>
+&lt;li>当设置为 &lt;code>yes&lt;/code> 时，OpenSSH 会将文件 &lt;code>~/.ssh/known_hosts&lt;/code> 中的主机名和地址进行散列。&lt;/li>
+&lt;li>当设置为 &lt;code>no&lt;/code> 时，主机名与地址将以明文形式写入。Ubuntu Linux 将这份声明设置为 &lt;code>yes&lt;/code> 来提高系统的安全性。&lt;/li>
+&lt;/ul>
+&lt;h3 id="host-hostnames">Host hostnames
+&lt;/h3>&lt;p>指定它后面的（直到下一个主机声明为止）声明只适用于与hostnames相匹配的主机。
+Hostnames可以包含?与&lt;code>*&lt;/code>通配符。单个的&lt;code>*&lt;/code>指定所有主机。如果没有这个关键字，任何声明都适用于所有主机。&lt;/p>
+&lt;h3 id="hostbasedauthentication">HostbasedAuthentication
+&lt;/h3>&lt;p>&lt;code>yes | no&lt;/code>&lt;/p>
+&lt;ul>
+&lt;li>当设置为 &lt;code>yes&lt;/code> 时，尝试进行rhosts身份验证。&lt;/li>
+&lt;li>对于安全性要求较高的系统，设置为 &lt;code>no&lt;/code>（默认）。&lt;/li>
+&lt;/ul>
+&lt;h3 id="hostkeyalgorithms-algorithms">HostKeyAlgorithms algorithms
+&lt;/h3>&lt;p>其中algorithms是一个由逗号隔开的算法列表，客户端按照优先级顺序依次使用这些算法。
+从&lt;code>ssh-rsa&lt;/code>或&lt;code>ssh-dss&lt;/code>中选择algorithms（默认值为&lt;code>ssh-rsa, ssh-dss&lt;/code>）。&lt;/p>
+&lt;h3 id="port-num">Port num
+&lt;/h3>&lt;p>使OpenSSH通过num端口与远程系统连接。默认值为 &lt;code>22&lt;/code>。&lt;/p>
+&lt;h3 id="stricthostkeychecking">StrictHostKeyChecking
+&lt;/h3>&lt;p>&lt;code>yes | no | ask&lt;/code>&lt;/p>
+&lt;p>决定OpenSSH是否将主机密钥添加到用户的known_hosts文件中以及如何添加。
+如果将该选项设置为ask，那么在连接新系统时会询问是否添加主机密钥；
+如果设置为no，就会自动添加主机密钥；
+如果设置为yes，就要求手工添加主机密钥。
+若将参数设置yes或ask，则当某系统的主机密钥发生改变之后，OpenSSH会拒绝连接到该系统。
+对于安全性要求较高的系统，请将此参设置为yes或ask。默认为ask。&lt;/p>
+&lt;h3 id="tcpkeepalive">TCPKeepAlive
+&lt;/h3>&lt;p>&lt;code>yes | no&lt;/code>&lt;/p>
+&lt;p>如果设置为yes（默认值），就定期检查连接是否存活。如果服务器崩溃或者由于其他原因导致连接死掉，那么这种检查将会导致ssh或scp连接中断，即便连接只是暂时死掉。
+若将这个参数设置为no，则会导致客户端不去检查连接是否存活。这项声明用到了TCP keepalive选项，它未经加密，并且容易受到IP欺骗（参见术语表）。如果希望采用能够防止IP欺骗的替代品，
+那么可以采用基于服务器的相关技术。&lt;/p>
+&lt;h3 id="user-name">User name
+&lt;/h3>&lt;p>指定登录系统时所用的用户名。可用Host声明来指定系统。该选项意味着，在远程系统上登录时，如果使用的用户名不同于在本地系统上登录所用的用户名，那么不必在命令行上输入用户名。&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-1"> 1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-2"> 2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-3"> 3&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-4">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-4"> 4&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-5">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-5"> 5&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-6">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-6"> 6&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-7">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-7"> 7&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-8">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-8"> 8&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-9">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-9"> 9&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-10">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-10">10&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-11">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-11">11&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-12">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-12">12&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-13">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-13">13&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-14">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-14">14&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-15">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-15">15&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-16">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-16">16&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-17">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-17">17&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-18">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-18">18&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-19">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-19">19&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-20">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-20">20&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-21">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-21">21&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-22">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-22">22&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-23">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-23">23&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-24">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-24">24&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-25">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-25">25&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-26">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-26">26&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-27">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-27">27&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-28">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-28">28&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-29">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-29">29&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-30">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-30">30&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-31">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-31">31&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-32">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-32">32&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-33">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-33">33&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-34">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-34">34&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-35">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-35">35&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-36">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-36">36&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-37">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-37">37&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-38">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-38">38&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-39">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-39">39&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-40">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-40">40&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-41">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-41">41&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-42">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-42">42&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-43">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-43">43&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-44">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-44">44&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-45">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-45">45&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-46">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-46">46&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-47">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-47">47&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-48">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-48">48&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-49">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-49">49&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-50">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-50">50&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-51">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-51">51&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-52">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-52">52&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-53">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-53">53&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-54">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-54">54&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-55">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-55">55&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-56">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-56">56&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-57">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-57">57&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-58">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-58">58&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-59">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-59">59&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-60">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-60">60&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-0-61">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-0-61">61&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-text" data-lang="text">&lt;span style="display:flex;">&lt;span># $OpenBSD: ssh_config,v 1.30 2016/02/20 23:06:23 sobrado Exp $
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># This is the ssh client system-wide configuration file. See
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># ssh_config(5) for more information. This file provides defaults for
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># users, and the values can be changed in per-user configuration files
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># or on the command line.
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># Configuration data is parsed as follows:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># 1. command line options
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># 2. user-specific file
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># 3. system-wide file
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># Any configuration value is only changed the first time it is set.
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># Thus, host-specific definitions should be at the beginning of the
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># configuration file, and defaults at the end.
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># Site-wide defaults for some commonly used options. For a comprehensive
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># list of available options, their meanings and defaults, please see the
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># ssh_config(5) man page.
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># Host *
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># ForwardAgent no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># ForwardX11 no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># RhostsRSAAuthentication no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># RSAAuthentication yes
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># PasswordAuthentication yes
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># HostbasedAuthentication no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># GSSAPIAuthentication no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># GSSAPIDelegateCredentials no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># BatchMode no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># CheckHostIP yes
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># AddressFamily any
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># ConnectTimeout 0
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># StrictHostKeyChecking ask
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># IdentityFile ~/.ssh/identity
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># IdentityFile ~/.ssh/id_rsa
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># IdentityFile ~/.ssh/id_dsa
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># IdentityFile ~/.ssh/id_ecdsa
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># IdentityFile ~/.ssh/id_ed25519
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># Port 22
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># Protocol 2
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># Cipher 3des
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># Ciphers aes128-ctr,aes192-ctr,aes256-ctr,arcfour256,arcfour128,aes128-cbc,3des-cbc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># MACs hmac-md5,hmac-sha1,umac-64@openssh.com,hmac-ripemd160
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># EscapeChar ~
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># Tunnel no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># TunnelDevice any:any
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># PermitLocalCommand no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># VisualHostKey no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># ProxyCommand ssh -q -W %h:%p gateway.example.com
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span># RekeyLimit 1G 1h
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Host *
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> StrictHostKeyChecking no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> UserKnownHostsFile=~/.ssh/known_hosts
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> IdentityFile=~/.ssh/github_rsa
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> IdentityFile=~/.ssh/github3_rsa
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> IdentityFile=~/.ssh/id_rsa
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Host github.com
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> StrictHostKeyChecking no
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> UserKnownHostsFile=/dev/null
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> IdentityFile=~/.ssh/github_rsa
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="ssh登录很慢问题的解决">SSH登录很慢问题的解决
+&lt;/h2>&lt;h3 id="dns反向解析的问题">DNS反向解析的问题
+&lt;/h3>&lt;p>OpenSSH 在用户登录的时候会验证 IP ，它根据用户的IP使用反向DNS找到主机名，再使用 DNS 找到 IP 地址，最后匹配一下登录的 IP 是否合法。如果客户机的 IP 没有域名，或者 DNS 服务器很慢或不通，那么登录就会很花时间。&lt;/p>
+&lt;p>解决办法：&lt;/p>
+&lt;p>在目标服务器上修改sshd服务器端配置,并重启 sshd&lt;/p>
+&lt;p>&lt;code>vi /etc/ssh/sshd_config&lt;/code>，设置 &lt;code>UseDNS&lt;/code> 为 &lt;code>no&lt;/code> 即可&lt;/p>
+&lt;p>当然也可以通过提供DNS正确反向解析的方法解决，有如下两种思路&lt;/p>
+&lt;ol>
+&lt;li>修改server上的 hosts 文件，将目标机器的IP和域名加上去。或者&lt;/li>
+&lt;li>让本机的 DNS 服务器能解析目标地址。&lt;/li>
+&lt;/ol>
+&lt;p>在 server 上 &lt;code>/etc/hosts&lt;/code> 文件中把常用的 ip 和 hostname 加入，然后在&lt;code> /etc/nsswitch.conf&lt;/code> 看看程序是否先查询 &lt;code>hosts&lt;/code> 文件（一般缺省是这样）。&lt;/p>
+&lt;h3 id="gssapi-认证造成的">GSSAPI 认证造成的
+&lt;/h3>&lt;p>用 &lt;code>ssh -v user@server&lt;/code> 可以看到登录时有如下信息：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-1-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-1-3">3&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>debug1: Next authentication method: gssapi-with-mic
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>debug1: Unspecified GSS failure. Minor code may provide more information
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>注：&lt;code>ssh -vvv user@server&lt;/code> 可以看到更细的debug信息&lt;/p>
+&lt;/blockquote>
+&lt;p>解决办法：&lt;/p>
+&lt;p>在客户端上修改 ssh 客户端配置(注意不是 &lt;code>sshd_conf&lt;/code>)&lt;/p>
+&lt;p>&lt;code>vi /etc/ssh/ssh_config&lt;/code>，设置 &lt;code>GSSAPIAuthentication no&lt;/code> 并重启 &lt;code>sshd&lt;/code>&lt;/p>
+&lt;p>可以使用&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-2-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-2-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>ssh -A -o &lt;span style="color:#e06c75">StrictHostKeyChecking&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>no -o &lt;span style="color:#e06c75">GSSAPIAuthentication&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>no -p &lt;span style="color:#d19a66">32200&lt;/span> username@server_ip
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>GSSAPI ( Generic Security Services Application Programming Interface) 是一套类似Kerberos 5 的通用网络安全系统接口。该接口是对各种不同的客户端服务器安全机制的封装，以消除安全接口的不同，降低编程难度。但该接口在目标机器无域名解析时会有问题&lt;/p>
+&lt;p>使用 &lt;code>strace&lt;/code> 查看后发现，ssh 在验证完 key 之后，进行 &lt;code>authentication gssapi-with-mic&lt;/code>，此时先去连接 DNS 服务器，在这之后会进行其他操作。&lt;/p>
+&lt;h2 id="how-to-keep-alive-ssh-sessions">How to Keep Alive SSH Sessions
+&lt;/h2>&lt;p>添加以下配置到 &lt;code>/etc/ssh/ssh_config&lt;/code> (修改系统内所有用户) 或 &lt;code>~/.ssh/config &lt;/code> (只修改当前用户) ，开启 keep alive&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-3-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-3-3">3&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>Host *
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ServerAliveInterval 300
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ServerAliveCountMax 2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>添加以下配置到 &lt;code>/etc/ssh/sshd_config&lt;/code>，可以使 OpenSSH 服务器保留所有活跃连接:&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-4-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-4-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-4-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-4-2">2&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>ClientAliveInterval 300
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>ClientAliveCountMax 2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这些设置将使SSH客户端或服务器每300秒（5分钟）向另一侧发送一个空数据包，并在两次尝试后仍未收到任何响应的情况下放弃，此时连接很可能已被丢弃。&lt;/p>
+&lt;h2 id="ssh登录时不自动执行-bashrc">SSH登录时不自动执行 &lt;code>.bashrc&lt;/code>
+&lt;/h2>&lt;p>在 &lt;code>~/.bash_profile&lt;/code> 文件中添加以下内容：&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-1">1&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-2">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-2">2&lt;/a>
+&lt;/span>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-5-3">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-5-3">3&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">if&lt;/span> &lt;span style="color:#56b6c2">[&lt;/span> -f ~/.bashrc &lt;span style="color:#56b6c2">]&lt;/span>; &lt;span style="color:#c678dd">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> . ~/.bashrc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#c678dd">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="key_load_public-invalid-format">&lt;code>key_load_public: invalid format&lt;/code>
+&lt;/h2>&lt;p>重新生成公钥&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-6-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-6-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>ssh-keygen -f ~/.ssh/id_rsa -y &amp;gt; ~/.ssh/id_rsa.pub
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="authentication-refused-bad-ownership-or-modes-for-directory">Authentication refused: bad ownership or modes for directory
+&lt;/h2>&lt;p>&lt;strong>问题&lt;/strong>&lt;/p>
+&lt;p>设置 ssh 免密码登陆的时候，发现有一些机器设置不生效。有一些机器正常。&lt;/p>
+&lt;p>&lt;strong>跟踪&lt;/strong>&lt;/p>
+&lt;p>登陆目标机器，查看 sshd 的日志信息。日志信息目录为，&lt;code>/var/log/auth.log&lt;/code>
+你会发现如下字样的日志信息。&lt;/p>
+&lt;div class="highlight">&lt;div style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#55595f" id="hl-7-1">&lt;a style="outline:none;text-decoration:none;color:inherit" href="#hl-7-1">1&lt;/a>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>Jul 22 14:20:33 v138020.go sshd[4917]: Authentication refused: bad ownership or modes for directory /home/xinhailong
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>原因&lt;/strong>&lt;/p>
+&lt;p>sshd 为了安全，对属主的目录和文件权限有所要求。如果权限不对，则 ssh 的免密码登陆不生效。&lt;/p>
+&lt;p>用户目录权限为 &lt;code>755&lt;/code> 或者 &lt;code>700&lt;/code>，就是不能是&lt;code>77x&lt;/code>&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>.ssh&lt;/code> 目录权限一般为 &lt;code>755&lt;/code> 或者 &lt;code>700&lt;/code>&lt;/li>
+&lt;li>&lt;code>rsa_id.pub&lt;/code> 及 &lt;code>authorized_keys&lt;/code> 权限一般为 &lt;code>644&lt;/code>&lt;/li>
+&lt;li>&lt;code>rsa_id&lt;/code> 权限必须为 &lt;code>600&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>解决方法&lt;/strong>&lt;/p>
+&lt;p>检测目录权限，把不符合要求的按要求设置权限即可。&lt;/p>
+&lt;hr>
+&lt;h2 id="参考链接">参考链接
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="http://book.51cto.com/art/200906/126284.htm" target="_blank" rel="noopener"
+>配置文件~/.ssh/config和/etc/ssh/ssh_config&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.cnblogs.com/leoyang63/articles/12061136.html" target="_blank" rel="noopener"
+>SSH登录很慢问题的解决&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://patrickmn.com/aside/how-to-keep-alive-ssh-sessions/" target="_blank" rel="noopener"
+>How to Keep Alive SSH Sessions
+&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.bo56.com/ssh%E5%85%8D%E5%AF%86%E7%A0%81%E7%99%BB%E9%99%86%E8%AE%BE%E7%BD%AE%E6%97%B6authentication-refused-bad-ownership-or-modes%E9%94%99%E8%AF%AF%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/" target="_blank" rel="noopener"
+>ssh免密码登陆设置时Authentication refused: bad ownership or modes错误解决方法&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://hostingwiki.cn/en/%E8%AE%BE%E7%BD%AE%E5%85%8D%E5%AF%86%E7%A0%81ssh%E5%90%8E%E5%87%BA%E7%8E%B0key_load_public-invalid-format/" target="_blank" rel="noopener"
+>设置免密码ssh后出现key_load_public: invalid format&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Shortcut on LRH3321's 博客</title><link>https://www.lrh3321.win/tags/shortcut/</link><description>Recent content in Shortcut on LRH3321's 博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 30 Aug 2023 22:07:48 +0800</lastBuildDate><atom:link href="https://www.lrh3321.win/tags/shortcut/index.xml" rel="self" type="application/rss+xml"/><item><title>Bash Shortcuts</title><link>https://www.lrh3321.win/p/bash-shortcuts/</link><pubDate>Wed, 30 Aug 2023 22:07:48 +0800</pubDate><guid>https://www.lrh3321.win/p/bash-shortcuts/</guid><description>&lt;ul>
+&lt;li>&lt;code>Ctrl + C&lt;/code>: Terminate the command&lt;/li>
+&lt;li>&lt;code>Ctrl + Z&lt;/code>: Suspend the command&lt;/li>
+&lt;li>&lt;code>Ctrl + A&lt;/code>: Move to the start of the line&lt;/li>
+&lt;li>&lt;code>Ctrl + E&lt;/code>: Move to the end of the line&lt;/li>
+&lt;li>&lt;code>Ctrl + F&lt;/code>: Move forward one character&lt;/li>
+&lt;li>&lt;code>Ctrl + B&lt;/code>: Move backward one character&lt;/li>
+&lt;li>&lt;code>Ctrl + U&lt;/code>: Delete from the cursor to the start of the line&lt;/li>
+&lt;li>&lt;code>Ctrl + K&lt;/code>: Delete from the cursor to the end of the line&lt;/li>
+&lt;li>&lt;code>Ctrl + W&lt;/code>: Delete from the cursor to the start of the word&lt;/li>
+&lt;li>&lt;code>Ctrl + D&lt;/code>: Delete the character under the cursor&lt;/li>
+&lt;li>&lt;code>Ctrl + H&lt;/code>: Delete the character before the cursor&lt;/li>
+&lt;li>&lt;code>Ctrl + T&lt;/code>: Swap the character under the cursor with the previous one&lt;/li>
+&lt;li>&lt;code>Ctrl + L&lt;/code>: Clear the screen&lt;/li>
+&lt;/ul>
+&lt;h2 id="editing-shortcuts">Editing Shortcuts
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcuts&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Tab&lt;/td>
+&lt;td>&lt;code>Ctrl + I&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>New Line&lt;/td>
+&lt;td>&lt;code>Ctrl + J&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Enter&lt;/td>
+&lt;td>&lt;code>Ctrl + M&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Paste the Last Thing to be Cut&lt;/td>
+&lt;td>&lt;code>Ctrl + Y&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Undo&lt;/td>
+&lt;td>&lt;code>Ctrl + _&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Upper the case Every Character Form Cursor&lt;/td>
+&lt;td>&lt;code>Alt + U&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Lower the case Every Character Form Cursor&lt;/td>
+&lt;td>&lt;code>Alt + L&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Capitalize the Character Under Cursor and Move to the End of the Word&lt;/td>
+&lt;td>&lt;code>Alt + C&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Cancel Changes and Put Back the Line&lt;/td>
+&lt;td>&lt;code>Alt + R&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Delete Character Under Cursor&lt;/td>
+&lt;td>&lt;code>Ctrl + D&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Delete Character From Left&lt;/td>
+&lt;td>&lt;code>Ctrl + H&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Delete Word before Cursor&lt;/td>
+&lt;td>&lt;code>Alt + Delete&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Delete Word after Cursor&lt;/td>
+&lt;td>&lt;code>Alt + D&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Clear Screen&lt;/td>
+&lt;td>&lt;code>Ctrl + L&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Escape&lt;/td>
+&lt;td>&lt;code>Ctrl + [&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Cut Word Before Cursor to Clipboard&lt;/td>
+&lt;td>&lt;code>Ctrl + W&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Cut Line After Cursor to Clipboard&lt;/td>
+&lt;td>&lt;code>Ctrl + K&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Cut Line Before Cursor to Clipboard&lt;/td>
+&lt;td>&lt;code>Ctrl + U&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Swap Current Word with Previous&lt;/td>
+&lt;td>&lt;code>Alt + T&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Swap the Last Character before Cursor&lt;/td>
+&lt;td>&lt;code>Ctrl + T&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Swap the Last Two Words Before the Cursor&lt;/td>
+&lt;td>&lt;code>Esc + T&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="emacs-and-vi-mode-shortcuts">Emacs and Vi Mode Shortcuts
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcut keys&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Set Emacs Mode&lt;/td>
+&lt;td>&lt;code>$set -o emacs&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Set Vi Mode&lt;/td>
+&lt;td>&lt;code>$set -o vi&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="navigation-shortcuts">Navigation Shortcuts
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcuts&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Go to the Beginning of the Line&lt;/td>
+&lt;td>&lt;code>Home&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Go to the End of the Line&lt;/td>
+&lt;td>&lt;code>End&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Forward one character&lt;/td>
+&lt;td>&lt;code>Ctrl + F&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Backward one character&lt;/td>
+&lt;td>&lt;code>Ctrl + B&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Previous Command&lt;/td>
+&lt;td>&lt;code>Ctrl + P&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Next Command&lt;/td>
+&lt;td>&lt;code>Ctrl + N&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Back one word&lt;/td>
+&lt;td>&lt;code>Alt + B&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Forward one word&lt;/td>
+&lt;td>&lt;code>Alt + F&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="control-character-shortcuts">Control Character Shortcuts
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcuts&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>^@&lt;/td>
+&lt;td>&lt;code>Ctrl + 2&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^Escape&lt;/td>
+&lt;td>&lt;code>Ctrl + 3&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^\&lt;/td>
+&lt;td>&lt;code>Ctrl + 4&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^&lt;/td>
+&lt;td>&lt;code>Ctrl + 5&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^^&lt;/td>
+&lt;td>&lt;code>Ctrl + 6&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^_Undo&lt;/td>
+&lt;td>&lt;code>Ctrl + 7&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>^? Backward Delete Character&lt;/td>
+&lt;td>&lt;code>Ctrl + 8&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Display Sequence for entering Key&lt;/td>
+&lt;td>&lt;code>Ctrl + V&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="history-shortcuts">History Shortcuts
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcuts&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Recall Last Command&lt;/td>
+&lt;td>&lt;code>Ctrl + R&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Previous Command in History&lt;/td>
+&lt;td>&lt;code>Ctrl + P&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Next Command in History&lt;/td>
+&lt;td>&lt;code>Ctrl + N&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Go back to Next Most Recent Command&lt;/td>
+&lt;td>&lt;code>Ctrl + S&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Escape from History Searching Mode&lt;/td>
+&lt;td>&lt;code>Ctrl + O&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Repeat Last Command&lt;/td>
+&lt;td>&lt;code>Ctrl + G&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Run Last Command Starting with &lt;code>ABC&lt;/code>&lt;/td>
+&lt;td>&lt;code>!!&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Print the last Command starting with &lt;code>ABC&lt;/code>&lt;/td>
+&lt;td>&lt;code>!abc&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Last Argument of Previous Command&lt;/td>
+&lt;td>&lt;code>!abc:p&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Last Argument of Previous Command&lt;/td>
+&lt;td>&lt;code>!$&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>All Arguments of Previous Command&lt;/td>
+&lt;td>&lt;code>Alt + .&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Run Previous Command, replacing &lt;code>abc&lt;/code> with &lt;code>def&lt;/code>&lt;/td>
+&lt;td>&lt;code>^abc^def&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="process-controls-shortcuts">Process Controls Shortcuts
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Action&lt;/th>
+&lt;th>Bash Shortcuts&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Recall Last Command&lt;/td>
+&lt;td>&lt;code>Ctrl + R&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Interrupt or Kill Whatever you are running&lt;/td>
+&lt;td>&lt;code>Ctrl + C&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Clear Screen&lt;/td>
+&lt;td>&lt;code>Ctrl + L&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Stop Output to Screen&lt;/td>
+&lt;td>&lt;code>Ctrl + S&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Allow Output to Screen&lt;/td>
+&lt;td>&lt;code>Ctrl + Q&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Send an EOF Marker&lt;/td>
+&lt;td>&lt;code>Ctrl + D&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Send the signal SIGTSTP to Current Task&lt;/td>
+&lt;td>&lt;code>Ctrl + Z&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>The bash shortcuts will boost maximizing your productivity to around 90%. However, Bash is not the only shell out there. The one that can be the best alternative to bash is ZSH. It is a default shell in macOS. No doubt the experience of using this shell can be quite different. Dig into the ZSH shortcuts list.&lt;/p>
+&lt;hr>
+&lt;h2 id="etcinputrc">&lt;code>/etc/inputrc&lt;/code>
+&lt;/h2>&lt;p>&lt;a class="link" href="https://www.man7.org/linux/man-pages/man3/readline.3.html" target="_blank" rel="noopener"
+>readline(3) — Linux manual page&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://tiswww.case.edu/php/chet/readline/rluserman.html" target="_blank" rel="noopener"
+>GNU Readline Library&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://www.gnu.org/software/bash/manual/bash.html#Bindable-Readline-Commands" target="_blank" rel="noopener"
+>8.4 Bindable Readline Commands&lt;/a>&lt;/p>
+&lt;h3 id="commands-for-moving">Commands For Moving
+&lt;/h3>&lt;p>&lt;code>beginning-of-line&lt;/code> (&lt;code>C-a&lt;/code>)&lt;/p>
+&lt;p>Move to the start of the current line.&lt;/p>
+&lt;p>&lt;code>end-of-line&lt;/code> (&lt;code>C-e&lt;/code>)&lt;/p>
+&lt;p>Move to the end of the line.&lt;/p>
+&lt;p>&lt;code>forward-char&lt;/code> (&lt;code>C-f&lt;/code>)&lt;/p>
+&lt;p>Move forward a character.&lt;/p>
+&lt;p>&lt;code>backward-char&lt;/code> (&lt;code>C-b&lt;/code>)&lt;/p>
+&lt;p>Move back a character.&lt;/p>
+&lt;p>&lt;code>forward-word&lt;/code> (&lt;code>M-f&lt;/code>)&lt;/p>
+&lt;p>Move forward to the end of the next word. Words are composed of letters and digits.&lt;/p>
+&lt;p>&lt;code>backward-word&lt;/code> (&lt;code>M-b&lt;/code>)&lt;/p>
+&lt;p>Move back to the start of the current or previous word. Words are composed of letters and digits.&lt;/p>
+&lt;p>&lt;code>shell-forward-word&lt;/code> (&lt;code>M-C-f&lt;/code>)&lt;/p>
+&lt;p>Move forward to the end of the next word. Words are delimited by non-quoted shell metacharacters.&lt;/p>
+&lt;p>&lt;code>shell-backward-word&lt;/code> (&lt;code>M-C-b&lt;/code>)&lt;/p>
+&lt;p>Move back to the start of the current or previous word. Words are delimited by non-quoted shell metacharacters.&lt;/p>
+&lt;p>&lt;code>previous-screen-line&lt;/code> ()&lt;/p>
+&lt;p>Attempt to move point to the same physical screen column on the previous physical screen line. This will not have the desired effect if the current Readline line does not take up more than one physical line or if point is not greater than the length of the prompt plus the screen width.&lt;/p>
+&lt;p>&lt;code>next-screen-line&lt;/code> ()&lt;/p>
+&lt;p>Attempt to move point to the same physical screen column on the next physical screen line. This will not have the desired effect if the current Readline line does not take up more than one physical line or if the length of the current Readline line is not greater than the length of the prompt plus the screen width.&lt;/p>
+&lt;p>&lt;code>clear-display&lt;/code> (&lt;code>M-C-l&lt;/code>)&lt;/p>
+&lt;p>Clear the screen and, if possible, the terminal’s scrollback buffer, then redraw the current line, leaving the current line at the top of the screen.&lt;/p>
+&lt;p>&lt;code>clear-screen&lt;/code> (&lt;code>C-l&lt;/code>)&lt;/p>
+&lt;p>Clear the screen, then redraw the current line, leaving the current line at the top of the screen.&lt;/p>
+&lt;p>&lt;code>redraw-current-line&lt;/code> ()&lt;/p>
+&lt;p>Refresh the current line. By default, this is unbound.&lt;/p>
+&lt;h3 id="commands-for-manipulating-the-history">Commands For Manipulating The History
+&lt;/h3>&lt;p>accept-line (Newline or Return)
+Accept the line regardless of where the cursor is. If this line is non-empty, add it to the history list according to the setting of the HISTCONTROL and HISTIGNORE variables. If this line is a modified history line, then restore the history line to its original state.&lt;/p>
+&lt;p>&lt;code>previous-history&lt;/code> (&lt;code>C-p&lt;/code>)&lt;/p>
+&lt;p>Move ‘back’ through the history list, fetching the previous command.&lt;/p>
+&lt;p>&lt;code>next-history&lt;/code> (&lt;code>C-n&lt;/code>)&lt;/p>
+&lt;p>Move ‘forward’ through the history list, fetching the next command.&lt;/p>
+&lt;p>&lt;code>beginning-of-history&lt;/code> (&lt;code>M-&amp;lt;&lt;/code>)&lt;/p>
+&lt;p>Move to the first line in the history.&lt;/p>
+&lt;p>&lt;code>end-of-history&lt;/code> (&lt;code>M-&amp;gt;&lt;/code>)&lt;/p>
+&lt;p>Move to the end of the input history, i.e., the line currently being entered.&lt;/p>
+&lt;p>&lt;code>reverse-search-history&lt;/code> (&lt;code>C-r&lt;/code>)&lt;/p>
+&lt;p>Search backward starting at the current line and moving ‘up’ through the history as necessary. This is an incremental search. This command sets the region to the matched text and activates the mark.&lt;/p>
+&lt;p>&lt;code>forward-search-history&lt;/code> (&lt;code>C-s&lt;/code>)&lt;/p>
+&lt;p>Search forward starting at the current line and moving ‘down’ through the history as necessary. This is an incremental search. This command sets the region to the matched text and activates the mark.&lt;/p>
+&lt;p>&lt;code>non-incremental-reverse-search-history&lt;/code> (&lt;code>M-p&lt;/code>)&lt;/p>
+&lt;p>Search backward starting at the current line and moving ‘up’ through the history as necessary using a non-incremental search for a string supplied by the user. The search string may match anywhere in a history line.&lt;/p>
+&lt;p>&lt;code>non-incremental-forward-search-history&lt;/code> (&lt;code>M-n&lt;/code>)&lt;/p>
+&lt;p>Search forward starting at the current line and moving ‘down’ through the history as necessary using a non-incremental search for a string supplied by the user. The search string may match anywhere in a history line.&lt;/p>
+&lt;p>&lt;code>history-search-forward&lt;/code> ()&lt;/p>
+&lt;p>Search forward through the history for the string of characters between the start of the current line and the point. The search string must match at the beginning of a history line. This is a non-incremental search. By default, this command is unbound.&lt;/p>
+&lt;p>&lt;code>history-search-backward&lt;/code> ()&lt;/p>
+&lt;p>Search backward through the history for the string of characters between the start of the current line and the point. The search string must match at the beginning of a history line. This is a non-incremental search. By default, this command is unbound.&lt;/p>
+&lt;p>&lt;code>history-substring-search-forward&lt;/code> ()&lt;/p>
+&lt;p>Search forward through the history for the string of characters between the start of the current line and the point. The search string may match anywhere in a history line. This is a non-incremental search. By default, this command is unbound.&lt;/p>
+&lt;p>&lt;code>history-substring-search-backward&lt;/code> ()&lt;/p>
+&lt;p>Search backward through the history for the string of characters between the start of the current line and the point. The search string may match anywhere in a history line. This is a non-incremental search. By default, this command is unbound.&lt;/p>
+&lt;p>&lt;code>yank-nth-arg&lt;/code> (&lt;code>M-C-y&lt;/code>)&lt;/p>
+&lt;p>Insert the first argument to the previous command (usually the second word on the previous line) at point. With an argument n, insert the nth word from the previous command (the words in the previous command begin with word 0). A negative argument inserts the nth word from the end of the previous command. Once the argument n is computed, the argument is extracted as if the ‘!n’ history expansion had been specified.&lt;/p>
+&lt;p>&lt;code>yank-last-arg&lt;/code> (&lt;code>M-.&lt;/code> or &lt;code>M-_&lt;/code>)&lt;/p>
+&lt;p>Insert last argument to the previous command (the last word of the previous history entry). With a numeric argument, behave exactly like yank-nth-arg. Successive calls to yank-last-arg move back through the history list, inserting the last word (or the word specified by the argument to the first call) of each line in turn. Any numeric argument supplied to these successive calls determines the direction to move through the history. A negative argument switches the direction through the history (back or forward). The history expansion facilities are used to extract the last argument, as if the ‘!$’ history expansion had been specified.&lt;/p>
+&lt;p>&lt;code>operate-and-get-next&lt;/code> (&lt;code>C-o&lt;/code>)&lt;/p>
+&lt;p>Accept the current line for return to the calling application as if a newline had been entered, and fetch the next line relative to the current line from the history for editing. A numeric argument, if supplied, specifies the history entry to use instead of the current line.&lt;/p>
+&lt;p>&lt;code>fetch-history&lt;/code> ()&lt;/p>
+&lt;p>With a numeric argument, fetch that entry from the history list and make it the current line. Without an argument, move back to the first entry in the history list.&lt;/p>
+&lt;h3 id="commands-for-changing-text">Commands For Changing Text
+&lt;/h3>&lt;p>&lt;code>end-of-file&lt;/code> (usually &lt;code>C-d&lt;/code>)&lt;/p>
+&lt;p>The character indicating end-of-file as set, for example, by stty. If this character is read when there are no characters on the line, and point is at the beginning of the line, Readline interprets it as the end of input and returns EOF.&lt;/p>
+&lt;p>&lt;code>delete-char&lt;/code> (&lt;code>C-d&lt;/code>)&lt;/p>
+&lt;p>Delete the character at point. If this function is bound to the same character as the tty EOF character, as C-d commonly is, see above for the effects.&lt;/p>
+&lt;p>&lt;code>backward-delete-char&lt;/code> (&lt;code>Rubout&lt;/code>)&lt;/p>
+&lt;p>Delete the character behind the cursor. A numeric argument means to kill the characters instead of deleting them.&lt;/p>
+&lt;p>&lt;code>forward-backward-delete-char&lt;/code> ()&lt;/p>
+&lt;p>Delete the character under the cursor, unless the cursor is at the end of the line, in which case the character behind the cursor is deleted. By default, this is not bound to a key.&lt;/p>
+&lt;p>&lt;code>quoted-insert&lt;/code> (&lt;code>C-q&lt;/code> or &lt;code>C-v&lt;/code>)&lt;/p>
+&lt;p>Add the next character typed to the line verbatim. This is how to insert key sequences like C-q, for example.&lt;/p>
+&lt;p>&lt;code>self-insert&lt;/code> (a, b, A, 1, !, …)&lt;/p>
+&lt;p>Insert yourself.&lt;/p>
+&lt;p>&lt;code>bracketed-paste-begin&lt;/code> ()&lt;/p>
+&lt;p>This function is intended to be bound to the &amp;ldquo;bracketed paste&amp;rdquo; escape sequence sent by some terminals, and such a binding is assigned by default. It allows Readline to insert the pasted text as a single unit without treating each character as if it had been read from the keyboard. The characters are inserted as if each one was bound to self-insert instead of executing any editing commands.&lt;/p>
+&lt;p>Bracketed paste sets the region (the characters between point and the mark) to the inserted text. It uses the concept of an active mark: when the mark is active, Readline redisplay uses the terminal’s standout mode to denote the region.&lt;/p>
+&lt;p>&lt;code>transpose-chars&lt;/code> (&lt;code>C-t&lt;/code>)&lt;/p>
+&lt;p>Drag the character before the cursor forward over the character at the cursor, moving the cursor forward as well. If the insertion point is at the end of the line, then this transposes the last two characters of the line. Negative arguments have no effect.&lt;/p>
+&lt;p>&lt;code>transpose-words&lt;/code> (&lt;code>M-t&lt;/code>)&lt;/p>
+&lt;p>Drag the word before point past the word after point, moving point past that word as well. If the insertion point is at the end of the line, this transposes the last two words on the line.&lt;/p>
+&lt;p>&lt;code>upcase-word&lt;/code> (&lt;code>M-u&lt;/code>)&lt;/p>
+&lt;p>Uppercase the current (or following) word. With a negative argument, uppercase the previous word, but do not move the cursor.&lt;/p>
+&lt;p>&lt;code>downcase-word&lt;/code> (&lt;code>M-l&lt;/code>)&lt;/p>
+&lt;p>Lowercase the current (or following) word. With a negative argument, lowercase the previous word, but do not move the cursor.&lt;/p>
+&lt;p>&lt;code>capitalize-word&lt;/code> (&lt;code>M-c&lt;/code>)&lt;/p>
+&lt;p>Capitalize the current (or following) word. With a negative argument, capitalize the previous word, but do not move the cursor.&lt;/p>
+&lt;p>&lt;code>overwrite-mode&lt;/code> ()&lt;/p>
+&lt;p>Toggle overwrite mode. With an explicit positive numeric argument, switches to overwrite mode. With an explicit non-positive numeric argument, switches to insert mode. This command affects only emacs mode; vi mode does overwrite differently. Each call to readline() starts in insert mode.&lt;/p>
+&lt;p>In overwrite mode, characters bound to self-insert replace the text at point rather than pushing the text to the right. Characters bound to backward-delete-char replace the character before point with a space.&lt;/p>
+&lt;p>By default, this command is unbound.&lt;/p>
+&lt;h3 id="killing-and-yanking">Killing And Yanking
+&lt;/h3>&lt;p>&lt;code>kill-line&lt;/code> (&lt;code>C-k&lt;/code>)&lt;/p>
+&lt;p>Kill the text from point to the end of the line. With a negative numeric argument, kill backward from the cursor to the beginning of the current line.&lt;/p>
+&lt;p>&lt;code>backward-kill-line&lt;/code> (&lt;code>C-x Rubout&lt;/code>)&lt;/p>
+&lt;p>Kill backward from the cursor to the beginning of the current line. With a negative numeric argument, kill forward from the cursor to the end of the current line.&lt;/p>
+&lt;p>&lt;code>unix-line-discard&lt;/code> (&lt;code>C-u&lt;/code>)&lt;/p>
+&lt;p>Kill backward from the cursor to the beginning of the current line.&lt;/p>
+&lt;p>&lt;code>kill-whole-line&lt;/code> ()&lt;/p>
+&lt;p>Kill all characters on the current line, no matter where point is. By default, this is unbound.&lt;/p>
+&lt;p>&lt;code>kill-word&lt;/code> (&lt;code>M-d&lt;/code>)&lt;/p>
+&lt;p>Kill from point to the end of the current word, or if between words, to the end of the next word. Word boundaries are the same as forward-word.&lt;/p>
+&lt;p>&lt;code>backward-kill-word&lt;/code> (&lt;code>M-DEL&lt;/code>)&lt;/p>
+&lt;p>Kill the word behind point. Word boundaries are the same as backward-word.&lt;/p>
+&lt;p>&lt;code>shell-kill-word&lt;/code> (&lt;code>M-C-d&lt;/code>)&lt;/p>
+&lt;p>Kill from point to the end of the current word, or if between words, to the end of the next word. Word boundaries are the same as shell-forward-word.&lt;/p>
+&lt;p>&lt;code>shell-backward-kill-word&lt;/code> ()&lt;/p>
+&lt;p>Kill the word behind point. Word boundaries are the same as shell-backward-word.&lt;/p>
+&lt;p>&lt;code>shell-transpose-words&lt;/code> (&lt;code>M-C-t&lt;/code>)&lt;/p>
+&lt;p>Drag the word before point past the word after point, moving point past that word as well. If the insertion point is at the end of the line, this transposes the last two words on the line. Word boundaries are the same as shell-forward-word and shell-backward-word.&lt;/p>
+&lt;p>&lt;code>unix-word-rubout&lt;/code> (&lt;code>C-w&lt;/code>)&lt;/p>
+&lt;p>Kill the word behind point, using white space as a word boundary. The killed text is saved on the kill-ring.&lt;/p>
+&lt;p>&lt;code>unix-filename-rubout&lt;/code> ()&lt;/p>
+&lt;p>Kill the word behind point, using white space and the slash character as the word boundaries. The killed text is saved on the kill-ring.&lt;/p>
+&lt;p>&lt;code>delete-horizontal-space&lt;/code> ()&lt;/p>
+&lt;p>Delete all spaces and tabs around point. By default, this is unbound.&lt;/p>
+&lt;p>&lt;code>kill-region&lt;/code> ()&lt;/p>
+&lt;p>Kill the text in the current region. By default, this command is unbound.&lt;/p>
+&lt;p>&lt;code>copy-region-as-kill&lt;/code> ()&lt;/p>
+&lt;p>Copy the text in the region to the kill buffer, so it can be yanked right away. By default, this command is unbound.&lt;/p>
+&lt;p>&lt;code>copy-backward-word&lt;/code> ()&lt;/p>
+&lt;p>Copy the word before point to the kill buffer. The word boundaries are the same as backward-word. By default, this command is unbound.&lt;/p>
+&lt;p>&lt;code>copy-forward-word&lt;/code> ()&lt;/p>
+&lt;p>Copy the word following point to the kill buffer. The word boundaries are the same as forward-word. By default, this command is unbound.&lt;/p>
+&lt;p>&lt;code>yank&lt;/code> (&lt;code>C-y&lt;/code>)&lt;/p>
+&lt;p>Yank the top of the kill ring into the buffer at point.&lt;/p>
+&lt;p>&lt;code>yank-pop&lt;/code> (&lt;code>M-y&lt;/code>)&lt;/p>
+&lt;p>Rotate the kill-ring, and yank the new top. You can only do this if the prior command is yank or yank-pop.&lt;/p>
+&lt;h3 id="specifying-numeric-arguments">Specifying Numeric Arguments
+&lt;/h3>&lt;p>&lt;code>digit-argument&lt;/code> (&lt;code>M-0&lt;/code>, &lt;code>M-1&lt;/code>, … &lt;code>M--&lt;/code>)&lt;/p>
+&lt;p>Add this digit to the argument already accumulating, or start a new argument. M&amp;ndash; starts a negative argument.&lt;/p>
+&lt;p>&lt;code>universal-argument&lt;/code> ()&lt;/p>
+&lt;p>This is another way to specify an argument. If this command is followed by one or more digits, optionally with a leading minus sign, those digits define the argument. If the command is followed by digits, executing universal-argument again ends the numeric argument, but is otherwise ignored. As a special case, if this command is immediately followed by a character that is neither a digit nor minus sign, the argument count for the next command is multiplied by four. The argument count is initially one, so executing this function the first time makes the argument count four, a second time makes the argument count sixteen, and so on. By default, this is not bound to a key.&lt;/p>
+&lt;h3 id="letting-readline-type-for-you">Letting Readline Type For You
+&lt;/h3>&lt;p>&lt;code>complete&lt;/code> (&lt;code>TAB&lt;/code>)
+Attempt to perform completion on the text before point. The actual completion performed is application-specific. Bash attempts completion treating the text as a variable (if the text begins with ‘$’), username (if the text begins with ‘~’), hostname (if the text begins with ‘@’), or command (including aliases and functions) in turn. If none of these produces a match, filename completion is attempted.&lt;/p>
+&lt;p>&lt;code>possible-completions&lt;/code> (&lt;code>M-?&lt;/code>)&lt;/p>
+&lt;p>List the possible completions of the text before point. When displaying completions, Readline sets the number of columns used for display to the value of completion-display-width, the value of the environment variable COLUMNS, or the screen width, in that order.&lt;/p>
+&lt;p>&lt;code>insert-completions&lt;/code> (&lt;code>M-*&lt;/code>)&lt;/p>
+&lt;p>Insert all completions of the text before point that would have been generated by possible-completions.&lt;/p>
+&lt;p>&lt;code>menu-complete&lt;/code> ()&lt;/p>
+&lt;p>Similar to complete, but replaces the word to be completed with a single match from the list of possible completions. Repeated execution of menu-complete steps through the list of possible completions, inserting each match in turn. At the end of the list of completions, the bell is rung (subject to the setting of bell-style) and the original text is restored. An argument of n moves n positions forward in the list of matches; a negative argument may be used to move backward through the list. This command is intended to be bound to TAB, but is unbound by default.&lt;/p>
+&lt;p>&lt;code>menu-complete-backward&lt;/code> ()&lt;/p>
+&lt;p>Identical to menu-complete, but moves backward through the list of possible completions, as if menu-complete had been given a negative argument.&lt;/p>
+&lt;p>&lt;code>delete-char-or-list&lt;/code> ()&lt;/p>
+&lt;p>Deletes the character under the cursor if not at the beginning or end of the line (like delete-char). If at the end of the line, behaves identically to possible-completions. This command is unbound by default.&lt;/p>
+&lt;p>&lt;code>complete-filename&lt;/code> (&lt;code>M-/&lt;/code>)&lt;/p>
+&lt;p>Attempt filename completion on the text before point.&lt;/p>
+&lt;p>&lt;code>possible-filename-completions&lt;/code> (&lt;code>C-x /&lt;/code>)&lt;/p>
+&lt;p>List the possible completions of the text before point, treating it as a filename.&lt;/p>
+&lt;p>&lt;code>complete-username&lt;/code> (&lt;code>M-~&lt;/code>)&lt;/p>
+&lt;p>Attempt completion on the text before point, treating it as a username.&lt;/p>
+&lt;p>&lt;code>possible-username-completions&lt;/code> (&lt;code>C-x ~&lt;/code>)&lt;/p>
+&lt;p>List the possible completions of the text before point, treating it as a username.&lt;/p>
+&lt;p>&lt;code>complete-variable&lt;/code> (&lt;code>M-$&lt;/code>)&lt;/p>
+&lt;p>Attempt completion on the text before point, treating it as a shell variable.&lt;/p>
+&lt;p>&lt;code>possible-variable-completions&lt;/code> (&lt;code>C-x $&lt;/code>)&lt;/p>
+&lt;p>List the possible completions of the text before point, treating it as a shell variable.&lt;/p>
+&lt;p>&lt;code>complete-hostname&lt;/code> (&lt;code>M-@&lt;/code>)&lt;/p>
+&lt;p>Attempt completion on the text before point, treating it as a hostname.&lt;/p>
+&lt;p>&lt;code>possible-hostname-completions&lt;/code> (&lt;code>C-x @&lt;/code>)&lt;/p>
+&lt;p>List the possible completions of the text before point, treating it as a hostname.&lt;/p>
+&lt;p>&lt;code>complete-command&lt;/code> (&lt;code>M-!&lt;/code>)&lt;/p>
+&lt;p>Attempt completion on the text before point, treating it as a command name. Command completion attempts to match the text against aliases, reserved words, shell functions, shell builtins, and finally executable filenames, in that order.&lt;/p>
+&lt;p>&lt;code>possible-command-completions&lt;/code> (&lt;code>C-x !&lt;/code>)&lt;/p>
+&lt;p>List the possible completions of the text before point, treating it as a command name.&lt;/p>
+&lt;p>&lt;code>dynamic-complete-history&lt;/code> (&lt;code>M-TAB&lt;/code>)&lt;/p>
+&lt;p>Attempt completion on the text before point, comparing the text against lines from the history list for possible completion matches.&lt;/p>
+&lt;p>&lt;code>dabbrev-expand&lt;/code> ()&lt;/p>
+&lt;p>Attempt menu completion on the text before point, comparing the text against lines from the history list for possible completion matches.&lt;/p>
+&lt;p>&lt;code>complete-into-braces&lt;/code> (&lt;code>M-{&lt;/code>)&lt;/p>
+&lt;p>Perform filename completion and insert the list of possible completions enclosed within braces so the list is available to the shell (see Brace Expansion).&lt;/p>
+&lt;h3 id="keyboard-macros">Keyboard Macros
+&lt;/h3>&lt;p>&lt;code>start-kbd-macro&lt;/code> (&lt;code>C-x (&lt;/code>)&lt;/p>
+&lt;p>Begin saving the characters typed into the current keyboard macro.&lt;/p>
+&lt;p>&lt;code>end-kbd-macro&lt;/code> (&lt;code>C-x )&lt;/code>)&lt;/p>
+&lt;p>Stop saving the characters typed into the current keyboard macro and save the definition.&lt;/p>
+&lt;p>&lt;code>call-last-kbd-macro&lt;/code> (&lt;code>C-x e&lt;/code>)&lt;/p>
+&lt;p>Re-execute the last keyboard macro defined, by making the characters in the macro appear as if typed at the keyboard.&lt;/p>
+&lt;p>&lt;code>print-last-kbd-macro&lt;/code> ()&lt;/p>
+&lt;p>Print the last keyboard macro defined in a format suitable for the inputrc file.&lt;/p>
+&lt;h3 id="some-miscellaneous-commands">Some Miscellaneous Commands
+&lt;/h3>&lt;p>&lt;code>re-read-init-file&lt;/code> (&lt;code>C-x C-r&lt;/code>)&lt;/p>
+&lt;p>Read in the contents of the inputrc file, and incorporate any bindings or variable assignments found there.&lt;/p>
+&lt;p>&lt;code>abort&lt;/code> (&lt;code>C-g&lt;/code>)&lt;/p>
+&lt;p>Abort the current editing command and ring the terminal’s bell (subject to the setting of bell-style).&lt;/p>
+&lt;p>&lt;code>do-lowercase-version&lt;/code> (&lt;code>M-A&lt;/code>, &lt;code>M-B&lt;/code>, &lt;code>M-x&lt;/code>, …)&lt;/p>
+&lt;p>If the metafied character x is upper case, run the command that is bound to the corresponding metafied lower case character. The behavior is undefined if x is already lower case.&lt;/p>
+&lt;p>&lt;code>prefix-meta&lt;/code> (&lt;code>ESC&lt;/code>)&lt;/p>
+&lt;p>Metafy the next character typed. This is for keyboards without a meta key. Typing ‘ESC f’ is equivalent to typing M-f.&lt;/p>
+&lt;p>&lt;code>undo&lt;/code> (&lt;code>C-_&lt;/code> or &lt;code>C-x C-u&lt;/code>)&lt;/p>
+&lt;p>Incremental undo, separately remembered for each line.&lt;/p>
+&lt;p>&lt;code>revert-line&lt;/code> (&lt;code>M-r&lt;/code>)&lt;/p>
+&lt;p>Undo all changes made to this line. This is like executing the undo command enough times to get back to the beginning.&lt;/p>
+&lt;p>&lt;code>tilde-expand&lt;/code> (&lt;code>M-&amp;amp;&lt;/code>)&lt;/p>
+&lt;p>Perform tilde expansion on the current word.&lt;/p>
+&lt;p>&lt;code>set-mark&lt;/code> (&lt;code>C-@&lt;/code>)&lt;/p>
+&lt;p>Set the mark to the point. If a numeric argument is supplied, the mark is set to that position.&lt;/p>
+&lt;p>&lt;code>exchange-point-and-mark&lt;/code> (&lt;code>C-x C-x&lt;/code>)&lt;/p>
+&lt;p>Swap the point with the mark. The current cursor position is set to the saved position, and the old cursor position is saved as the mark.&lt;/p>
+&lt;p>&lt;code>character-search&lt;/code> (&lt;code>C-]&lt;/code>)&lt;/p>
+&lt;p>A character is read and point is moved to the next occurrence of that character. A negative argument searches for previous occurrences.&lt;/p>
+&lt;p>&lt;code>character-search-backward&lt;/code> (&lt;code>M-C-]&lt;/code>)&lt;/p>
+&lt;p>A character is read and point is moved to the previous occurrence of that character. A negative argument searches for subsequent occurrences.&lt;/p>
+&lt;p>&lt;code>skip-csi-sequence&lt;/code> ()&lt;/p>
+&lt;p>Read enough characters to consume a multi-key sequence such as those defined for keys like Home and End. Such sequences begin with a Control Sequence Indicator (CSI), usually ESC-[. If this sequence is bound to &amp;ldquo;\e[&amp;rdquo;, keys producing such sequences will have no effect unless explicitly bound to a Readline command, instead of inserting stray characters into the editing buffer. This is unbound by default, but usually bound to ESC-[.&lt;/p>
+&lt;p>&lt;code>insert-comment&lt;/code> (&lt;code>M-#&lt;/code>)&lt;/p>
+&lt;p>Without a numeric argument, the value of the comment-begin variable is inserted at the beginning of the current line. If a numeric argument is supplied, this command acts as a toggle: if the characters at the beginning of the line do not match the value of comment-begin, the value is inserted, otherwise the characters in comment-begin are deleted from the beginning of the line. In either case, the line is accepted as if a newline had been typed. The default value of comment-begin causes this command to make the current line a shell comment. If a numeric argument causes the comment character to be removed, the line will be executed by the shell.&lt;/p>
+&lt;p>&lt;code>dump-functions&lt;/code> ()&lt;/p>
+&lt;p>Print all of the functions and their key bindings to the Readline output stream. If a numeric argument is supplied, the output is formatted in such a way that it can be made part of an inputrc file. This command is unbound by default.&lt;/p>
+&lt;p>&lt;code>dump-variables&lt;/code> ()&lt;/p>
+&lt;p>Print all of the settable variables and their values to the Readline output stream. If a numeric argument is supplied, the output is formatted in such a way that it can be made part of an inputrc file. This command is unbound by default.&lt;/p>
+&lt;p>&lt;code>dump-macros&lt;/code> ()&lt;/p>
+&lt;p>Print all of the Readline key sequences bound to macros and the strings they output. If a numeric argument is supplied, the output is formatted in such a way that it can be made part of an inputrc file. This command is unbound by default.&lt;/p>
+&lt;p>&lt;code>spell-correct-word&lt;/code> (&lt;code>C-x s&lt;/code>)&lt;/p>
+&lt;p>Perform spelling correction on the current word, treating it as a directory or filename, in the same way as the cdspell shell option. Word boundaries are the same as those used by shell-forward-word.&lt;/p>
+&lt;p>&lt;code>glob-complete-word&lt;/code> (&lt;code>M-g&lt;/code>)&lt;/p>
+&lt;p>The word before point is treated as a pattern for pathname expansion, with an asterisk implicitly appended. This pattern is used to generate a list of matching file names for possible completions.&lt;/p>
+&lt;p>&lt;code>glob-expand-word&lt;/code> (&lt;code>C-x *&lt;/code>)&lt;/p>
+&lt;p>The word before point is treated as a pattern for pathname expansion, and the list of matching file names is inserted, replacing the word. If a numeric argument is supplied, a ‘*’ is appended before pathname expansion.&lt;/p>
+&lt;p>&lt;code>glob-list-expansions&lt;/code> (&lt;code>C-x g&lt;/code>)&lt;/p>
+&lt;p>The list of expansions that would have been generated by glob-expand-word is displayed, and the line is redrawn. If a numeric argument is supplied, a ‘*’ is appended before pathname expansion.&lt;/p>
+&lt;p>&lt;code>display-shell-version&lt;/code> (&lt;code>C-x C-v&lt;/code>)&lt;/p>
+&lt;p>Display version information about the current instance of Bash.&lt;/p>
+&lt;p>&lt;code>shell-expand-line&lt;/code> (&lt;code>M-C-e&lt;/code>)&lt;/p>
+&lt;p>Expand the line as the shell does. This performs alias and history expansion as well as all of the shell word expansions (see Shell Expansions).&lt;/p>
+&lt;p>&lt;code>history-expand-line&lt;/code> (&lt;code>M-^&lt;/code>)&lt;/p>
+&lt;p>Perform history expansion on the current line.&lt;/p>
+&lt;p>&lt;code>magic-space&lt;/code> ()&lt;/p>
+&lt;p>Perform history expansion on the current line and insert a space (see History Expansion).&lt;/p>
+&lt;p>&lt;code>alias-expand-line&lt;/code> ()&lt;/p>
+&lt;p>Perform alias expansion on the current line (see Aliases).&lt;/p>
+&lt;p>&lt;code>history-and-alias-expand-line&lt;/code> ()&lt;/p>
+&lt;p>Perform history and alias expansion on the current line.&lt;/p>
+&lt;p>&lt;code>insert-last-argument&lt;/code> (&lt;code>M-.&lt;/code> or &lt;code>M-_&lt;/code>)&lt;/p>
+&lt;p>A synonym for yank-last-arg.&lt;/p>
+&lt;p>&lt;code>edit-and-execute-command&lt;/code> (&lt;code>C-x C-e&lt;/code>)&lt;/p>
+&lt;p>Invoke an editor on the current command line, and execute the result as shell commands. Bash attempts to invoke $VISUAL, $EDITOR, and emacs as the editor, in that order.&lt;/p>
+&lt;hr>
+&lt;p>&lt;a class="link" href="https://tutorialtactic.com/keyboard-shortcuts/bash-shortcuts/" target="_blank" rel="noopener"
+>https://tutorialtactic.com/keyboard-shortcuts/bash-shortcuts/&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/fliptheweb/bash-shortcuts-cheat-sheet" target="_blank" rel="noopener"
+>https://github.com/fliptheweb/bash-shortcuts-cheat-sheet&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://www.gnu.org/software/bash/manual/bash.html#Readline-Init-File-Syntax-1" target="_blank" rel="noopener"
+>https://www.gnu.org/software/bash/manual/bash.html#Readline-Init-File-Syntax-1&lt;/a>&lt;/p></description></item></channel></rss>
