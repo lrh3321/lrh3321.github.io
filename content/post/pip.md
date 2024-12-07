@@ -31,8 +31,6 @@ tags:
 + `C:\Documents and Settings\All Users\Application Data\PyPA\pip\pip.conf` (Windows XP)
 + `C:\ProgramData\PyPA\pip\pip.conf` (Windows 7及以后)
 
-<!-- more -->
-
 ## Pip 配置的主要一些配置
 
 可以配置如下：

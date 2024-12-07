@@ -41,8 +41,6 @@ flutter doctor
 [environment]::SetEnvironmentvariable("FLUTTER_STORAGE_BASE_URL", "https://storage.flutter-io.cn", "User")
 ```
 
-<!-- more -->
-
 ## 社区运行的镜像站点
 
 ### Flutter 社区

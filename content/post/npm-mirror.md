@@ -28,8 +28,6 @@ npm config set sqlite3_binary_site https://npmmirror.com/mirrors/sqlite3/
 npm config set python_mirror https://npmmirror.com/mirrors/python/
 ```
 
-<!-- more -->
-
 ```bash
 yarn config set registry https://registry.npmmirror.com/
 ```

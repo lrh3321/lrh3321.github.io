@@ -3,7 +3,7 @@ title: "Graalvm"
 description:
 slug: graalvm
 date: 2023-08-12T13:27:10+08:00
-lastmod: 2023-08-12T13:27:10+08:00
+lastmod: 2024-12-07T13:39:53+08:00
 categories:
 - java
 tags:
@@ -27,13 +27,11 @@ config:
         unsafe: true
 ---
 
-
 ```bash
 docker pull ghcr.dockerproxy.com/graalvm/jdk-community:17
 docker pull ghcr.io/graalvm/jdk-community:17
 docker pull ghcr.dockerproxy.com/graalvm/native-image-community:17
 docker pull ghcr.io/graalvm/native-image-community:17
-
 
 docker run \
   --rm -it \
@@ -257,7 +255,7 @@ EOF
 | spring        | Spring仓库                      | https://repo.spring.io/milestone/       | https://maven.aliyun.com/repository/spring                        |
 | spring-plugin | Spring插件仓库                  | https://repo.spring.io/plugins-release/ | https://maven.aliyun.com/repository/spring-plugin                 |
 
-<!-- https://mvnrepository.com/repos -->
+> [Maven Repository: Repositories](https://mvnrepository.com/repos)
 
 ## GraalVM Native Support
 
@@ -265,6 +263,7 @@ This project has been configured to let you generate either a lightweight contai
 It is also possible to run your tests in a native image.
 
 ### Lightweight Container with Cloud Native Buildpacks
+
 If you're already familiar with Spring Boot container images support, this is the easiest way to get started.
 Docker should be installed and configured on your machine prior to creating the image.
 
@@ -308,6 +307,7 @@ $ ./gradlew nativeTest
 ```
 
 ### Lightweight Container with Cloud Native Buildpacks
+
 If you're already familiar with Spring Boot container images support, this is the easiest way to get started.
 Docker should be installed and configured on your machine prior to creating the image.
 
@@ -324,6 +324,7 @@ $ docker run --rm maven-demo:0.0.1-SNAPSHOT
 ```
 
 ### Executable with Native Build Tools
+
 Use this option if you want to explore more options such as running your tests in a native image.
 The GraalVM `native-image` compiler should be installed and configured on your machine.
 

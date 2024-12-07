@@ -3,7 +3,7 @@ title: 利用 GitHook 构建持续交付和部署
 categories:
   - git
 date: 2017-10-22 21:16:08+08:00
-lastmod: 2017-10-22 21:16:08+08:00
+lastmod: 2024-10-22 21:16:08+08:00
 tags:
   - git
 keywords:
@@ -21,8 +21,6 @@ keywords:
 钩子都被存储在 Git 目录下的 `hooks` 子目录中。 也即绝大部分项目中的 `.git/hooks` 。 当你用 `git init` 初始化一个新版本库时，Git 默认会在这个目录中放置一些示例脚本。这些脚本除了本身可以被调用外，它们还透露了被触发时所传入的参数。 所有的示例都是 shell 脚本，其中一些还混杂了 Perl 代码，不过，任何正确命名的可执行脚本都可以正常使用 —— 你可以用 Ruby 或 Python，或其它语言编写它们。 这些示例的名字都是以 .sample 结尾，如果你想启用它们，得先移除这个后缀。
 
 把一个正确命名且可执行的文件放入 Git 目录下的 `hooks` 子目录中，即可激活该钩子脚本。 这样一来，它就能被 Git 调用。
-
-<!-- more -->
 
 ### 服务器端钩子
 
@@ -89,4 +87,5 @@ popd
 
 ---
 
-- [husky - Modern native Git hooks made easy](https://github.com/typicode/husky)
+- [husky - Git hooks made easy 🐶 woof!](https://github.com/typicode/husky)
+- [rusty-hook - git hook manager, geared toward Rust projects](https://github.com/swellaby/rusty-hook)

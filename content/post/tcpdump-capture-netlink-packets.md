@@ -29,8 +29,6 @@ tcpdump -i nlmon0 -w nlmsg.pcap
 
 This creates an NLMON device named nlmon0 and sets it up. Use a packet sniffer (for example, tcpdump) to capture Netlink messages. Recent versions of Wireshark feature decoding of Netlink messages.
 
-<!-- more -->
-
 ```bash
 modprobe nlmon
 ip link add type nlmon

@@ -18,8 +18,6 @@ Redis 是一个基于内存的高性能key-value数据库。
 
 Redis 本质上是一个 Key-Value 类型的内存数据库，很像 Memcached，整个数据库统统加载在内存当中进行操作，定期通过异步操作把数据库数据flush到硬盘上进行保存。因为是纯内存操作， Redis 的性能非常出色，每秒可以处理超过 10万次读写操作，是已知性能最快的Key-Value DB。
 
-<!-- more -->
-
 Redis 的出色之处不仅仅是性能，Redis 最大的魅力是支持保存多种数据结构，此外单个value的最大限制是1GB，不像 Memcached只能保存1MB的数据，因此 Redis 可以用来实现很多有用的功能，比方说用他的List来做FIFO双向链表，实现一个轻量级的高性 能消息队列服务，用他的Set可以做高性能的tag系统等等。另外 Redis 也可以对存入的Key-Value设置expire时间，因此也可以被当作一个功能加强版的Memcached来用。
 
 Redis的主要缺点是数据库容量受到物理内存的限制，不能用作海量数据的高性能读写，因此 Redis 适合的场景主要局限在较小数据量的高性能操作和运算上。
@@ -149,6 +147,7 @@ vm-max-threads这个参数,可以设置访问swap文件的线程数,设置最好
 最大缓存配置在 Redis 中，允许用户设置最大使用内存大小 `server.maxmemory` 默认为0，没有指定最大缓存，如果有新的数据添加，超过最大内存，则会使 Redis 崩溃，所以一定要设置。Redis 内存数据集大小上升到一定大小的时候，就会实行数据淘汰策略。
 　　
 Redis 提供 6种数据淘汰策略：
+
 - `volatile-lru`: 从已设置过期时间的数据集（`server.db[i].expires`）中挑选最近最少使用的数据淘汰
 - `volatile-ttl`: 从已设置过期时间的数据集（`server.db[i].expires`）中挑选将要过期的数据淘汰
 - `volatile-random`: 从已设置过期时间的数据集（`server.db[i].expires`）中任意选择数据淘汰
