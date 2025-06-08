@@ -23,11 +23,11 @@ draft: false
 ---
 # Git 使用小技巧
 
-## 取消 `sslVerify`
+## 取消 `sslVerify` 应对 SNI 阻断
 
-应对 SNI 阻断
-
-`git config --global http.sslVerify false`
+```shell
+git config --global http.sslVerify false
+```
 
 ## 使用 SSH 替代 HTTP 方式拉取 Repo
 
@@ -35,7 +35,7 @@ draft: false
 
 `~/.gitconfig`
 
-```toml
+```toml ~/.gitconfig
 [url "git@github.com:"]
     insteadOf = https://github.com/
 [url "git@gitlab.com:"]
@@ -45,18 +45,20 @@ draft: false
 ```bash
 # 或者：
 
-git config --global url."git@gitlab.com:groupName/projectName.git".insteadOf "https://gitlab.com/groupName/projectName.git"`
+git config --global \
+  url."git@gitlab.com:groupName/projectName.git".insteadOf \
+  "https://gitlab.com/groupName/projectName.git"`
 
 # 全局替换,拉取域名下的所有包
 git config --global url."git@gitlab.yoursite.com:".insteadof "https://gitlab.yoursite.com/"
 
-git config --global url."https://".insteadOf git://
+git config --global url."https://".insteadOf "git://"
 ```
 
 ## Git 跟踪文件更改
   
 ```bash
-git log --follow --patch routes/admin/contract_operation.js
+git log --follow routes/admin/contract_operation.js
 ```
 
 ## 使用 HTTP/1.1
