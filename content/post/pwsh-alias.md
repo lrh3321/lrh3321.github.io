@@ -23,13 +23,13 @@ draft: false
 
 打开 Powershell Profile 配置文件
 
-```pwsh
+```powershell
 code $PROFILE.CurrentUserAllHosts
 ```
 
 ## `which`
 
-```pwsh
+```powershell
 Function Show-Full-Path {
     $(Get-Command $args[0]).Source;
 }
@@ -40,7 +40,7 @@ Set-Alias -Name which -Value Show-Full-Path
 
 ## `grep`
 
-```pwsh
+```powershell
 Set-Alias -Name grep -Value Select-String
 ```
 
@@ -52,11 +52,11 @@ ripgrep recursively searches directories for a regex pattern while respecting yo
 
 [Latest releases](https://github.com/BurntSushi/ripgrep/releases/latest)
 
-```pwsh
+```powershell
 cargo install ripgrep
 ```
 
-```pwsh
+```powershell
 Set-Alias -Name grep -Value rg
 ```
 
@@ -70,7 +70,7 @@ Rust implementation of findutils
 
 #### Install
 
-```pwsh
+```powershell
 cargo install findutils
 ```
 
@@ -82,15 +82,15 @@ A simple, fast and user-friendly alternative to 'find'
 
 #### Install
 
-```pwsh
+```powershell
 cargo install fd-find
 ```
 
-```pwsh
+```powershell
 winget install sharkdp.fd
 ```
 
-```pwsh
+```powershell
 Set-Alias -Name find -Value fd
 ```
 
@@ -102,11 +102,11 @@ Set-Alias -Name find -Value fd
 
 A modern, multi-threaded file-tree visualization and disk usage analysis tool that respects hidden file and gitignore rules.
 
-```pwsh
+```powershell
 cargo install erdtree
 ```
 
-```pwsh
+```powershell
 Set-Alias -Name tree -Value erd
 ```
 
@@ -118,11 +118,11 @@ Set-Alias -Name tree -Value erd
 
 The next gen ls command
 
-```pwsh
+```powershell
 cargo install lsd
 ```
 
-```pwsh
+```powershell
 Set-Alias -Name ls -Value lsd
 ```
 
@@ -134,11 +134,11 @@ Set-Alias -Name ls -Value lsd
 
 A command-line DNS client.
 
-```pwsh
+```powershell
 cargo install --git https://github.com/ogham/dog.git dog
 ```
 
-```pwsh
+```powershell
 Set-Alias -Name dig -Value dog
 ```
 
@@ -150,11 +150,11 @@ Set-Alias -Name dig -Value dog
 
 Cross-platform Rust rewrite of the GNU coreutils
 
-```pwsh
+```powershell
 cargo install coreutils
 ```
 
-```pwsh
+```powershell
 #  [, arch, b2sum, b3sum, base32, base64, basename, basenc, cat, cksum, comm, cp, csplit, cut,
 #  date, dd, df, dir, dircolors, dirname, du, echo, env, expand, expr, factor, false, fmt,
 #  fold, hashsum, head, hostname, join, link, ln, ls, md5sum, mkdir, mktemp, more, mv, nl,
@@ -166,14 +166,7 @@ cargo install coreutils
 
 Set-Location $(Split-Path -Path $(Get-Command coreutils).Source)
 
-$comands = "[", "arch", "b2sum", "b3sum", "base32", "base64", "basename", "basenc", "cksum", "comm", "csplit", "cut"
-$comands += "date", "dd", "df", "dir", "dircolors", "dirname", "du", "echo", "env", "expand", "expr", "factor", "false", "fmt"
-$comands += "fold", "hashsum", "head", "hostname", "join", "link", "ln", "ls", "md5sum", "mkdir", "mktemp", "more", "mv", "nl"
-$comands += "nproc", "numfmt", "od", "paste", "pr", "printenv", "printf", "ptx", "pwd", "readlink", "realpath", "relpath", "rm"
-$comands += "rmdir", "seq", "sha1sum", "sha224sum", "sha256sum", "sha3-224sum", "sha3-256sum", "sha3-384sum", "sha3-512sum"
-$comands += "sha384sum", "sha3sum", "sha512sum", "shake128sum", "shake256sum", "shred", "shuf", "sleep", "sort"
-$comands += "split", "sum", "sync", "tac", "tail", "tee", "test", "touch", "tr", "true", "truncate", "tsort", "uname", "unexpand"
-$comands += "uniq", "unlink", "vdir", "wc", "whoami", "yes"
+$comands=$(coreutils --list)
 
 foreach ($e in $comands) {
     # enumerate over the whole array
